@@ -22,6 +22,7 @@ function signature(value: string) {
 export async function passwordMatches(password: string): Promise<boolean> {
   const url = process.env.SUPABASE_URL;
   const key = process.env.SUPABASE_SECRET_KEY;
+
   if (!url || !key) return false;
 
   try {
@@ -32,26 +33,28 @@ export async function passwordMatches(password: string): Promise<boolean> {
         headers: {
           'Content-Type': 'application/json',
           apikey: key,
+          Authorization: `Bearer ${key}`,
         },
         body: JSON.stringify({ p_password: password }),
         cache: 'no-store',
       },
     );
 
-const result = await response.text();
+    const result = await response.text();
 
-if (!response.ok) {
-  console.error(
-    '[developer-auth] Supabase error:',
-    response.status,
-    result.slice(0, 500)
-  );
-  return false;
-}
+    if (!response.ok) {
+      console.error(
+        '[developer-auth] Supabase error:',
+        response.status,
+        result.slice(0, 500),
+      );
+      return false;
+    }
 
-console.log('[developer-auth] Supabase response:', result);
-return result.trim() === 'true';
-  } catch {
+    console.log('[developer-auth] Supabase response:', result);
+    return result.trim() === 'true';
+  } catch (error) {
+    console.error('[developer-auth] Request failed:', error);
     return false;
   }
 }
@@ -66,25 +69,33 @@ export async function getSession(): Promise<AuthUser | null> {
   if (!value) return null;
 
   const [exp, sig] = value.split('.');
+
   if (
     !/^\d+$/.test(exp) ||
     Number(exp) < Date.now() ||
     Number(exp) > Date.now() + 3600000 ||
     !sig ||
     !/^[0-9a-f]{64}$/.test(sig)
-  ) return null;
+  ) {
+    return null;
+  }
 
   const expected = signature(exp);
+
   if (
     sig.length !== expected.length ||
     !timingSafeEqual(Buffer.from(sig), Buffer.from(expected))
-  ) return null;
+  ) {
+    return null;
+  }
 
   return { role: 'developer' };
 }
 
 export async function requireAuth() {
   const user = await getSession();
+
   if (!user) throw new Error('UNAUTHORIZED');
+
   return user;
 }
