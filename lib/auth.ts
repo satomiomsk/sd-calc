@@ -33,7 +33,6 @@ export async function passwordMatches(password: string): Promise<boolean> {
         headers: {
           'Content-Type': 'application/json',
           apikey: key,
-          Authorization: `Bearer ${key}`,
         },
         body: JSON.stringify({ p_password: password }),
         cache: 'no-store',
