@@ -65,20 +65,32 @@ jobs:
 
           homepage = Path("app/page.tsx")
           text = homepage.read_text()
-          text = text.replace(': "/developer";', ': "/sd-calculator-supabase/developer";')
+          text = text.replace(': "/developer";', ': "/sd-calculator-supabase/";')
           homepage.write_text(text)
           PY
-          rm -rf app/api
+          rm -rf app/api app/developer
 
       - name: Build static website preview
         env:
           NEXT_PUBLIC_BASE_PATH: /sd-calculator-supabase
         run: npm run build
 
-      - name: Upload static preview files
-        uses: actions/upload-artifact@v4
+      - name: Upload GitHub Pages artifact
+        uses: actions/upload-pages-artifact@v3
         with:
-          name: visual-editor-static-preview
           path: out/
-          if-no-files-found: error
-          retention-days: 7
+
+  deploy:
+    needs: build-static-preview
+    if: github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
