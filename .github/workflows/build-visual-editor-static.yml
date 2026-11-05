@@ -59,7 +59,7 @@ jobs:
 
           layout = Path("app/layout.tsx")
           text = layout.read_text()
-          text = "\\n".join(
+          text = "\n".join(
               line for line in text.splitlines()
               if 'import { AppAnalytics }' not in line and '<AppAnalytics />' not in line
           ) + "\\n"
