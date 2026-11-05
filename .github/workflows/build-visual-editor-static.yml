@@ -1,0 +1,84 @@
+name: Build static visual editor preview
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - visual-editor-preview
+    paths:
+      - "app/**"
+      - "components/**"
+      - "hooks/**"
+      - "lib/**"
+      - "public/**"
+      - "package.json"
+      - "next.config.mjs"
+      - ".github/workflows/build-visual-editor-static.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  build-static-preview:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout visual editor branch
+        uses: actions/checkout@v4
+        with:
+          ref: visual-editor-preview
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Prepare a static-only preview build
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+
+          config = Path("next.config.mjs")
+          source = config.read_text()
+          source = source.replace(
+              "output: 'standalone',",
+              "output: 'export',\n  basePath: '/sd-calculator-supabase',\n  trailingSlash: true,"
+          )
+          config.write_text(source)
+
+          tariffs = Path("hooks/use-tariffs.ts")
+          tariffs.write_text("""\"use client\";
+          import { DEFAULT_TARIFFS, type TariffSnapshot } from '@/lib/tariffs';
+          export const TARIFF_ORIGIN = '';
+          export function useTariffs() {
+            return { tariffs: DEFAULT_TARIFFS as TariffSnapshot, status: 'Встроенные условия' };
+          }
+          """)
+
+          layout = Path("app/layout.tsx")
+          text = layout.read_text()
+          text = text.replace('import { AppAnalytics } from "@/components/app-analytics"\\n', '')
+          text = text.replace('        <AppAnalytics />\\n', '')
+          layout.write_text(text)
+
+          homepage = Path("app/page.tsx")
+          text = homepage.read_text()
+          text = text.replace(': "/developer";', ': "/sd-calculator-supabase/developer";')
+          homepage.write_text(text)
+          PY
+          rm -rf app/api
+
+      - name: Build static website preview
+        env:
+          NEXT_PUBLIC_BASE_PATH: /sd-calculator-supabase
+        run: npm run build
+
+      - name: Upload static preview files
+        uses: actions/upload-artifact@v4
+        with:
+          name: visual-editor-static-preview
+          path: out/
+          if-no-files-found: error
+          retention-days: 7
