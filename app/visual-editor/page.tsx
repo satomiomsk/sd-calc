@@ -14,16 +14,23 @@ export default function VisualEditorPage() {
   const [color, setColor] = useState("#26364A");
   const [background, setBackground] = useState("#FFFFFF");
   const [fontSize, setFontSize] = useState("16");
+  const [mode, setMode] = useState<"select" | "test">("select");
 
   const attachPicker = useCallback(() => {
     const doc = frame.current?.contentDocument;
     if (!doc?.body) return;
-    doc.body.addEventListener("click", onPreviewClick, true);
-    doc.addEventListener("mouseover", onPreviewHover, true);
-    doc.addEventListener("mouseout", onPreviewOut, true);
+    if (mode === "select") {
+      doc.body.addEventListener("click", onPreviewClick, true);
+      doc.addEventListener("mouseover", onPreviewHover, true);
+      doc.addEventListener("mouseout", onPreviewOut, true);
+    } else {
+      doc.body.removeEventListener("click", onPreviewClick, true);
+      doc.removeEventListener("mouseover", onPreviewHover, true);
+      doc.removeEventListener("mouseout", onPreviewOut, true);
+    }
     setNotice("Предпросмотр готов. Нажмите на текст, кнопку или блок.");
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [mode]);
 
   function onPreviewHover(event: Event) {
     const el = event.target as HTMLElement;
@@ -112,7 +119,7 @@ export default function VisualEditorPage() {
           <button onClick={applyChanges} className="w-full rounded-xl bg-[#e83c35] px-4 py-3 text-sm font-semibold text-white hover:bg-[#c92f29]">Применить в предпросмотре</button>
           <button onClick={clearSelection} className="w-full rounded-xl border border-[#dfe4eb] px-4 py-2 text-sm hover:bg-[#f5f7fa]">Снять выделение</button>
         </div> : <div className="mt-5 rounded-xl border border-dashed border-[#dfe4eb] p-5 text-center text-sm leading-6 text-[#748195]">После выбора элемента здесь появятся доступные настройки.</div>}
-        <p className="mt-6 text-xs leading-5 text-[#8993a2]">Это первая пробная версия: изменения действуют только до обновления страницы. Калькуляторы можно нажимать и проверять прямо в окне слева.</p>
+        <p className="mt-6 text-xs leading-5 text-[#8993a2]">Изменения действуют только в предпросмотре. В режиме «Выбрать элемент» можно редактировать оформление, а в режиме «Проверить сайт» — пользоваться кнопками и калькуляторами.</p>
       </aside>
     </div>
   </main>;
