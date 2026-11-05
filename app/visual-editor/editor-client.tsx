@@ -97,7 +97,7 @@ export default function VisualEditorPage() {
   return <main className="min-h-screen bg-[#eef1f5] text-[#26364a]">
     <header className="flex flex-wrap items-center justify-between gap-3 border-b border-[#dfe4eb] bg-white px-5 py-4">
       <div><h1 className="text-xl font-bold">Визуальный редактор SD</h1><p className="text-sm text-[#748195]">Тестовый режим — изменения не сохраняются на сайте</p></div>
-      <a href={`${PREVIEW_BASE_PATH}/`} className="rounded-xl border border-[#dfe4eb] px-4 py-2 text-sm font-medium hover:bg-[#f5f7fa]">Открыть сайт отдельно ↗</a>
+      <div className="flex items-center gap-2"><a href={`${PREVIEW_BASE_PATH}/`} className="rounded-xl border border-[#dfe4eb] px-4 py-2 text-sm font-medium hover:bg-[#f5f7fa]">Открыть сайт отдельно ↗</a><button onClick={async () => { await fetch("/api/developer/session", { method: "DELETE" }); window.location.href = "/developer"; }} className="rounded-xl border border-[#dfe4eb] px-4 py-2 text-sm font-medium hover:bg-[#f5f7fa]">Выйти</button></div>
     </header>
     <div className="grid min-h-[calc(100vh-81px)] grid-cols-1 lg:grid-cols-[minmax(0,1fr)_320px]">
       <section className="min-h-[70vh] p-3 sm:p-5">
