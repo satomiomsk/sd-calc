@@ -59,8 +59,10 @@ jobs:
 
           layout = Path("app/layout.tsx")
           text = layout.read_text()
-          text = text.replace('import { AppAnalytics } from "@/components/app-analytics"\\n', '')
-          text = text.replace('        <AppAnalytics />\\n', '')
+          text = "\\n".join(
+              line for line in text.splitlines()
+              if 'import { AppAnalytics }' not in line and '<AppAnalytics />' not in line
+          ) + "\\n"
           layout.write_text(text)
 
           homepage = Path("app/page.tsx")
@@ -82,7 +84,7 @@ jobs:
 
   deploy:
     needs: build-static-preview
-    if: github.event_name != 'pull_request'
+    if: github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     permissions:
       pages: write
