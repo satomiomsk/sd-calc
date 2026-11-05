@@ -1,0 +1,6 @@
+# Copy this file to .dev.vars for local Cloudflare Worker development.
+NEXTJS_ENV=development
+
+# Set real values only in your local .dev.vars file; never commit secrets.
+SUPABASE_URL=
+SUPABASE_SECRET_KEY=
