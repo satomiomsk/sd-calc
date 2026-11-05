@@ -62,7 +62,7 @@ jobs:
           text = "\n".join(
               line for line in text.splitlines()
               if 'import { AppAnalytics }' not in line and '<AppAnalytics />' not in line
-          ) + "\\n"
+          )
           layout.write_text(text)
 
           homepage = Path("app/page.tsx")
