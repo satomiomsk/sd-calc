@@ -1,0 +1,51 @@
+name: Build standalone offline APK
+
+on:
+  workflow_dispatch:
+    inputs:
+      source_branch:
+        description: "Ветка с исходным кодом APK"
+        required: true
+        default: "android-standalone-offline"
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout APK source branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.source_branch }}
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+      - name: Install Android platform and build tools
+        run: sdkmanager "platforms;android-35" "build-tools;35.0.0"
+      - name: Install Node dependencies
+        run: npm install --no-audit --no-fund
+      - name: Install Python image dependency
+        run: python -m pip install Pillow
+      - name: Build offline web assets
+        run: node scripts/build-android-web.mjs
+      - name: Build and sign APK
+        run: |
+          SD_ANDROID_JAVA_HOME="$JAVA_HOME" \
+          SD_ANDROID_BUILD_TOOLS="$ANDROID_HOME/build-tools/35.0.0" \
+          SD_ANDROID_PLATFORM="$ANDROID_HOME/platforms/android-35" \
+          python scripts/build-android.py
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: sd-calculations-offline-apk
+          path: android/output/*.apk
+          if-no-files-found: error
