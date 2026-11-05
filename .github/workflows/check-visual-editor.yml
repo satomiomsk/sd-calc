@@ -1,0 +1,39 @@
+name: Check visual editor
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - visual-editor-preview
+    paths:
+      - "app/**"
+      - "components/**"
+      - "hooks/**"
+      - "lib/**"
+      - "public/**"
+      - "package.json"
+      - "postcss.config.mjs"
+      - "tsconfig.json"
+      - "next.config.*"
+      - ".github/workflows/check-visual-editor.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout visual editor branch
+        uses: actions/checkout@v4
+        with:
+          ref: visual-editor-preview
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - name: Install dependencies
+        run: npm install
+      - name: Build Next.js app
+        run: npm run build
