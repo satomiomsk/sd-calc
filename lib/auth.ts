@@ -38,8 +38,19 @@ export async function passwordMatches(password: string): Promise<boolean> {
       },
     );
 
-    if (!response.ok) return false;
-    return (await response.json()) === true;
+const result = await response.text();
+
+if (!response.ok) {
+  console.error(
+    '[developer-auth] Supabase error:',
+    response.status,
+    result.slice(0, 500)
+  );
+  return false;
+}
+
+console.log('[developer-auth] Supabase response:', result);
+return result.trim() === 'true';
   } catch {
     return false;
   }
