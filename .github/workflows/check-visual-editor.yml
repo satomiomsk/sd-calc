@@ -15,6 +15,8 @@ on:
       - "postcss.config.mjs"
       - "tsconfig.json"
       - "next.config.*"
+      - "wrangler.jsonc"
+      - "open-next.config.ts"
       - ".github/workflows/check-visual-editor.yml"
 
 permissions:
@@ -34,5 +36,5 @@ jobs:
           node-version: 22
       - name: Install dependencies
         run: npm install
-      - name: Build Next.js app
-        run: npm run build
+      - name: Build Cloudflare Worker package (no deployment)
+        run: npm run cf:build
