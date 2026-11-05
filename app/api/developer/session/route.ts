@@ -13,7 +13,7 @@ export async function POST(req:NextRequest){
  record.count++;attempts.set(key,record);
  if(Number(req.headers.get('content-length')??0)>4096)return NextResponse.json({error:'Слишком длинный запрос'},{status:413});
  let password;try{password=(await req.json()).password;}catch{return NextResponse.json({error:'Неверный запрос'},{status:400});}
- if(typeof password!=='string'||password.length>1024||!passwordMatches(password))return NextResponse.json({error:'Неверный пароль'},{status:401});
+ if(typeof password!=='string'||password.length>1024||!(await passwordMatches(password)))return NextResponse.json({error:'Неверный пароль'},{status:401});
  attempts.delete(key);const response=NextResponse.json({authenticated:true});response.cookies.set(SESSION_COOKIE,issueSession(),{httpOnly:true,secure:req.headers.get('origin')?.startsWith('https:')??true,sameSite:'strict',path:'/',maxAge:3600});return response;
 }
 export async function DELETE(req:NextRequest){if(!isSameOrigin(req))return NextResponse.json({error:'Недопустимый источник'},{status:403});const r=NextResponse.json({authenticated:false});r.cookies.delete(SESSION_COOKIE);return r;}
