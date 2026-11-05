@@ -1,0 +1,16 @@
+{
+  "id": "/",
+  "name": "SD | Расчёты",
+  "short_name": "SD | Расчёты",
+  "description": "Удобный расчёт агентского вознаграждения при покупке и продаже недвижимости.",
+  "lang": "ru",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#FAFBFD",
+  "theme_color": "#E83C35",
+  "icons": [
+    { "src": "/icons/sd-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/icons/sd-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" }
+  ]
+}
