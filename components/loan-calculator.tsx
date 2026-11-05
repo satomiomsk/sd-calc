@@ -1,0 +1,89 @@
+"use client";
+
+import { useState, type FormEvent, type KeyboardEvent } from "react";
+import { Calculator, RotateCcw } from "lucide-react";
+import { formatInput } from "@/lib/calculator";
+import { calculateLoan, calculateLoanFromPayment, type LoanResult } from "@/lib/loan";
+
+const currency = new Intl.NumberFormat("ru-RU", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+const amount = (value: number) => `${currency.format(value)}\u00a0₽`;
+const parse = (value: string) => {
+  const normalized = value.replace(/\s/g, "").replace(",", ".");
+  return /^\d+(?:\.\d+)?$/.test(normalized) ? Number(normalized) : NaN;
+};
+
+const dismissKeyboard = (event: KeyboardEvent<HTMLInputElement>) => {
+  if (event.key === "Enter" && !event.nativeEvent.isComposing) {
+    event.preventDefault();
+    event.currentTarget.blur();
+  }
+};
+
+type LoanMode = "principal" | "payment";
+type LoanDraft = { value: string; term: string; unit: string; rate: string; result: LoanResult | null; error: string; changed: boolean };
+const emptyDraft = (): LoanDraft => ({ value: "", term: "", unit: "years", rate: "", result: null, error: "", changed: false });
+
+export function LoanCalculator() {
+  const [mode, setMode] = useState<LoanMode>("principal");
+  const [drafts, setDrafts] = useState<Record<LoanMode, LoanDraft>>({ principal: emptyDraft(), payment: emptyDraft() });
+  const { value, term, unit, rate, result, error, changed } = drafts[mode];
+  const reverse = mode === "payment";
+  const update = (patch: Partial<LoanDraft>) => setDrafts(previous => ({ ...previous, [mode]: { ...previous[mode], ...patch } }));
+  const edit = (patch: Partial<LoanDraft>) => update({ ...patch, changed: true, error: "" });
+  const submit = (event: FormEvent) => {
+    event.preventDefault();
+    try {
+      const months = parse(term) * (unit === "years" ? 12 : 1);
+      const calculation = reverse ? calculateLoanFromPayment(parse(value), months, parse(rate)) : calculateLoan(parse(value), months, parse(rate));
+      update({ result: calculation, error: "", changed: false });
+    } catch (error) { update({ error: error instanceof Error ? error.message : "Проверьте параметры кредита.", result: null }); }
+  };
+  const reset = () => setDrafts(previous => ({ ...previous, [mode]: emptyDraft() }));
+  const inputStyle = "h-14 w-full min-w-0 rounded-xl border border-[#E4E8ED] bg-[#F7F8FA] px-4 text-lg font-medium tabular-nums outline-none placeholder:text-sm placeholder:font-normal placeholder:text-[#8993A2] focus:border-[#E83C35] focus:ring-4 focus:ring-[#E83C35]/10";
+  return <div>
+    <div role="group" aria-label="Режим кредитного расчёта" className="mb-5 grid grid-cols-2 border-b border-[#E4E8ED] sm:flex sm:overflow-x-auto">
+      {(["principal", "payment"] as const).map(item => <button key={item} type="button" aria-pressed={mode === item} onClick={() => setMode(item)} className={`min-h-14 min-w-0 text-balance border-b-2 px-2 py-3 text-sm leading-5 font-semibold transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#26364A] sm:min-h-12 sm:min-w-max sm:flex-1 sm:whitespace-nowrap sm:px-3 ${mode === item ? "border-[#E83C35] text-[#26364A]" : "border-transparent text-[#647184] hover:border-[#C5CDD8] hover:text-[#26364A]"}`} aria-label={item === "principal" ? "По сумме кредита" : "По ежемесячному платежу"}>{item === "principal" ? "По сумме кредита" : "По ежемесячному платежу"}</button>)}
+    </div>
+    <div className="grid items-start gap-6 lg:grid-cols-[1fr_1.1fr]">
+    <form onSubmit={submit} className="min-w-0 rounded-3xl border border-[#EBEEF2] bg-white p-6 sm:p-8">
+      <div className="mb-6 flex items-center gap-3"><span className="flex size-11 items-center justify-center rounded-xl bg-[#FCEBEA] text-[#E83C35]"><Calculator className="size-6" /></span><h3 className="text-xl font-semibold">Параметры кредита</h3></div>
+      <div className="space-y-5">
+        <div><label htmlFor={reverse ? "loan-payment" : "loan-principal"} className="mb-3 block text-sm font-semibold">{reverse ? "Комфортный платёж в месяц" : "Сумма кредита"}</label><div className="relative"><input id={reverse ? "loan-payment" : "loan-principal"} inputMode="decimal" enterKeyHint="done" onKeyDown={dismissKeyboard} autoComplete="off" value={value} onChange={event => edit({ value: formatInput(event.target.value) })} placeholder={reverse ? "Введите платёж" : "Введите сумму"} className={`${inputStyle} pr-12`} /><span className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-[#7B8797]">₽</span></div></div>
+        <div><label htmlFor="loan-term" className="mb-3 block text-sm font-semibold">Срок кредита</label><div className="flex gap-2"><input id="loan-term" inputMode="decimal" enterKeyHint="done" onKeyDown={dismissKeyboard} value={term} onChange={event => edit({ term: event.target.value })} placeholder="Введите срок" className={inputStyle} /><select aria-label="Единицы срока кредита" value={unit} onChange={event => edit({ unit: event.target.value })} className="h-14 shrink-0 rounded-xl border border-[#E4E8ED] bg-[#F7F8FA] px-3 text-sm outline-none focus:ring-2 focus:ring-[#E83C35]"><option value="years">лет</option><option value="months">месяцев</option></select></div></div>
+        <div><label htmlFor="loan-rate" className="mb-3 block text-sm font-semibold">Процентная ставка</label><div className="relative"><input id="loan-rate" inputMode="decimal" enterKeyHint="done" onKeyDown={dismissKeyboard} value={rate} onChange={event => edit({ rate: event.target.value })} placeholder="Годовая ставка" className={`${inputStyle} pr-12`} /><span className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-[#7B8797]">%</span></div></div>
+      </div>
+      {error && <p role="alert" className="mt-4 text-sm leading-relaxed text-[#BD302A]">{error}</p>}
+      <div className="mt-7 flex flex-wrap gap-3"><button type="submit" className="min-h-12 flex-1 rounded-xl bg-[#E83C35] px-5 py-3 text-sm font-semibold text-white hover:bg-[#D6332D] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#E83C35]">РАССЧИТАТЬ</button><button type="button" onClick={reset} className="flex min-h-12 items-center justify-center gap-2 rounded-xl border border-[#E4E8ED] px-4 py-3 text-sm font-semibold text-[#647184] hover:bg-[#F5F7FA]"><RotateCcw className="size-4" />СБРОСИТЬ</button></div>
+    </form>
+    <div className="min-w-0 space-y-4" aria-live="polite">
+      {result ? <>
+        <section aria-label="Результаты кредита" className="min-w-0 rounded-3xl border border-[#F3DAD8] bg-[#FCEBEA] p-6 sm:p-8">
+          <h3 className="text-xl font-semibold lg:flex lg:min-h-11 lg:items-center">Результаты расчета</h3>
+          {changed && <p className="mt-3 text-xs leading-relaxed text-[#A94442]">Параметры изменены. Нажмите «Рассчитать», чтобы обновить результат.</p>}
+          <p className="mb-2 mt-6 text-sm text-[#6E7886]">{reverse ? "Сумма кредита" : "Ежемесячный платёж"}</p><p data-testid={reverse ? "loan-available-principal" : "loan-monthly"} className="text-[clamp(1.5rem,6vw,2.5rem)] font-semibold tracking-tight text-[#E83C35] tabular-nums">{amount(reverse ? result.principal : result.monthlyPayment)}</p>
+          <dl className="mt-6 space-y-4 border-t border-[#26364A]/10 pt-5 text-sm">
+            {reverse ? <ResultRow label="Ежемесячный платёж" value={amount(result.monthlyPayment)} /> : <ResultRow label="Основной долг" value={amount(result.principal)} />}
+            <ResultRow label="Общая сумма процентов" value={amount(result.interest)} />
+            <ResultRow label="Общая сумма выплат" value={amount(result.totalPayment)} />
+            <ResultRow label="Срок кредита" value={`${result.months} мес.`} />
+          </dl>
+          <svg role="img" aria-label={`Основной долг ${amount(result.principal)}, проценты ${amount(result.interest)}`} viewBox="0 0 100 12" preserveAspectRatio="none" className="mt-6 h-3 w-full overflow-hidden rounded-full"><rect width="100" height="12" className="fill-[#26364A]" /><rect width={result.principal / result.totalPayment * 100} height="12" className="fill-[#E83C35]" /></svg>
+          <div className="mt-3 flex flex-wrap gap-x-4 gap-y-2 text-xs text-[#647184]"><span className="flex items-center gap-2"><span className="size-2 rounded-full bg-[#E83C35]" />Основной долг</span><span className="flex items-center gap-2"><span className="size-2 rounded-full bg-[#26364A]" />Проценты</span></div>
+          <div className="mt-6 space-y-2 border-t border-[#26364A]/10 pt-4 text-justify text-xs leading-relaxed text-[#6E7886]">
+            <p>{reverse ? result.annualRate === 0 ? "S = A × n" : "S = A × (1 − (1 + i)⁻ⁿ) / i" : result.annualRate === 0 ? "A = S / n" : "A = S × i × (1 + i)ⁿ / ((1 + i)ⁿ − 1)"}</p>
+            <p>A - ежемесячный платёж; S - сумма кредита; i - годовая ставка / 12 / 100; n - срок в месяцах.</p>
+            <p>Предварительный расчёт без учёта страховок и дополнительных расходов. Не является одобрением банка. {reverse ? "Сумма кредита округляется вниз до копеек, чтобы рассчитанный платёж не превышал указанный." : "Ежемесячный платёж рассчитывается без промежуточного округления."} Суммы отображаются с точностью до копеек.</p>
+          </div>
+        </section>
+        <div className="grid min-w-0 gap-4 sm:grid-cols-2">
+          <section className="min-w-0 rounded-2xl border border-[#D6E2F0] bg-[#EAF2FB] p-5"><h3 className="text-sm font-medium">Переплата</h3><p data-testid="loan-interest" className="mt-3 text-xl font-semibold tabular-nums">{amount(result.interest)}</p><p className="mt-2 text-xs leading-relaxed text-[#6E7886]">Общая сумма процентов за весь срок кредита</p></section>
+          <section className="min-w-0 rounded-2xl border border-[#D6E2F0] bg-[#EAF2FB] p-5"><h3 className="text-sm font-medium">Общая сумма выплат</h3><p data-testid="loan-total" className="mt-3 text-xl font-semibold tabular-nums">{amount(result.totalPayment)}</p><p className="mt-2 text-xs leading-relaxed text-[#6E7886]">Основной долг плюс все начисленные проценты</p></section>
+        </div>
+      </> : <section className="rounded-3xl border border-[#EBEEF2] bg-white p-8 text-center"><Calculator className="mx-auto mb-4 size-10 text-[#D68B86]" /><h3 className="text-lg font-semibold">Здесь появятся результаты кредита</h3><p className="mt-3 text-sm leading-relaxed text-[#748195]">{reverse ? "Укажите комфортный ежемесячный платёж, срок и годовую ставку, затем нажмите «Рассчитать»." : "Укажите сумму, срок и годовую ставку, затем нажмите «Рассчитать»."}</p></section>}
+    </div>
+  </div></div>;
+}
+
+function ResultRow({ label, value }: { label: string; value: string }) {
+  return <div className="flex flex-wrap justify-between gap-2"><dt className="text-[#6E7886]">{label}</dt><dd className="font-medium tabular-nums">{value}</dd></div>;
+}
