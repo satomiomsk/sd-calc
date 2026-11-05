@@ -6,6 +6,8 @@ import { execFileSync } from 'node:child_process';
 const project = process.cwd();
 const work = mkdtempSync(join(tmpdir(), 'sd-android-web-'));
 for (const path of ['components/ui', 'hooks', 'public']) cpSync(join(project, path), join(work, path), { recursive: true });
+// Android build uses only tariff defaults bundled into the APK.
+writeFileSync(join(work, 'hooks/use-tariffs.ts'), "\"use client\";\nimport {DEFAULT_TARIFFS,type TariffSnapshot} from '@/lib/tariffs';\nexport const TARIFF_ORIGIN='';\nexport function useTariffs(){ return {tariffs: DEFAULT_TARIFFS as TariffSnapshot, status: 'Встроенные условия'}; }\n");
 for (const path of ['app/page.tsx', 'app/globals.css', 'lib/tariffs.ts', 'lib/calculator.ts', 'lib/discounts.ts', 'lib/mortgage.ts', 'lib/loan.ts', 'components/legal-footer.tsx', 'components/commission-calculator.tsx', 'components/loan-calculator.tsx', 'components/mortgage-calculators.tsx', 'lib/utils.ts', 'postcss.config.mjs', 'tsconfig.json', 'package.json']) {
   mkdirSync(resolve(work, path, '..'), { recursive: true });
   cpSync(join(project, path), join(work, path));
