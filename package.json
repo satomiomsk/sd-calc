@@ -8,7 +8,8 @@
     "lint": "eslint .",
     "cf:build": "opennextjs-cloudflare build",
     "cf:preview": "opennextjs-cloudflare build && opennextjs-cloudflare preview",
-    "cf:deploy": "opennextjs-cloudflare build && opennextjs-cloudflare deploy"
+    "cf:deploy": "opennextjs-cloudflare build && opennextjs-cloudflare deploy",
+    "cf:typegen": "wrangler types --env-interface CloudflareEnv cloudflare-env.d.ts"
   },
   "dependencies": {
     "@hookform/resolvers": "3.10.0",
@@ -46,7 +47,7 @@
     "embla-carousel-react": "8.5.1",
     "input-otp": "1.4.1",
     "lucide-react": "0.513.0",
-    "next": "16.3.8",
+    "next": "16.2.9",
     "next-themes": "0.4.6",
     "radix-ui": "1.4.2",
     "react": "19.2.7",
@@ -69,11 +70,11 @@
     "@types/react": "19.2.17",
     "@types/react-dom": "19.2.3",
     "eslint": "9.28.0",
-    "eslint-config-next": "16.3.8",
+    "eslint-config-next": "16.2.9",
     "tailwindcss": "4.1.8",
     "tw-animate-css": "1.3.3",
     "typescript": "5.9.3",
-    "wrangler": "4.68.0"
+    "wrangler": "4.157.0"
   },
   "pnpm": {
     "overrides": {
