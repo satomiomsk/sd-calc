@@ -2,7 +2,8 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 
-type Picked = { tag: string; text: string; color: string; background: string; fontSize: string };\nconst PREVIEW_BASE_PATH = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
+type Picked = { tag: string; text: string; color: string; background: string; fontSize: string };
+const PREVIEW_BASE_PATH = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
 
 export default function VisualEditorPage() {
   const frame = useRef<HTMLIFrameElement>(null);
