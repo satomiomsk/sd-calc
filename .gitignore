@@ -35,3 +35,6 @@ yarn-error.log
 .env
 .env.*
 !.env.example
+.open-next/
+cloudflare-env.d.ts
+.dev.vars
