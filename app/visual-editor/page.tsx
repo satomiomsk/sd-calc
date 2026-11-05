@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 
-type Picked = { tag: string; text: string; color: string; background: string; fontSize: string };
+type Picked = { tag: string; text: string; color: string; background: string; fontSize: string };\nconst PREVIEW_BASE_PATH = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
 
 export default function VisualEditorPage() {
   const frame = useRef<HTMLIFrameElement>(null);
@@ -96,13 +96,13 @@ export default function VisualEditorPage() {
   return <main className="min-h-screen bg-[#eef1f5] text-[#26364a]">
     <header className="flex flex-wrap items-center justify-between gap-3 border-b border-[#dfe4eb] bg-white px-5 py-4">
       <div><h1 className="text-xl font-bold">Визуальный редактор SD</h1><p className="text-sm text-[#748195]">Тестовый режим — изменения не сохраняются на сайте</p></div>
-      <a href="/" className="rounded-xl border border-[#dfe4eb] px-4 py-2 text-sm font-medium hover:bg-[#f5f7fa]">Открыть сайт отдельно ↗</a>
+      <a href={`${PREVIEW_BASE_PATH}/`} className="rounded-xl border border-[#dfe4eb] px-4 py-2 text-sm font-medium hover:bg-[#f5f7fa]">Открыть сайт отдельно ↗</a>
     </header>
     <div className="grid min-h-[calc(100vh-81px)] grid-cols-1 lg:grid-cols-[minmax(0,1fr)_320px]">
       <section className="min-h-[70vh] p-3 sm:p-5">
         <div className="mb-2 flex items-center justify-between text-xs text-[#748195]"><span>ПРЕДПРОСМОТР САЙТА</span><span>Нажимайте на элементы для выбора</span></div>
         <div className="h-[75vh] overflow-hidden rounded-2xl border border-[#dfe4eb] bg-white shadow-sm">
-          <iframe ref={frame} src="/" title="Предпросмотр сайта SD" onLoad={attachPicker} className="h-full w-full border-0" />
+          <iframe ref={frame} src={`${PREVIEW_BASE_PATH}/`} title="Предпросмотр сайта SD" onLoad={attachPicker} className="h-full w-full border-0" />
         </div>
       </section>
       <aside className="border-t border-[#dfe4eb] bg-white p-5 lg:border-t-0 lg:border-l">
