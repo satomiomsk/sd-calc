@@ -141,17 +141,23 @@ export function CommissionCalculator({ operation, tariffs }: { operation: Operat
                     {motivationPercent !== "" && !motivationValid && <p id="motivation-hint" className="mt-2 text-xs leading-relaxed text-[#BD302A]">Введите процент от 0 до 100.</p>}
                     <div className="mt-4 border-t border-[#26364A]/10 pt-4"><p className="text-xs text-[#647184]">От итоговой комиссии с учётом скидки</p><p data-testid="motivation-amount" className="mt-1 text-3xl font-semibold tracking-tight tabular-nums text-[#26364A]">{motivationAmount === null ? "-" : money(motivationAmount)}</p>{motivationAmount !== null && <p className="mt-2 text-xs leading-relaxed text-[#748195]"><span className="whitespace-nowrap">{money(discounted.total)}</span> × {motivationPercent}%</p>}</div>
                   </div>}
-                  {discount && <div data-testid="discount-applied" className="mt-4 space-y-2 rounded-xl bg-white/65 p-4 text-sm leading-relaxed">
-                    <p className="font-semibold text-[#A94442]">Применена скидка: {discount.name} - {discount.paired ? "3%+3%" : `${discount.percent}%`}</p>
+                  {discount && !discount.paired && <div data-testid="discount-applied" className="mt-4 space-y-2 rounded-xl bg-white/65 p-4 text-sm leading-relaxed">
+                    <p className="font-semibold text-[#A94442]">Применена скидка: {discount.name} - {discount.percent}%</p>
                     <p>Комиссия без скидки: <span className="whitespace-nowrap">{money(result.total)}</span></p>
                     {discounted && <p>Скидка: <span data-testid="discount-saving" className="whitespace-nowrap">{money(discounted.saving)}</span></p>}
                   </div>}
-                  {discount?.paired && <div className="mt-4 space-y-3 rounded-xl bg-white/65 p-4 text-sm leading-relaxed">
-                    <h3 className="font-semibold">{sale ? "Комиссия по ранее совершённой покупке" : "Комиссия по ранее совершённой продаже"}</h3>
+                  {discount?.paired && <div data-testid="discount-applied" className="mt-4 space-y-3 rounded-xl bg-white/65 p-4 text-sm leading-relaxed">
+                    <div className="space-y-1 font-semibold text-[#A94442]">
+                      <p>Применена скидка:</p>
+                      <p>За встречную сделку: продажа + покупка в одном городе - 3%+3%</p>
+                    </div>
+                    <p>Комиссия без скидки: <span className="whitespace-nowrap">{money(result.total)}</span></p>
                     {pairedResult?.status === "ok" && pairedDiscounted ? <>
                       <p>Комиссия предыдущей сделки: <span className="whitespace-nowrap">{money(pairedResult.total)}</span></p>
-                      <p>3% от текущей комиссии: <span data-testid="current-saving" className="whitespace-nowrap">{money(pairedDiscounted.currentSaving)}</span></p>
-                      <p>3% от предыдущей комиссии: <span data-testid="previous-saving" className="whitespace-nowrap">{money(pairedDiscounted.previousSaving)}</span></p>
+                      <div className="space-y-3 pt-3">
+                        <p>3% от текущей комиссии: <span data-testid="current-saving" className="whitespace-nowrap">{money(pairedDiscounted.currentSaving)}</span></p>
+                        <p>3% от предыдущей комиссии: <span data-testid="previous-saving" className="whitespace-nowrap">{money(pairedDiscounted.previousSaving)}</span></p>
+                      </div>
                       <p className="border-t border-[#26364A]/10 pt-3 font-semibold">Общая скидка: <span data-testid="combined-saving" className="whitespace-nowrap">{money(pairedDiscounted.saving)}</span></p>
                     </> : <p className="text-[#647184]">{pairedResult?.status === "undefined" ? "Для указанной стоимости тариф не определён. Уточните размер комиссии" : "Укажите стоимость встречного объекта для расчёта итоговой комиссии"}</p>}
                   </div>}
