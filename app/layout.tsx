@@ -11,14 +11,14 @@ const publicAsset = (path: string) => `${process.env.NEXT_PUBLIC_BASE_PATH ?? ""
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://sdcalc55.github.io/"),
-  title: "SD | Расчёты",
+  title: "SD | Калькулятор",
   description: "Расчёт агентского вознаграждения и кредитный калькулятор",
   openGraph: {
     type: "website",
     locale: "ru_RU",
     url: "https://sdcalc55.github.io/",
-    siteName: "SD | Расчёты",
-    title: "SD | Расчёты",
+    siteName: "SD | Калькулятор",
+    title: "SD | Калькулятор",
     description: "Расчёт агентского вознаграждения и кредитный калькулятор",
     images: [{
       url: "https://sdcalc55.github.io/og-preview-256.png?v=9",
