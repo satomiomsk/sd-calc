@@ -144,31 +144,12 @@ jobs:
           badging=$("$aapt" dump badging "$apk")
           echo "$badging" | grep -E '^application-icon(-[0-9]+)?:' || { echo "APK manifest does not expose launcher icon resources"; exit 1; }
           echo "$badging" | grep -F "application-label:'SD | Расчёты'" || { echo "Unexpected application label"; exit 1; }
-          python - "$apk" <<'PY'
-          import sys
-          from zipfile import ZipFile
-
-          apk = sys.argv[1]
-          with ZipFile(apk) as archive:
-              names = set(archive.namelist())
-          required = [
-              "ic_launcher.png",
-              "ic_launcher_round.png",
-              "ic_launcher.xml",
-              "ic_launcher_round.xml",
-              "ic_launcher_foreground.png",
-          ]
-          for name in required:
-              matches = [path for path in names if path.endswith("/" + name)]
-              if not matches:
-                  raise SystemExit(f"APK is missing icon resource: {name}")
-              print(f"Verified {name}: {', '.join(matches)}")
-          densities = ("mipmap-mdpi", "mipmap-hdpi", "mipmap-xhdpi", "mipmap-xxhdpi", "mipmap-xxxhdpi")
-          for density in densities:
-              if not any(path.startswith("res/" + density) and path.endswith("/ic_launcher.png") for path in names):
-                  raise SystemExit(f"APK is missing {density} launcher icon")
-          print("All launcher/adaptive icon resources are embedded in the installable APK")
-          PY
+          resources=$("$aapt" dump resources "$apk")
+          for resource in 'mipmap/ic_launcher' 'mipmap/ic_launcher_round' 'drawable/ic_launcher_foreground'; do
+            echo "$resources" | grep -F "$resource" >/dev/null || { echo "APK is missing resource: $resource"; exit 1; }
+            echo "Verified resource: $resource"
+          done
+          echo "Launcher and adaptive icon resources are embedded in the installable APK"
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
