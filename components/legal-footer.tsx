@@ -21,7 +21,7 @@ export function LegalFooter() {
         <DialogContent className="flex max-h-[85dvh] flex-col gap-0 overflow-hidden rounded-2xl p-0 sm:max-w-3xl">
           <DialogHeader className="shrink-0 px-5 pt-6 pb-4 pr-10 sm:px-7 sm:pr-12">
             <DialogTitle className="text-left text-lg leading-snug text-[#26364A] sm:text-xl">Условия использования и политика конфиденциальности</DialogTitle>
-            <DialogDescription className="text-left text-xs leading-relaxed">SD | Расчёты · Версия 1.0.4</DialogDescription>
+            <DialogDescription className="text-left text-xs leading-relaxed">SD | Расчёты · Версия 1.0</DialogDescription>
           </DialogHeader>
           <div className="min-h-0 overflow-y-auto overscroll-contain px-5 pb-6 text-sm leading-relaxed text-[#536175] sm:px-7" tabIndex={0} aria-label="Текст условий и политики">
             <section aria-labelledby="legal-terms" className="space-y-4">
