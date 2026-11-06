@@ -19,7 +19,7 @@ function signature(value: string) {
     .digest('hex');
 }
 
-export async function passwordMatches(password: string): Promise<boolean> {
+export function passwordMatches(password: string): boolean {
   const expected = process.env.DEVELOPER_PASSWORD;
   if (!expected || typeof password !== 'string') return false;
 
