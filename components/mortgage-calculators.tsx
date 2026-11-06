@@ -79,7 +79,7 @@ function MortgageCard({ config }: { config: typeof configs[number] }) {
         </div>}
       </div>
     </div>
-    <div className="mt-5 flex flex-wrap items-center justify-between gap-3 border-t border-[#EBEEF2] pt-4"><p className="text-xs text-[#748195]">Автоматический расчёт</p><button type="button" aria-label={`Сбросить: ${config.title}`} onClick={() => setValues(previous => previous.map((value, i) => i === previous.length - 1 ? value : ""))} className="flex items-center gap-1.5 rounded-md py-1 text-xs font-medium text-[#647184] outline-offset-4 hover:text-[#E83C35] focus-visible:outline-2"><RotateCcw className="size-3.5" />Сбросить</button></div>
+    <div className="mt-5 flex flex-wrap items-center justify-between gap-3 border-t border-[#EBEEF2] pt-4"><p className="hidden text-xs text-[#748195] sm:block">Автоматический расчёт</p><button type="button" onClick={() => window.scrollTo({ top: 0, behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "instant" : "smooth" })} className="rounded-md py-1 text-xs font-medium text-[#647184] outline-offset-4 hover:text-[#E83C35] focus-visible:outline-2 sm:hidden">Вернуться</button><button type="button" aria-label={`Сбросить: ${config.title}`} onClick={() => setValues(previous => previous.map((value, i) => i === previous.length - 1 ? value : ""))} className="flex items-center gap-1.5 rounded-md py-1 text-xs font-medium text-[#647184] outline-offset-4 hover:text-[#E83C35] focus-visible:outline-2"><RotateCcw className="size-3.5" />Сбросить</button></div>
   </section>;
 }
 
@@ -99,7 +99,7 @@ export function MortgageCalculators() {
     window.addEventListener("scroll", resetOnReturn, { passive: true });
     return () => window.removeEventListener("scroll", resetOnReturn);
   }, []);
-  return <div><div className="mb-5 lg:hidden"><nav ref={navigationRef} aria-label="Выберите нужный расчёт" className="grid grid-cols-[.7fr_1fr_1.25fr] border-b border-[#E4E8ED]">{configs.map(config => <a key={config.mode} href={`#mortgage-${config.mode}`} aria-label={config.title} aria-current={activeMode === config.mode ? "location" : undefined} onClick={event => {
+  return <div><div className="mb-5 lg:hidden"><nav ref={navigationRef} aria-label="Выберите нужный расчёт" className="grid grid-cols-3 border-b border-[#E4E8ED]">{configs.map(config => <a key={config.mode} href={`#mortgage-${config.mode}`} aria-label={config.title} aria-current={activeMode === config.mode ? "location" : undefined} onClick={event => {
     event.preventDefault();
     setActiveMode(config.mode);
     const target = document.getElementById(`mortgage-${config.mode}`);
