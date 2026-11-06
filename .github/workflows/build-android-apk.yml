@@ -37,12 +37,14 @@ jobs:
       - name: Create Android project
         run: npx cap add android
 
-      - name: Apply SD Calculator launcher icon
+      - name: Apply SD Calculator launcher and installer icons
         run: |
           python -m pip install --quiet pillow
           python - <<'PY'
           from PIL import Image
           from pathlib import Path
+          import xml.etree.ElementTree as ET
+
           source = Image.open("public/icons/sd-512.png").convert("RGBA")
           sizes = {"mdpi": 48, "hdpi": 72, "xhdpi": 96, "xxhdpi": 144, "xxxhdpi": 192}
           for density, size in sizes.items():
@@ -51,10 +53,16 @@ jobs:
               icon = source.resize((size, size), Image.Resampling.LANCZOS)
               icon.save(folder / "ic_launcher.png")
               icon.save(folder / "ic_launcher_round.png")
-          # Adaptive launcher icon foreground; keep the supplied square artwork intact.
+
+          # Adaptive icon artwork stays inside Android's safe zone.
+          foreground = Image.new("RGBA", (432, 432), (0, 0, 0, 0))
+          artwork = source.copy()
+          artwork.thumbnail((288, 288), Image.Resampling.LANCZOS)
+          foreground.alpha_composite(artwork, ((432 - artwork.width) // 2, (432 - artwork.height) // 2))
           drawable = Path("android/app/src/main/res/drawable")
           drawable.mkdir(parents=True, exist_ok=True)
-          source.resize((432, 432), Image.Resampling.LANCZOS).save(drawable / "ic_launcher_foreground.png")
+          foreground.save(drawable / "ic_launcher_foreground.png")
+
           adaptive = Path("android/app/src/main/res/mipmap-anydpi-v26")
           adaptive.mkdir(parents=True, exist_ok=True)
           for name in ("ic_launcher", "ic_launcher_round"):
@@ -64,6 +72,16 @@ jobs:
               <foreground android:drawable="@drawable/ic_launcher_foreground" />
           </adaptive-icon>
           ''')
+
+          manifest = Path("android/app/src/main/AndroidManifest.xml")
+          tree = ET.parse(manifest)
+          application = tree.getroot().find("application")
+          if application is None:
+              raise SystemExit("AndroidManifest.xml has no application element")
+          ns = "{http://schemas.android.com/apk/res/android}"
+          application.set(ns + "icon", "@mipmap/ic_launcher")
+          application.set(ns + "roundIcon", "@mipmap/ic_launcher_round")
+          tree.write(manifest, encoding="utf-8", xml_declaration=True)
           PY
 
       - name: Copy static website into Android app
@@ -107,8 +125,8 @@ jobs:
           }
           """
           import re
-          text, version_name_count = re.subn(r'versionName\s+"[^"]+"', 'versionName "1.0"', text, count=1)
-          text, version_code_count = re.subn(r'versionCode\s+\d+', 'versionCode 1', text, count=1)
+          text, version_name_count = re.subn(r'versionName\s+"[^"]+"', 'versionName "1.0.1"', text, count=1)
+          text, version_code_count = re.subn(r'versionCode\s+\d+', 'versionCode 2', text, count=1)
           if version_name_count != 1 or version_code_count != 1:
               raise SystemExit("Could not set Android versionName/versionCode")
           path.write_text(text)
