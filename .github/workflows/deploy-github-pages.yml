@@ -1,8 +1,6 @@
 name: Deploy SD Calculator to GitHub Pages
 
 on:
-  push:
-    branches: [reduce-supabase-traffic]
   workflow_dispatch:
 
 permissions:
