@@ -1,5 +1,5 @@
 import 'server-only';
-import { createHmac, timingSafeEqual } from 'node:crypto';
+import { createHash, createHmac, timingSafeEqual } from 'node:crypto';
 import { cookies } from 'next/headers';
 
 export type AuthUser = { role: 'developer' };
@@ -8,8 +8,8 @@ const cookieName = 'sd_developer';
 export const SESSION_COOKIE = cookieName;
 
 function getSessionKey() {
-  const key = process.env.SUPABASE_SECRET_KEY;
-  if (!key) throw new Error('SUPABASE_SECRET_KEY не настроен');
+  const key = process.env.SUPABASE_SECRET_KEY || process.env.DEVELOPER_PASSWORD;
+  if (!key) throw new Error('Настройте SUPABASE_SECRET_KEY или DEVELOPER_PASSWORD');
   return key;
 }
 
@@ -20,42 +20,13 @@ function signature(value: string) {
 }
 
 export async function passwordMatches(password: string): Promise<boolean> {
-  const url = process.env.SUPABASE_URL;
-  const key = process.env.SUPABASE_SECRET_KEY;
+  const expected = process.env.DEVELOPER_PASSWORD;
+  if (!expected || typeof password !== 'string') return false;
 
-  if (!url || !key) return false;
-
-  try {
-    const response = await fetch(
-      `${url.replace(/\/+$/, '')}/rest/v1/rpc/verify_developer_password`,
-      {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          apikey: key,
-        },
-        body: JSON.stringify({ p_password: password }),
-        cache: 'no-store',
-      },
-    );
-
-    const result = await response.text();
-
-    if (!response.ok) {
-      console.error(
-        '[developer-auth] Supabase error:',
-        response.status,
-        result.slice(0, 500),
-      );
-      return false;
-    }
-
-    console.log('[developer-auth] Supabase response:', result);
-    return result.trim() === 'true';
-  } catch (error) {
-    console.error('[developer-auth] Request failed:', error);
-    return false;
-  }
+  // Hash both values to fixed-length buffers before comparing in constant time.
+  const suppliedDigest = createHash('sha256').update(password, 'utf8').digest();
+  const expectedDigest = createHash('sha256').update(expected, 'utf8').digest();
+  return timingSafeEqual(suppliedDigest, expectedDigest);
 }
 
 export function issueSession() {
