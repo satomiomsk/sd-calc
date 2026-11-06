@@ -7,11 +7,13 @@ import { ErrorReporter, ConsoleReporter, ReactErrorBoundary } from "@/components
 
 const inter = localFont({ src: "../public/fonts/InterVariable.woff2", display: "swap", weight: "100 900" });
 
+const publicAsset = (path: string) => `${process.env.NEXT_PUBLIC_BASE_PATH ?? ""}${path}`;
+
 export const metadata: Metadata = {
   title: "SD | Расчёты",
   description: "Удобный расчёт агентского вознаграждения при покупке и продаже недвижимости",
-  icons: { icon: "/favicon.png?v=sd-calculator-1" },
-  manifest: "/manifest.webmanifest",
+  icons: { icon: publicAsset("/favicon.png?v=sd-calculator-1") },
+  manifest: publicAsset("/manifest.webmanifest"),
   appleWebApp: { capable: true, title: "SD | Расчёты", statusBarStyle: "default" },
 };
 
