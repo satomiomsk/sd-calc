@@ -9,9 +9,9 @@ import { calculateMortgage, type MortgageMode } from "@/lib/mortgage";
 const rubles = new Intl.NumberFormat("ru-RU", { maximumFractionDigits: 0 });
 const percent = new Intl.NumberFormat("ru-RU", { maximumFractionDigits: 6 });
 const configs: { mode: MortgageMode; title: string; description: string; labels: string[]; defaults: string[]; resultLabel: string }[] = [
-  { mode: "part", title: "Рассчитать ПВ", description: "Узнайте сумму ПВ исходя из стоимости ОН и %ПВ", labels: ["Стоимость объекта, ₽", "Первоначальный взнос, %"], defaults: ["", "20,1"], resultLabel: "Сумма первоначального взноса" },
-  { mode: "whole", title: "Рассчитать стоимость ОН по ПВ", description: "Определите бюджет по первоначальному взносу", labels: ["Сумма первоначального взноса, ₽", "Первоначальный взнос, %"], defaults: ["", "20,1"], resultLabel: "Стоимость объекта недвижимости" },
-  { mode: "adjustment", title: "Рассчитать стоимость ОН при нехватке ПВ", description: "Рассчитайте стоимость ОН с учетом ЧПВ клиента и необходимого %ПВ", labels: ["Стоимость объекта, ₽", "Сумма первоначального взноса, ₽", "Необходимый первоначальный взнос, %"], defaults: ["", "", "20,1"], resultLabel: "Стоимость с расчётной корректировкой" },
+  { mode: "part", title: "Рассчитать первоначальный взнос", description: "Узнайте сумму ПВ исходя из стоимости ОН и %ПВ", labels: ["Стоимость объекта, ₽", "Первоначальный взнос, %"], defaults: ["", "20,1"], resultLabel: "Сумма первоначального взноса" },
+  { mode: "whole", title: "Рассчитать бюджет по ПВ", description: "Определите бюджет по первоначальному взносу", labels: ["Сумма первоначального взноса, ₽", "Первоначальный взнос, %"], defaults: ["", "20,1"], resultLabel: "Стоимость объекта недвижимости" },
+  { mode: "adjustment", title: "Рассчитать стоимость при частичном ПВ", description: "Рассчитайте стоимость ОН с учетом ЧПВ клиента и необходимого %ПВ", labels: ["Стоимость объекта, ₽", "Сумма первоначального взноса, ₽", "Необходимый первоначальный взнос, %"], defaults: ["", "", "20,1"], resultLabel: "Стоимость с расчётной корректировкой" },
 ];
 
 const formulas: Record<MortgageMode, string> = {
