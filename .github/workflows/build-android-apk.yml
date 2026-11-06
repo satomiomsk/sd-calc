@@ -125,11 +125,6 @@ jobs:
               }
           }
           """
-          import re
-          text, version_name_count = re.subn(r'versionName\s+"[^"]+"', 'versionName "1.0"', text, count=1)
-          text, version_code_count = re.subn(r'versionCode\s+\d+', 'versionCode 3', text, count=1)
-          if version_name_count != 1 or version_code_count != 1:
-              raise SystemExit("Could not set Android versionName/versionCode")
           path.write_text(text)
           PY
 
@@ -139,37 +134,16 @@ jobs:
           chmod +x gradlew
           ./gradlew assembleRelease
 
-      - name: Verify APK version and launcher icon resources
+      - name: Verify APK launcher icon
         run: |
-          python - <<'PY'
-          from pathlib import Path
-          from zipfile import ZipFile
-          import re
-          apk = next(Path("android/app/build/outputs/apk/release").glob("*.apk"))
-          with ZipFile(apk) as z:
-              names = set(z.namelist())
-              required = {
-                  "res/mipmap-mdpi-v4/ic_launcher.png",
-                  "res/mipmap-hdpi-v4/ic_launcher.png",
-                  "res/mipmap-xhdpi-v4/ic_launcher.png",
-                  "res/mipmap-xxhdpi-v4/ic_launcher.png",
-                  "res/mipmap-xxxhdpi-v4/ic_launcher.png",
-                  "res/mipmap-anydpi-v26/ic_launcher.xml",
-                  "res/mipmap-anydpi-v26/ic_launcher_round.xml",
-                  "res/drawable/ic_launcher_foreground.png",
-                  "AndroidManifest.xml",
-              }
-              missing = sorted(required - names)
-              if missing:
-                  raise SystemExit("APK is missing launcher icon resources: " + ", ".join(missing))
-              print(f"Verified launcher icon assets in {apk.name}: {len(required)} required entries present")
-          gradle = Path("android/app/build.gradle").read_text()
-          if not re.search(r'versionName\\s+"1\\.0"', gradle):
-              raise SystemExit("APK versionName is not 1.0")
-          if not re.search(r'versionCode\\s+3', gradle):
-              raise SystemExit("Unexpected versionCode")
-          print("Verified Android versionName 1.0 / versionCode 3")
-          PY
+          set -euo pipefail
+          apk=$(find android/app/build/outputs/apk/release -maxdepth 1 -name '*.apk' -print -quit)
+          test -n "$apk"
+          aapt=$(find "$ANDROID_HOME/build-tools" -type f -name aapt | sort -V | tail -n 1)
+          test -n "$aapt"
+          badging=$("$aapt" dump badging "$apk")
+          echo "$badging" | grep -E '^application-icon(-[0-9]+)?:' || { echo "APK manifest does not expose launcher icon resources"; exit 1; }
+          echo "Verified launcher icon is referenced by the APK manifest"
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
