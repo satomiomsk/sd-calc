@@ -3,16 +3,19 @@
 import Image from "next/image";
 import localFont from "next/font/local";
 import { useEffect, useState } from "react";
+import { Capacitor } from "@capacitor/core";
+import { App } from "@capacitor/app";
 import { ArrowLeft, ChevronRight, ArrowDownLeft, ArrowUpRight, HousePlus, KeyRound, WalletCards, Calculator, House, Instagram, Sparkles, type LucideIcon } from "lucide-react";
 import { CommissionCalculator } from "@/components/commission-calculator";
 import { MortgageCalculators } from "@/components/mortgage-calculators";
 import { LegalFooter } from "@/components/legal-footer";
 import { LoanCalculator } from "@/components/loan-calculator";
 import type { Operation } from "@/lib/calculator";
-import { useTariffs, TARIFF_ORIGIN } from "@/hooks/use-tariffs";
+import { useTariffs } from "@/hooks/use-tariffs";
 
 const navigationFont = localFont({ src: "../public/fonts/OnestVariable.ttf", display: "swap", weight: "100 900" });
 const headingFont = localFont({ src: "../public/fonts/MontserratVariable.ttf", display: "swap", weight: "100 900" });
+const publicAsset = (path: string) => `${process.env.NEXT_PUBLIC_BASE_PATH ?? ""}${path}`;
 
 type Screen = "home" | "commission" | "mortgage";
 const titles = { commission: "Комиссия", mortgage: "Ипотека" };
@@ -30,6 +33,30 @@ export default function Home() {
   const [screen, setScreen] = useState<Screen>("home");
   const [operation, setOperation] = useState<Operation>("sale");
   const [mortgageTab, setMortgageTab] = useState<"downpayment" | "loan">("downpayment");
+  useEffect(() => {
+    if (!Capacitor.isNativePlatform()) return;
+    let active = true;
+    let listener: { remove: () => Promise<void> } | undefined;
+    App.addListener("backButton", ({ canGoBack }) => {
+      if (screen !== "home") {
+        // Android system back gesture/button should return to the app's home screen.
+        setScreen("home");
+        window.history.replaceState({ ...window.history.state, sdScreen: "home" }, "");
+        window.scrollTo({ top: 0, behavior: "instant" });
+      } else if (!canGoBack) {
+        void App.exitApp();
+      } else {
+        window.history.back();
+      }
+    }).then(handle => {
+      if (active) listener = handle;
+      else void handle.remove();
+    });
+    return () => {
+      active = false;
+      if (listener) void listener.remove();
+    };
+  }, [screen]);
   useEffect(() => {
     // Keep calculator navigation in the same document, preserving all input state.
     window.history.replaceState({ ...window.history.state, sdScreen: "home" }, "");
@@ -56,7 +83,7 @@ export default function Home() {
     <header className="border-b border-[#E7EBF0] bg-white">
       <div className="mx-auto flex min-h-20 max-w-[1200px] flex-nowrap items-center justify-between gap-x-2 px-4 pt-[calc(1.5rem+env(safe-area-inset-top,0px))] pb-4 sm:gap-x-4 sm:px-8 max-sm:min-h-16 max-sm:pt-[calc(.75rem+env(safe-area-inset-top,0px))] max-sm:pb-3">
         <a href="#" onClick={event => { event.preventDefault(); navigate("home"); }} aria-label="Калькулятор SD - главная" className="flex shrink-0 items-center gap-1 rounded-lg outline-offset-4 focus-visible:outline-2 focus-visible:outline-[#E83C35] sm:gap-3">
-          <span role="button" tabIndex={0} aria-label="Вход разработчика" onClick={event => { event.preventDefault(); event.stopPropagation(); window.location.href = location.hostname === "sd.local" ? `${TARIFF_ORIGIN}/developer` : "/developer"; }} onKeyDown={event => { if(event.key === "Enter" || event.key === " ") { event.preventDefault(); event.stopPropagation(); window.location.href = location.hostname === "sd.local" ? `${TARIFF_ORIGIN}/developer` : "/developer"; } }} className="flex size-7 shrink-0 items-center justify-center rounded-md outline-offset-4 focus-visible:outline-2 min-[375px]:size-8 sm:size-10"><Image src="/images/sd-calculator-logo.png" alt="Логотип SD" width={40} height={40} unoptimized className="size-full object-contain" /></span>
+          <span className="flex size-7 shrink-0 items-center justify-center rounded-md min-[375px]:size-8 sm:size-10"><Image src={publicAsset("/images/sd-calculator-logo.png")} alt="Логотип SD" width={40} height={40} unoptimized className="size-full object-contain" /></span>
           <span className="whitespace-nowrap text-[13px] font-semibold tracking-tight min-[375px]:text-sm sm:text-[18px]">SvDemidenko</span>
         </a>
         <div className="ml-auto flex shrink-0 items-center gap-5">
@@ -89,9 +116,9 @@ export default function Home() {
         {(["sale", "purchase"] as const).map(value => <button key={value} type="button" aria-pressed={operation === value} onClick={() => setOperation(value)} className={`flex min-h-14 items-center justify-center gap-2 rounded-xl px-3 py-3 text-sm font-semibold transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#E83C35] sm:text-base ${operation === value ? value === "sale" ? "bg-[#E83C35] text-white shadow-sm" : "bg-[#26364A] text-white shadow-sm" : "bg-white text-[#647184] hover:bg-[#FFF7F6]"}`}>{value === "sale" ? <ArrowUpRight className="size-5 shrink-0" /> : <ArrowDownLeft className="size-5 shrink-0" />}{value === "sale" ? "Продажа" : "Покупка"}</button>)}
       </div>}
       {screen === "mortgage" && <div role="group" aria-label="Калькуляторы ипотеки" className="mb-4 grid grid-cols-2 gap-1.5 rounded-[14px] border border-[#E4E8ED] bg-[#EEF1F5] p-1 sm:flex sm:gap-2 sm:overflow-x-auto sm:rounded-2xl sm:p-1.5">
-        {(["downpayment", "loan"] as const).map(value => <button key={value} type="button" aria-pressed={mortgageTab === value} onClick={() => setMortgageTab(value)} className={`flex min-h-[60px] min-w-0 items-center justify-center gap-1.5 text-balance rounded-[10px] px-1.5 py-2 text-sm leading-[19px] font-semibold transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#26364A] sm:min-h-14 sm:min-w-max sm:flex-1 sm:gap-2 sm:whitespace-nowrap sm:rounded-xl sm:px-4 sm:py-3 sm:text-base ${mortgageTab === value ? value === "downpayment" ? "bg-[#E83C35] text-white shadow-sm" : "bg-[#26364A] text-white shadow-sm" : "bg-white text-[#647184] hover:bg-[#F7F8FA]"}`}>{value === "downpayment" ? <House className="size-[18px] shrink-0 sm:size-5" /> : <Calculator className="size-[18px] shrink-0 sm:size-5" />}<span>{value === "downpayment" ? "Расчёт по ПВ" : "Кредитный калькулятор"}</span></button>)}
+        {(["downpayment", "loan"] as const).map(value => <button key={value} type="button" aria-pressed={mortgageTab === value} onClick={() => setMortgageTab(value)} className={`flex min-h-[60px] min-w-0 items-center justify-center gap-1.5 text-balance rounded-[10px] px-1.5 py-2 text-sm leading-[19px] font-semibold transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#26364A] sm:min-h-14 sm:min-w-max sm:flex-1 sm:gap-2 sm:whitespace-nowrap sm:rounded-xl sm:px-4 sm:py-3 sm:text-base ${mortgageTab === value ? value === "downpayment" ? "bg-[#E83C35] text-white shadow-sm" : "bg-[#26364A] text-white shadow-sm" : "bg-white text-[#647184] hover:bg-[#F7F8FA]"}`}>{value === "downpayment" ? <House className="size-[18px] shrink-0 sm:size-5" /> : <Calculator className="size-[18px] shrink-0 sm:size-5" />}<span>{value === "downpayment" ? <><span className="sm:hidden">Расчёт по ПВ</span><span className="hidden sm:inline">Расчёт по первоначальному взносу</span></> : "Кредитный калькулятор"}</span></button>)}
       </div>}
-      <div hidden={screen !== "commission"}><CommissionCalculator operation={operation} tariffs={tariffs.version > 0 ? tariffs : undefined} tariffStatus={tariffStatus} /></div>
+      <div hidden={screen !== "commission"}><CommissionCalculator operation={operation} tariffs={tariffs} tariffStatus={tariffStatus} /></div>
       <div hidden={screen !== "mortgage" || mortgageTab !== "loan"}><LoanCalculator /></div>
       <div hidden={screen !== "mortgage" || mortgageTab !== "downpayment"}><MortgageCalculators /></div>
     </main>
@@ -99,7 +126,7 @@ export default function Home() {
       <div className={`flex w-full flex-col items-center justify-center gap-4 border px-4 sm:gap-5 ${screen === "home" ? "mx-auto mt-0 max-w-[900px] rounded-2xl border-[#E4E8ED] bg-white py-5 max-sm:py-2 sm:mt-6 sm:py-6" : "rounded-3xl border-[#F3DAD8] bg-[#FFF7F6] py-2 sm:py-3"}`}>
         <div className="flex items-center justify-center gap-4 sm:gap-6">
         <div className="relative shrink-0">
-          <Image src="/images/svdemidenko-portrait-v3.png" alt="Портрет SvDemidenko" width={512} height={512} unoptimized className={`block aspect-square size-20 shrink-0 rounded-full border-[3px] border-white object-contain object-center shadow-sm sm:size-28 ${screen === "home" ? "max-sm:size-14 max-sm:[@media(max-height:650px)]:size-12" : ""}`} />
+          <Image src={publicAsset("/images/svdemidenko-portrait-v3.png")} alt="Портрет SvDemidenko" width={512} height={512} unoptimized className={`block aspect-square size-20 shrink-0 rounded-full border-[3px] border-white object-contain object-center shadow-sm sm:size-28 ${screen === "home" ? "max-sm:size-14 max-sm:[@media(max-height:650px)]:size-12" : ""}`} />
         </div>
         <div className="min-w-0 text-left">
           <nav aria-label="Социальные сети" className="flex items-center gap-0 sm:gap-1">
@@ -108,7 +135,7 @@ export default function Home() {
               { name: "MAX", href: "https://max.ru/u/f9LHodD0cOK4HS3ILV9kidFm5zkxzt0iRbfZYiViC9zB7MF8pvVrcAskwJk", icon: "max" },
               { name: "ВКонтакте", href: "https://vk.ru/lanaomsk", icon: "vk" },
               { name: "Telegram", href: "https://t.me/svdemidenko", icon: "telegram" },
-            ].map(social => <a key={social.icon} href={social.href} target="_blank" rel="noopener noreferrer" aria-label={social.name} title={social.name} className="flex size-9 shrink-0 items-center justify-center rounded-xl text-[#647184] outline-offset-2 transition-colors hover:bg-white hover:text-[#26364A] focus-visible:outline-2 focus-visible:outline-[#A94442] min-[375px]:size-11">{social.icon === "instagram" ? <Instagram aria-hidden="true" className="size-7" strokeWidth={1.7} /> : <Image src={`/images/social-${social.icon}.svg`} alt="" width={28} height={28} unoptimized className="size-7" />}</a>)}
+            ].map(social => <a key={social.icon} href={social.href} target="_blank" rel="noopener noreferrer" aria-label={social.name} title={social.name} className="flex size-9 shrink-0 items-center justify-center rounded-xl text-[#647184] outline-offset-2 transition-colors hover:bg-white hover:text-[#26364A] focus-visible:outline-2 focus-visible:outline-[#A94442] min-[375px]:size-11">{social.icon === "instagram" ? <Instagram aria-hidden="true" className="size-7" strokeWidth={1.7} /> : <Image src={publicAsset(`/images/social-${social.icon}.svg`)} alt="" width={28} height={28} unoptimized className="size-7" />}</a>)}
           </nav>
         </div>
         </div>

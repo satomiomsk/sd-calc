@@ -9,9 +9,9 @@ import { calculateMortgage, type MortgageMode } from "@/lib/mortgage";
 const rubles = new Intl.NumberFormat("ru-RU", { maximumFractionDigits: 0 });
 const percent = new Intl.NumberFormat("ru-RU", { maximumFractionDigits: 6 });
 const configs: { mode: MortgageMode; title: string; description: string; labels: string[]; defaults: string[]; resultLabel: string }[] = [
-  { mode: "part", title: "Рассчитать ПВ", description: "Узнайте сумму ПВ исходя из стоимости ОН и %ПВ", labels: ["Стоимость объекта, ₽", "Первоначальный взнос, %"], defaults: ["", "20,1"], resultLabel: "Сумма первоначального взноса" },
-  { mode: "whole", title: "Рассчитать стоимость ОН по ПВ", description: "Определите бюджет по первоначальному взносу", labels: ["Сумма первоначального взноса, ₽", "Первоначальный взнос, %"], defaults: ["", "20,1"], resultLabel: "Стоимость объекта недвижимости" },
-  { mode: "adjustment", title: "Рассчитать стоимость ОН при нехватке ПВ", description: "Рассчитайте стоимость ОН с учетом ЧПВ клиента и необходимого %ПВ", labels: ["Стоимость объекта, ₽", "Сумма первоначального взноса, ₽", "Необходимый первоначальный взнос, %"], defaults: ["", "", "20,1"], resultLabel: "Стоимость с расчётной корректировкой" },
+  { mode: "part", title: "Рассчитать первоначальный взнос", description: "Узнайте сумму ПВ исходя из стоимости ОН и %ПВ", labels: ["Стоимость объекта, ₽", "Первоначальный взнос, %"], defaults: ["", "20,1"], resultLabel: "Сумма первоначального взноса" },
+  { mode: "whole", title: "Рассчитать бюджет по ПВ", description: "Определите бюджет по первоначальному взносу", labels: ["Сумма первоначального взноса, ₽", "Первоначальный взнос, %"], defaults: ["", "20,1"], resultLabel: "Стоимость объекта недвижимости" },
+  { mode: "adjustment", title: "Рассчитать стоимость при частичном ПВ", description: "Рассчитайте стоимость ОН с учетом ЧПВ клиента и необходимого %ПВ", labels: ["Стоимость объекта, ₽", "Сумма первоначального взноса, ₽", "Необходимый первоначальный взнос, %"], defaults: ["", "", "20,1"], resultLabel: "Стоимость с расчётной корректировкой" },
 ];
 
 const formulas: Record<MortgageMode, string> = {
@@ -79,7 +79,7 @@ function MortgageCard({ config }: { config: typeof configs[number] }) {
         </div>}
       </div>
     </div>
-    <div className="mt-5 flex flex-wrap items-center justify-between gap-3 border-t border-[#EBEEF2] pt-4"><p className="text-xs text-[#748195]">Автоматический расчёт</p><button type="button" aria-label={`Сбросить: ${config.title}`} onClick={() => setValues(previous => previous.map((value, i) => i === previous.length - 1 ? value : ""))} className="flex items-center gap-1.5 rounded-md py-1 text-xs font-medium text-[#647184] outline-offset-4 hover:text-[#E83C35] focus-visible:outline-2"><RotateCcw className="size-3.5" />Сбросить</button></div>
+    <div className="mt-5 flex flex-wrap items-center justify-between gap-3 border-t border-[#EBEEF2] pt-4"><p className="hidden text-xs text-[#748195] lg:block">Автоматический расчёт</p><button type="button" onClick={() => window.scrollTo({ top: 0, behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "instant" : "smooth" })} className="rounded-md py-1 text-xs font-medium text-[#647184] outline-offset-4 hover:text-[#E83C35] focus-visible:outline-2 lg:hidden">Вернуться</button><button type="button" aria-label={`Сбросить: ${config.title}`} onClick={() => setValues(previous => previous.map((value, i) => i === previous.length - 1 ? value : ""))} className="flex items-center gap-1.5 rounded-md py-1 text-xs font-medium text-[#647184] outline-offset-4 hover:text-[#E83C35] focus-visible:outline-2"><RotateCcw className="size-3.5" />Сбросить</button></div>
   </section>;
 }
 
@@ -99,13 +99,13 @@ export function MortgageCalculators() {
     window.addEventListener("scroll", resetOnReturn, { passive: true });
     return () => window.removeEventListener("scroll", resetOnReturn);
   }, []);
-  return <div><div className="mb-5 lg:hidden"><nav ref={navigationRef} aria-label="Выберите нужный расчёт" className="grid grid-cols-[.7fr_1fr_1.25fr] border-b border-[#E4E8ED]">{configs.map(config => <a key={config.mode} href={`#mortgage-${config.mode}`} aria-label={config.title} aria-current={activeMode === config.mode ? "location" : undefined} onClick={event => {
+  return <div><div className="mb-5 lg:hidden"><nav ref={navigationRef} aria-label="Выберите нужный расчёт" className="grid grid-cols-3 border-b border-[#E4E8ED]">{configs.map(config => <a key={config.mode} href={`#mortgage-${config.mode}`} aria-label={config.title} aria-current={activeMode === config.mode ? "location" : undefined} onClick={event => {
     event.preventDefault();
     setActiveMode(config.mode);
     const target = document.getElementById(`mortgage-${config.mode}`);
     target?.focus({ preventScroll: true });
     target?.scrollIntoView({ behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "instant" : "smooth", block: "start" });
-  }} className={`inline-flex min-h-11 min-w-0 items-center justify-center whitespace-nowrap border-b-2 px-[3px] py-2 text-sm leading-5 font-semibold transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#26364A] ${activeMode === config.mode ? "border-[#E83C35] text-[#26364A]" : "border-transparent text-[#647184] hover:border-[#C5CDD8] hover:text-[#26364A]"}`}>{config.mode === "part" ? "Взнос" : config.mode === "whole" ? "Стоимость" : "Частичный ПВ"}</a>)}</nav></div><div className="grid items-start gap-6 lg:grid-cols-2">{configs.map(config => <MortgageCard key={config.mode} config={config} />)}</div>
+  }} className={`inline-flex min-h-11 min-w-0 items-center justify-center whitespace-nowrap border-b-2 px-[3px] py-2 text-sm leading-5 font-semibold transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#26364A] ${activeMode === config.mode ? "border-[#E83C35] text-[#26364A]" : "border-transparent text-[#647184] hover:border-[#C5CDD8] hover:text-[#26364A]"}`}>{config.mode === "part" ? "Взнос" : config.mode === "whole" ? "Бюджет" : "Частичный ПВ"}</a>)}</nav></div><div className="grid items-start gap-6 lg:grid-cols-2">{configs.map(config => <MortgageCard key={config.mode} config={config} />)}</div>
     <section aria-label="Округление расчётов" className="mt-8 rounded-3xl border border-[#EBEEF2] bg-white p-6 sm:p-8">
       <p className="-mx-3 text-center text-[11px] leading-loose text-[#7B8797] min-[375px]:text-xs sm:mx-0 sm:text-sm"><span className="block whitespace-nowrap">Расчёт без промежуточного округления</span><span className="block whitespace-nowrap">Итог округляется вверх до целого рубля</span></p>
     </section>

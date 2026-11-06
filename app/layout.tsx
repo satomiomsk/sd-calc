@@ -4,16 +4,37 @@ import localFont from "next/font/local"
 import { Toaster } from "@/components/ui/sonner"
 import "./globals.css"
 import { ErrorReporter, ConsoleReporter, ReactErrorBoundary } from "@/components/error-reporter"
-import { AppAnalytics } from "@/components/app-analytics"
 
 const inter = localFont({ src: "../public/fonts/InterVariable.woff2", display: "swap", weight: "100 900" });
 
+const publicAsset = (path: string) => `${process.env.NEXT_PUBLIC_BASE_PATH ?? ""}${path}`;
+
 export const metadata: Metadata = {
-  title: "SD | Расчёты",
-  description: "Удобный расчёт агентского вознаграждения при покупке и продаже недвижимости",
-  icons: { icon: "/favicon.png?v=sd-calculator-1" },
-  manifest: "/manifest.webmanifest",
-  appleWebApp: { capable: true, title: "SD | Расчёты", statusBarStyle: "default" },
+  metadataBase: new URL("https://sdcalc55.github.io/"),
+  title: "SD | Калькулятор",
+  description: "Расчёт агентского вознаграждения и кредитный калькулятор",
+  openGraph: {
+    type: "website",
+    locale: "ru_RU",
+    url: "https://sdcalc55.github.io/",
+    title: "SD | Калькулятор",
+    description: "Расчёт агентского вознаграждения и кредитный калькулятор",
+    images: [{
+      url: "https://sdcalc55.github.io/images/sd-calculator-logo.png?v=160-white",
+      width: 160,
+      height: 160,
+      alt: "SD — калькулятор расчётов",
+    }],
+  },
+  twitter: {
+    card: "summary",
+    title: "SD | Калькулятор",
+    description: "Расчёт агентского вознаграждения и кредитный калькулятор",
+    images: ["https://sdcalc55.github.io/images/sd-calculator-logo.png?v=160"],
+  },
+  icons: { icon: publicAsset("/favicon.png?v=sd-calculator-1") },
+  manifest: publicAsset("/manifest.webmanifest"),
+  appleWebApp: { capable: true, title: "SD | Калькулятор", statusBarStyle: "default" },
 };
 
 export const viewport: Viewport = {
@@ -39,7 +60,6 @@ export default function RootLayout({
         <Toaster />
         <ErrorReporter />
         <ConsoleReporter />
-        <AppAnalytics />
       </body>
     </html>
   );
