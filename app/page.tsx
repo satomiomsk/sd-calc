@@ -9,7 +9,7 @@ import { MortgageCalculators } from "@/components/mortgage-calculators";
 import { LegalFooter } from "@/components/legal-footer";
 import { LoanCalculator } from "@/components/loan-calculator";
 import type { Operation } from "@/lib/calculator";
-import { useTariffs, TARIFF_ORIGIN } from "@/hooks/use-tariffs";
+import { useTariffs } from "@/hooks/use-tariffs";
 
 const navigationFont = localFont({ src: "../public/fonts/OnestVariable.ttf", display: "swap", weight: "100 900" });
 const headingFont = localFont({ src: "../public/fonts/MontserratVariable.ttf", display: "swap", weight: "100 900" });
@@ -56,7 +56,7 @@ export default function Home() {
     <header className="border-b border-[#E7EBF0] bg-white">
       <div className="mx-auto flex min-h-20 max-w-[1200px] flex-nowrap items-center justify-between gap-x-2 px-4 pt-[calc(1.5rem+env(safe-area-inset-top,0px))] pb-4 sm:gap-x-4 sm:px-8 max-sm:min-h-16 max-sm:pt-[calc(.75rem+env(safe-area-inset-top,0px))] max-sm:pb-3">
         <a href="#" onClick={event => { event.preventDefault(); navigate("home"); }} aria-label="Калькулятор SD - главная" className="flex shrink-0 items-center gap-1 rounded-lg outline-offset-4 focus-visible:outline-2 focus-visible:outline-[#E83C35] sm:gap-3">
-          <span role="button" tabIndex={0} aria-label="Вход разработчика" onClick={event => { event.preventDefault(); event.stopPropagation(); window.location.href = location.hostname === "sd.local" ? `${TARIFF_ORIGIN}/developer` : "/developer"; }} onKeyDown={event => { if(event.key === "Enter" || event.key === " ") { event.preventDefault(); event.stopPropagation(); window.location.href = location.hostname === "sd.local" ? `${TARIFF_ORIGIN}/developer` : "/developer"; } }} className="flex size-7 shrink-0 items-center justify-center rounded-md outline-offset-4 focus-visible:outline-2 min-[375px]:size-8 sm:size-10"><Image src="/images/sd-calculator-logo.png" alt="Логотип SD" width={40} height={40} unoptimized className="size-full object-contain" /></span>
+          <span className="flex size-7 shrink-0 items-center justify-center rounded-md min-[375px]:size-8 sm:size-10"><Image src="/images/sd-calculator-logo.png" alt="Логотип SD" width={40} height={40} unoptimized className="size-full object-contain" /></span>
           <span className="whitespace-nowrap text-[13px] font-semibold tracking-tight min-[375px]:text-sm sm:text-[18px]">SvDemidenko</span>
         </a>
         <div className="ml-auto flex shrink-0 items-center gap-5">
