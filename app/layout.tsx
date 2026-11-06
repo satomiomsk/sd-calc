@@ -31,7 +31,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "SD | Расчёты",
     description: "Расчёт агентского вознаграждения и кредитный калькулятор",
-    images: ["https://sdcalc55.github.io/og-preview.png?v=2"],
+    images: ["https://sdcalc55.github.io/og-preview-small.png?v=3"],
   },
   icons: { icon: publicAsset("/favicon.png?v=sd-calculator-1") },
   manifest: publicAsset("/manifest.webmanifest"),
