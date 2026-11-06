@@ -94,6 +94,11 @@ jobs:
               if marker not in text:
                   raise SystemExit("Could not find dependencies block in app/build.gradle")
               text = text.replace(marker, release + "\\n" + marker, 1)
+          import re
+          text, version_name_count = re.subn(r'versionName\s+"[^"]+"', 'versionName "1.0"', text, count=1)
+          text, version_code_count = re.subn(r'versionCode\s+\d+', 'versionCode 1', text, count=1)
+          if version_name_count != 1 or version_code_count != 1:
+              raise SystemExit("Could not set Android versionName/versionCode")
           path.write_text(text)
           PY
 
