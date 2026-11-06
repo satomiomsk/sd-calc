@@ -15,6 +15,7 @@ import { useTariffs } from "@/hooks/use-tariffs";
 
 const navigationFont = localFont({ src: "../public/fonts/OnestVariable.ttf", display: "swap", weight: "100 900" });
 const headingFont = localFont({ src: "../public/fonts/MontserratVariable.ttf", display: "swap", weight: "100 900" });
+const publicAsset = (path: string) => `${process.env.NEXT_PUBLIC_BASE_PATH ?? ""}${path}`;
 
 type Screen = "home" | "commission" | "mortgage";
 const titles = { commission: "Комиссия", mortgage: "Ипотека" };
@@ -82,7 +83,7 @@ export default function Home() {
     <header className="border-b border-[#E7EBF0] bg-white">
       <div className="mx-auto flex min-h-20 max-w-[1200px] flex-nowrap items-center justify-between gap-x-2 px-4 pt-[calc(1.5rem+env(safe-area-inset-top,0px))] pb-4 sm:gap-x-4 sm:px-8 max-sm:min-h-16 max-sm:pt-[calc(.75rem+env(safe-area-inset-top,0px))] max-sm:pb-3">
         <a href="#" onClick={event => { event.preventDefault(); navigate("home"); }} aria-label="Калькулятор SD - главная" className="flex shrink-0 items-center gap-1 rounded-lg outline-offset-4 focus-visible:outline-2 focus-visible:outline-[#E83C35] sm:gap-3">
-          <span className="flex size-7 shrink-0 items-center justify-center rounded-md min-[375px]:size-8 sm:size-10"><Image src="/images/sd-calculator-logo.png" alt="Логотип SD" width={40} height={40} unoptimized className="size-full object-contain" /></span>
+          <span className="flex size-7 shrink-0 items-center justify-center rounded-md min-[375px]:size-8 sm:size-10"><Image src={publicAsset("/images/sd-calculator-logo.png")} alt="Логотип SD" width={40} height={40} unoptimized className="size-full object-contain" /></span>
           <span className="whitespace-nowrap text-[13px] font-semibold tracking-tight min-[375px]:text-sm sm:text-[18px]">SvDemidenko</span>
         </a>
         <div className="ml-auto flex shrink-0 items-center gap-5">
@@ -125,7 +126,7 @@ export default function Home() {
       <div className={`flex w-full flex-col items-center justify-center gap-4 border px-4 sm:gap-5 ${screen === "home" ? "mx-auto mt-0 max-w-[900px] rounded-2xl border-[#E4E8ED] bg-white py-5 max-sm:py-2 sm:mt-6 sm:py-6" : "rounded-3xl border-[#F3DAD8] bg-[#FFF7F6] py-2 sm:py-3"}`}>
         <div className="flex items-center justify-center gap-4 sm:gap-6">
         <div className="relative shrink-0">
-          <Image src="/images/svdemidenko-portrait-v3.png" alt="Портрет SvDemidenko" width={512} height={512} unoptimized className={`block aspect-square size-20 shrink-0 rounded-full border-[3px] border-white object-contain object-center shadow-sm sm:size-28 ${screen === "home" ? "max-sm:size-14 max-sm:[@media(max-height:650px)]:size-12" : ""}`} />
+          <Image src={publicAsset("/images/svdemidenko-portrait-v3.png")} alt="Портрет SvDemidenko" width={512} height={512} unoptimized className={`block aspect-square size-20 shrink-0 rounded-full border-[3px] border-white object-contain object-center shadow-sm sm:size-28 ${screen === "home" ? "max-sm:size-14 max-sm:[@media(max-height:650px)]:size-12" : ""}`} />
         </div>
         <div className="min-w-0 text-left">
           <nav aria-label="Социальные сети" className="flex items-center gap-0 sm:gap-1">
@@ -134,7 +135,7 @@ export default function Home() {
               { name: "MAX", href: "https://max.ru/u/f9LHodD0cOK4HS3ILV9kidFm5zkxzt0iRbfZYiViC9zB7MF8pvVrcAskwJk", icon: "max" },
               { name: "ВКонтакте", href: "https://vk.ru/lanaomsk", icon: "vk" },
               { name: "Telegram", href: "https://t.me/svdemidenko", icon: "telegram" },
-            ].map(social => <a key={social.icon} href={social.href} target="_blank" rel="noopener noreferrer" aria-label={social.name} title={social.name} className="flex size-9 shrink-0 items-center justify-center rounded-xl text-[#647184] outline-offset-2 transition-colors hover:bg-white hover:text-[#26364A] focus-visible:outline-2 focus-visible:outline-[#A94442] min-[375px]:size-11">{social.icon === "instagram" ? <Instagram aria-hidden="true" className="size-7" strokeWidth={1.7} /> : <Image src={`/images/social-${social.icon}.svg`} alt="" width={28} height={28} unoptimized className="size-7" />}</a>)}
+            ].map(social => <a key={social.icon} href={social.href} target="_blank" rel="noopener noreferrer" aria-label={social.name} title={social.name} className="flex size-9 shrink-0 items-center justify-center rounded-xl text-[#647184] outline-offset-2 transition-colors hover:bg-white hover:text-[#26364A] focus-visible:outline-2 focus-visible:outline-[#A94442] min-[375px]:size-11">{social.icon === "instagram" ? <Instagram aria-hidden="true" className="size-7" strokeWidth={1.7} /> : <Image src={publicAsset(`/images/social-${social.icon}.svg`)} alt="" width={28} height={28} unoptimized className="size-7" />}</a>)}
           </nav>
         </div>
         </div>
