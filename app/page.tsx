@@ -3,6 +3,8 @@
 import Image from "next/image";
 import localFont from "next/font/local";
 import { useEffect, useState } from "react";
+import { Capacitor } from "@capacitor/core";
+import { App } from "@capacitor/app";
 import { ArrowLeft, ChevronRight, ArrowDownLeft, ArrowUpRight, HousePlus, KeyRound, WalletCards, Calculator, House, Instagram, Sparkles, type LucideIcon } from "lucide-react";
 import { CommissionCalculator } from "@/components/commission-calculator";
 import { MortgageCalculators } from "@/components/mortgage-calculators";
@@ -30,6 +32,30 @@ export default function Home() {
   const [screen, setScreen] = useState<Screen>("home");
   const [operation, setOperation] = useState<Operation>("sale");
   const [mortgageTab, setMortgageTab] = useState<"downpayment" | "loan">("downpayment");
+  useEffect(() => {
+    if (!Capacitor.isNativePlatform()) return;
+    let active = true;
+    let listener: { remove: () => Promise<void> } | undefined;
+    App.addListener("backButton", ({ canGoBack }) => {
+      if (screen !== "home") {
+        // Android system back gesture/button should return to the app's home screen.
+        setScreen("home");
+        window.history.replaceState({ ...window.history.state, sdScreen: "home" }, "");
+        window.scrollTo({ top: 0, behavior: "instant" });
+      } else if (!canGoBack) {
+        void App.exitApp();
+      } else {
+        window.history.back();
+      }
+    }).then(handle => {
+      if (active) listener = handle;
+      else void handle.remove();
+    });
+    return () => {
+      active = false;
+      if (listener) void listener.remove();
+    };
+  }, [screen]);
   useEffect(() => {
     // Keep calculator navigation in the same document, preserving all input state.
     window.history.replaceState({ ...window.history.state, sdScreen: "home" }, "");
