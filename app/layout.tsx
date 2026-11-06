@@ -17,7 +17,6 @@ export const metadata: Metadata = {
     type: "website",
     locale: "ru_RU",
     url: "https://sdcalc55.github.io/",
-    siteName: "SD | Калькулятор",
     title: "SD | Калькулятор",
     description: "Расчёт агентского вознаграждения и кредитный калькулятор",
     images: [{
