@@ -20,7 +20,7 @@ export const metadata: Metadata = {
     title: "SD | Калькулятор",
     description: "Расчёт агентского вознаграждения и кредитный калькулятор",
     images: [{
-      url: "https://sdcalc55.github.io/og-preview-256.png?v=9",
+      url: "https://sdcalc55.github.io/images/sd-calculator-logo.png",
       width: 256,
       height: 256,
       alt: "SD — калькулятор расчётов",
@@ -28,13 +28,13 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary",
-    title: "SD | Расчёты",
+    title: "SD | Калькулятор",
     description: "Расчёт агентского вознаграждения и кредитный калькулятор",
-    images: ["https://sdcalc55.github.io/og-preview-256.png?v=9"],
+    images: ["https://sdcalc55.github.io/images/sd-calculator-logo.png"],
   },
   icons: { icon: publicAsset("/favicon.png?v=sd-calculator-1") },
   manifest: publicAsset("/manifest.webmanifest"),
-  appleWebApp: { capable: true, title: "SD | Расчёты", statusBarStyle: "default" },
+  appleWebApp: { capable: true, title: "SD | Калькулятор", statusBarStyle: "default" },
 };
 
 export const viewport: Viewport = {
