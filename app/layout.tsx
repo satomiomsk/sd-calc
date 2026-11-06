@@ -21,7 +21,7 @@ export const metadata: Metadata = {
     title: "SD | Расчёты",
     description: "Расчёт агентского вознаграждения и кредитный калькулятор",
     images: [{
-      url: "https://sdcalc55.github.io/og-preview.png?v=2",
+      url: "https://sdcalc55.github.io/og-preview-small.png?v=3",
       width: 1200,
       height: 630,
       alt: "SD — калькулятор расчётов",
