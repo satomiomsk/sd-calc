@@ -81,6 +81,7 @@ jobs:
           ns = "{http://schemas.android.com/apk/res/android}"
           application.set(ns + "icon", "@mipmap/ic_launcher")
           application.set(ns + "roundIcon", "@mipmap/ic_launcher_round")
+          ET.register_namespace("android", "http://schemas.android.com/apk/res/android")
           tree.write(manifest, encoding="utf-8", xml_declaration=True)
           PY
 
