@@ -10,18 +10,18 @@ const inter = localFont({ src: "../public/fonts/InterVariable.woff2", display: "
 const publicAsset = (path: string) => `${process.env.NEXT_PUBLIC_BASE_PATH ?? ""}${path}`;
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://satomiomsk.github.io/sd-calc/"),
+  metadataBase: new URL("https://sdcalc55.github.io/"),
   title: "SD | Расчёты",
-  description: "Удобный расчёт агентского вознаграждения при покупке и продаже недвижимости",
+  description: "Расчёт агентского вознаграждения и кредитный калькулятор",
   openGraph: {
     type: "website",
     locale: "ru_RU",
-    url: "https://satomiomsk.github.io/sd-calc/",
+    url: "https://sdcalc55.github.io/",
     siteName: "SD | Расчёты",
     title: "SD | Расчёты",
-    description: "Удобный расчёт агентского вознаграждения при покупке и продаже недвижимости",
+    description: "Расчёт агентского вознаграждения и кредитный калькулятор",
     images: [{
-      url: "https://satomiomsk.github.io/sd-calc/images/sd-calculator-logo.png",
+      url: "https://sdcalc55.github.io/images/sd-calculator-logo.png",
       width: 512,
       height: 512,
       alt: "SD — калькулятор расчётов",
@@ -30,8 +30,8 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary",
     title: "SD | Расчёты",
-    description: "Удобный расчёт агентского вознаграждения при покупке и продаже недвижимости",
-    images: ["https://satomiomsk.github.io/sd-calc/images/sd-calculator-logo.png"],
+    description: "Расчёт агентского вознаграждения и кредитный калькулятор",
+    images: ["https://sdcalc55.github.io/images/sd-calculator-logo.png"],
   },
   icons: { icon: publicAsset("/favicon.png?v=sd-calculator-1") },
   manifest: publicAsset("/manifest.webmanifest"),
