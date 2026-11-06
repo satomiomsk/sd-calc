@@ -7,7 +7,6 @@ on:
     paths:
       - "lib/auth.ts"
       - "tests/auth.test.cjs"
-      - "package.json"
       - ".github/workflows/test-developer-auth.yml"
   workflow_dispatch:
 
@@ -26,7 +25,9 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 22
-      - name: Install dependencies
-        run: npm install
+      - name: Install TypeScript test runner
+        run: npm install --prefix /tmp/auth-test --ignore-scripts typescript@5.9.3
       - name: Test developer password and signed sessions
+        env:
+          NODE_PATH: /tmp/auth-test/node_modules
         run: node --test tests/auth.test.cjs
