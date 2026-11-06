@@ -94,6 +94,18 @@ jobs:
               if marker not in text:
                   raise SystemExit("Could not find dependencies block in app/build.gradle")
               text = text.replace(marker, release + "\\n" + marker, 1)
+          # Configure signing separately so it also applies when the Capacitor template
+          # already contains a buildTypes block.
+          text += """
+          
+          android {
+              buildTypes {
+                  release {
+                      signingConfig signingConfigs.debug
+                  }
+              }
+          }
+          """
           import re
           text, version_name_count = re.subn(r'versionName\s+"[^"]+"', 'versionName "1.0"', text, count=1)
           text, version_code_count = re.subn(r'versionCode\s+\d+', 'versionCode 1', text, count=1)
