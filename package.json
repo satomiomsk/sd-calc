@@ -4,7 +4,6 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "next start",
     "lint": "eslint .",
     "build:android": "npm run build && npx cap sync android"
   },
