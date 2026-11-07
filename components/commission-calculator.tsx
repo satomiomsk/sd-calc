@@ -202,7 +202,7 @@ export function CommissionCalculator({ operation, tariffs }: { operation: Operat
           </div>
           <div className="mt-5 flex flex-wrap items-center justify-between gap-3">
             <span className="flex items-center gap-1.5 text-xs text-[#748195] dark:text-[#B8C4D2]"><span className="size-1.5 rounded-full bg-[#84A992]" />Автоматический расчёт</span>
-            <button onClick={clear} className="flex items-center gap-1.5 rounded-md py-1 text-xs font-medium text-[#647184] outline-offset-4 hover:text-[#E83C35] focus-visible:outline-2"><RotateCcw className="size-3.5" />Сбросить</button>
+            <button onClick={clear} className="inline-flex min-h-10 items-center gap-2 rounded-xl border border-[#E83C35]/25 bg-[#FFF1F0] px-3.5 py-2 text-sm font-semibold text-[#C94B45] shadow-sm transition hover:border-[#E83C35]/50 hover:bg-[#FCE5E3] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#E83C35] dark:border-[#8D4845] dark:bg-[#3A292B] dark:text-[#F0A09A] dark:hover:bg-[#493033]"><RotateCcw className="size-3.5" />Сбросить</button>
           </div>
         </section>
         <div className="space-y-4">
