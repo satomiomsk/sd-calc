@@ -139,6 +139,8 @@ export default function Home() {
   const [historyMode, setHistoryModeState] = useState<HistoryMode>("manual");
   const [themeMode, setThemeMode] = useState<ThemeMode>("system");
   const [themeReady, setThemeReady] = useState(false);
+  const [isNativeApp, setIsNativeApp] = useState(false);
+  useEffect(() => { setIsNativeApp(Capacitor.isNativePlatform()); }, []);
   const [expandedHistory, setExpandedHistory] = useState<Set<string>>(() => new Set());
   const [historyFilter, setHistoryFilter] = useState<"all" | "commission" | "downpayment" | "loan">("all");
   useEffect(() => { try { const saved = window.sessionStorage.getItem("sd-history-filter"); if (saved === "all" || saved === "commission" || saved === "downpayment" || saved === "loan") setHistoryFilter(saved); } catch {} }, []);
@@ -287,7 +289,7 @@ export default function Home() {
         <div><h2 className="mb-3 text-lg font-semibold">История расчётов</h2><div className="rounded-2xl border border-[#EBEEF2] bg-white p-4"><p className="mb-3 font-medium">Сохранение истории</p><div className="grid grid-cols-2 gap-2"><button type="button" onClick={() => { setHistoryMode("manual"); setHistoryModeState(getHistoryMode()); }} className={`rounded-xl border px-3 py-3 text-sm font-medium ${historyMode === "manual" ? "border-[#E83C35] bg-[#FCEBEA] text-[#A94442]" : "border-[#E4E8ED]"}`}>Ручное</button><button type="button" onClick={() => { setHistoryMode("auto"); setHistoryModeState(getHistoryMode()); }} className={`rounded-xl border px-3 py-3 text-sm font-medium ${historyMode === "auto" ? "border-[#E83C35] bg-[#FCEBEA] text-[#A94442]" : "border-[#E4E8ED]"}`}>Автоматическое</button></div><p className="mt-2 text-xs text-[#748195]">{historyMode === "manual" ? "Записи создаются по нажатию на закладку." : "Автоматическое сохранение после завершённого расчёта."}</p></div></div>
         <div><h2 className="mb-3 text-lg font-semibold">Внешний вид</h2><div className="rounded-2xl border border-[#EBEEF2] bg-white p-4"><p className="mb-3 font-medium">Тема приложения</p><div className="grid grid-cols-3 gap-2">{([{value:"light",label:"Светлая"},{value:"dark",label:"Тёмная"},{value:"system",label:"Авто"}] as const).map(option => <button key={option.value} type="button" aria-pressed={themeMode === option.value} onClick={() => { try { localStorage.setItem("sd-theme-mode-v1", option.value); } catch {}
             document.cookie = `sd-theme-mode-v1=${option.value}; Path=/; Max-Age=31536000; SameSite=Lax`;
-            setThemeMode(option.value); const dark = option.value === "dark" || (option.value === "system" && window.matchMedia("(prefers-color-scheme: dark)").matches); document.documentElement.classList.toggle("dark", dark); }} className={`rounded-xl border px-2 py-3 text-sm font-medium ${themeMode === option.value ? "border-[#E83C35] bg-[#FCEBEA] text-[#A94442]" : "border-[#E4E8ED]"}`}>{option.label}</button>)}</div><p className="mt-2 text-xs text-[#748195]"></p></div></div><LegalSettings /><div><h2 className="mb-3 text-lg font-semibold">Приложение</h2><div className="rounded-2xl border border-[#EBEEF2] bg-white p-4 text-sm">Версия <span className="float-right text-[#748195]">1.0.0</span></div></div>
+            setThemeMode(option.value); const dark = option.value === "dark" || (option.value === "system" && window.matchMedia("(prefers-color-scheme: dark)").matches); document.documentElement.classList.toggle("dark", dark); }} className={`rounded-xl border px-2 py-3 text-sm font-medium ${themeMode === option.value ? "border-[#E83C35] bg-[#FCEBEA] text-[#A94442]" : "border-[#E4E8ED]"}`}>{option.label}</button>)}</div><p className="mt-2 text-xs text-[#748195]"></p></div></div>{isNativeApp && <LegalSettings />}<div><h2 className="mb-3 text-lg font-semibold">Приложение</h2><div className="rounded-2xl border border-[#EBEEF2] bg-white p-4 text-sm">Версия <span className="float-right text-[#748195]">1.0.0</span></div></div>
       </section>}
     </main>
     <footer className={`mx-auto mt-auto w-full max-w-[1200px] px-5 pb-7 sm:px-8 ${screen === "home" ? "max-sm:pb-[calc(.5rem+env(safe-area-inset-bottom,0px))]" : ""}`}>
@@ -308,7 +310,7 @@ export default function Home() {
         </div>
         </div>
       </div>
-      <LegalFooter />
+      {!isNativeApp && <LegalFooter />}
     </footer>
   </div>;
 }
