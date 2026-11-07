@@ -14,7 +14,7 @@ function LegalDialog({ footer = false }: { footer?: boolean }) {
   return <Dialog>
     <DialogTrigger asChild>
       {footer
-        ? <button type="button" className="w-fit max-w-full shrink-0 rounded-sm text-right text-[11px] leading-[1.6] no-underline transition-colors hover:text-[#26364A] focus-visible:outline-2 focus-visible:outline-offset-4 sm:max-w-[300px] lg:max-w-none lg:whitespace-nowrap">Условия использования и политика конфиденциальности</button>
+        ? <button type="button" className="hidden w-fit max-w-full shrink-0 rounded-sm text-right text-[11px] sm:block leading-[1.6] no-underline transition-colors hover:text-[#26364A] focus-visible:outline-2 focus-visible:outline-offset-4 sm:max-w-[300px] lg:max-w-none lg:whitespace-nowrap">Условия использования и политика конфиденциальности</button>
         : <button type="button" className="flex min-h-10 w-full items-center justify-between gap-3 text-left text-sm font-medium text-[#26364A] outline-offset-4 focus-visible:outline-2 focus-visible:outline-[#E83C35]"><span>Условия использования и политика конфиденциальности</span><span aria-hidden="true" className="text-[#748195]">›</span></button>}
     </DialogTrigger>
       <DialogContent className="flex max-h-[85dvh] flex-col gap-0 overflow-hidden rounded-2xl p-0 sm:max-w-3xl">
