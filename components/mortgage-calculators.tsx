@@ -63,7 +63,7 @@ function MortgageCard({ config }: { config: typeof configs[number] }) {
   useEffect(() => {
     try {
       const isRefresh = performance.getEntriesByType("navigation")[0]?.type === "reload";
-      const activeCalculator = window.sessionStorage.getItem("sd-mortgage-tab") === "downpayment";
+      const activeCalculator = window.sessionStorage.getItem("sd-current-screen") === "mortgage" && window.sessionStorage.getItem("sd-mortgage-tab") === "downpayment";
       if (isRefresh && activeCalculator) window.sessionStorage.removeItem(storageKey);
       const saved = isRefresh && activeCalculator ? null : window.sessionStorage.getItem(storageKey);
       if (saved) {
