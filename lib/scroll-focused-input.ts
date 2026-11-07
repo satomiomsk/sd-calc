@@ -1,4 +1,4 @@
-export function scrollFocusedInputIntoView(element: HTMLElement) {
+export function scrollFocusedInputIntoView(element: HTMLElement, revealThrough?: HTMLElement | null) {
   if (typeof window === "undefined") return;
 
   const check = () => {
@@ -7,7 +7,11 @@ export function scrollFocusedInputIntoView(element: HTMLElement) {
     const viewport = window.visualViewport;
     const visibleTop = viewport?.offsetTop ?? 0;
     const visibleBottom = visibleTop + (viewport?.height ?? window.innerHeight);
-    const rect = element.getBoundingClientRect();
+    const focusedRect = element.getBoundingClientRect();
+    const endRect = revealThrough?.getBoundingClientRect();
+    const rect = endRect
+      ? { top: Math.min(focusedRect.top, endRect.top), bottom: Math.max(focusedRect.bottom, endRect.bottom) }
+      : focusedRect;
     const margin = 24;
     let delta = 0;
 
