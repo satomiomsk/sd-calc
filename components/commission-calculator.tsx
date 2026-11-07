@@ -192,7 +192,7 @@ export function CommissionCalculator({ operation, tariffs }: { operation: Operat
             {discount?.paired && <MoneyInput id="paired-price" label={sale ? "Стоимость ранее приобретаемой недвижимости, ₽" : "Стоимость ранее продаваемой недвижимости, ₽"} value={pairedPrice} onChange={setPairedPrice} />}
           </div>
           <div className="mt-5 flex flex-wrap items-center justify-between gap-3">
-            <span className="flex items-center gap-1.5 text-xs text-[#748195] dark:text-[#B8C4D2]"><span className="size-1.5 rounded-full bg-[#84A992]" />Автоматический перерасчёт</span>
+            <span className="flex items-center gap-1.5 text-xs text-[#748195] dark:text-[#B8C4D2]"><span className="size-1.5 rounded-full bg-[#84A992]" />Автоматический расчёт</span>
             <button onClick={clear} className="flex items-center gap-1.5 rounded-md py-1 text-xs font-medium text-[#647184] outline-offset-4 hover:text-[#E83C35] focus-visible:outline-2"><RotateCcw className="size-3.5" />Сбросить</button>
           </div>
         </section>
