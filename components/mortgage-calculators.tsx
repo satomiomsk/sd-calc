@@ -31,9 +31,9 @@ const formulas: Record<MortgageMode, string> = {
 };
 
 const themes = {
-  part: { background: "bg-[#EEF1F5]", accent: "text-[#E83C35]", border: "border-[#E4E8ED]", link: "border-[#E4E8ED] bg-[#F7F8FA] text-[#E83C35] hover:bg-[#EEF1F5]" },
-  whole: { background: "bg-[#EEF1F5]", accent: "text-[#E83C35]", border: "border-[#E4E8ED]", link: "border-[#E4E8ED] bg-[#F7F8FA] text-[#E83C35] hover:bg-[#EEF1F5]" },
-  adjustment: { background: "bg-[#EEF1F5]", accent: "text-[#E83C35]", border: "border-[#E4E8ED]", link: "border-[#E4E8ED] bg-[#F7F8FA] text-[#E83C35] hover:bg-[#EEF1F5]" },
+  part: { background: "bg-[#FCEBEA] dark:bg-[#352322]", accent: "text-[#D68B86] dark:text-[#E69A94]", border: "border-[#F1DCD9] dark:border-[#65413F]", link: "border-[#F1DCD9] bg-[#FFF7F6] text-[#C94B45] hover:bg-[#FCEBEA] dark:border-[#65413F] dark:bg-[#352322] dark:text-[#E69A94]" },
+  whole: { background: "bg-[#FAF3E6] dark:bg-[#332D20]", accent: "text-[#967A3E] dark:text-[#D6BD83]", border: "border-[#EADFC7] dark:border-[#62543A]", link: "border-[#EADFC7] bg-[#FFFBF3] text-[#967A3E] hover:bg-[#FAF3E6] dark:border-[#62543A] dark:bg-[#332D20] dark:text-[#D6BD83]" },
+  adjustment: { background: "bg-[#EAF2FB] dark:bg-[#202F40]", accent: "text-[#52769D] dark:text-[#91B5DD]", border: "border-[#D6E2F0] dark:border-[#405A75]", link: "border-[#D6E2F0] bg-[#F5F9FE] text-[#52769D] hover:bg-[#EAF2FB] dark:border-[#405A75] dark:bg-[#202F40] dark:text-[#91B5DD]" },
 };
 
 function MortgageInput({ id, label, value, money, suffix, placeholder, onChange }: { id: string; label: string; value: string; money: boolean; suffix?: string; placeholder: string; onChange: (value: string) => void }) {
