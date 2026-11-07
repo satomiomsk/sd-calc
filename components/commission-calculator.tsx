@@ -106,7 +106,7 @@ export function CommissionCalculator({ operation, tariffs }: { operation: Operat
     const key = JSON.stringify(params);
     if (savedKey === key || dismissedKey === key) return;
     const timer = window.setTimeout(() => {
-      saveCalculation({ kind: "commission", title: `Комиссия - ${sale ? "Продажа" : "Покупка"}`, summary: money(discounted.total), params, results: { commission: money(result.total), final: money(discounted.total), ...(discounted.saving > 0 ? { discountSaving: money(discounted.saving) } : {}), discount: discount?.name ?? "Без скидки" } }, true);
+      saveCalculation({ kind: "commission", title: `Комиссия - ${sale ? "Продажа" : "Покупка"}`, summary: money(discounted.total), params, results: { commission: money(result.total), final: money(discounted.total), discount: discount?.name ?? "Без скидки" } }, true);
       setSavedKey(key);
     }, 650);
     return () => window.clearTimeout(timer);
