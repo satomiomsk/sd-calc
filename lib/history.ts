@@ -40,6 +40,11 @@ export function deleteCalculation(id: string) {
   window.dispatchEvent(new CustomEvent("sd-history-updated"));
 }
 
+export function removeCalculationByKind(kind: CalculationKind) {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(getCalculationHistory().filter(item => item.kind !== kind)));
+  window.dispatchEvent(new CustomEvent("sd-history-updated"));
+}
+
 export function clearCalculationHistory() {
   localStorage.removeItem(STORAGE_KEY);
   window.dispatchEvent(new CustomEvent("sd-history-updated"));
