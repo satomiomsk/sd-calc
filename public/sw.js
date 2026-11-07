@@ -31,7 +31,7 @@ self.addEventListener("install", (event) => {
       if (response.ok) {
         await cache.put("/", response.clone());
         const html = await response.text();
-        const assets = [...html.matchAll(/(?:src|href)=["']([^"']*\\/_next\\/static\\/[^"']+)["']/g)]
+        const assets = [...html.matchAll(/(?:src|href)=["']([^"']*\/_next\/static\/[^"']+)["']/g)]
           .map((match) => new URL(match[1], self.location.origin).pathname);
         await Promise.all([...new Set(assets)].map(async (url) => {
           try {
@@ -91,7 +91,7 @@ self.addEventListener("fetch", (event) => {
     url.pathname.startsWith("/icons/") ||
     url.pathname.startsWith("/images/") ||
     url.pathname.startsWith("/fonts/") ||
-    /\\.(?:png|jpe?g|svg|webp|ico|woff2?|ttf|otf)$/i.test(url.pathname) ||
+    /\.(?:png|jpe?g|svg|webp|ico|woff2?|ttf|otf)$/i.test(url.pathname) ||
     url.pathname === "/manifest.webmanifest";
 
   if (isAppAsset) {
