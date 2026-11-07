@@ -23,7 +23,7 @@ export function formatInput(value: string): string {
 }
 
 export function calculate(operation: Operation, category: Category, price: number | null, credit: number | null = null, tariffs?: TariffSnapshot): Calculation {
-  const valid = (v: number | null): v is number => v !== null && Number.isFinite(v) && v > 0 && v <= Number.MAX_SAFE_INTEGER;
+  const valid = (v: number | null): v is number => v !== null && Number.isFinite(v) && v > 0 && v <= 999999999;
   if (!valid(price) || (operation !== "sale" && operation !== "purchase")) return { status: "invalid" };
   if (tariffs) {
     const rule = tariffs.rules.find(r => r.operation === operation && r.category === category && price >= r.from && (r.to === null || price <= r.to));
