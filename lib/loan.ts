@@ -7,7 +7,7 @@ function validateTermAndRate(months: number, annualRate: number) {
 }
 
 export function calculateLoan(principal: number, months: number, annualRate: number): LoanResult {
-  if (!Number.isFinite(principal) || principal <= 0 || principal > 999999999) throw new Error("Укажите корректную сумму кредита больше нуля.");
+  if (!Number.isFinite(principal) || principal <= 0 || principal > 999999999) throw new Error("Введите корректную сумму. Максимум — 999 999 999 ₽.");
   if (principal < 0.01) throw new Error("Сумма кредита должна быть не меньше 0,01 ₽.");
   if (Math.round(principal * 100) / 100 !== principal) throw new Error("Укажите сумму кредита с точностью до копеек.");
   validateTermAndRate(months, annualRate);
@@ -21,7 +21,7 @@ export function calculateLoan(principal: number, months: number, annualRate: num
 }
 
 export function calculateLoanFromPayment(payment: number, months: number, annualRate: number): LoanResult {
-  if (!Number.isFinite(payment) || payment <= 0 || payment > 999999999) throw new Error("Укажите корректный ежемесячный платёж больше нуля.");
+  if (!Number.isFinite(payment) || payment <= 0 || payment > 999999999) throw new Error("Введите корректную сумму. Максимум — 999 999 999 ₽.");
   if (payment < 0.01) throw new Error("Ежемесячный платёж должен быть не меньше 0,01 ₽.");
   if (Math.round(payment * 100) / 100 !== payment) throw new Error("Укажите ежемесячный платёж с точностью до копеек.");
   validateTermAndRate(months, annualRate);
