@@ -1,7 +1,8 @@
 "use client";
 
 import { useRef, useState } from "react";
-import { Calculator, Copy, Info, RotateCcw, Wallet } from "lucide-react";
+import { ArrowUp, Bookmark, Calculator, Copy, Info, RotateCcw, Wallet } from "lucide-react";
+import { saveCalculation } from "@/lib/history";
 import { toast } from "sonner";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { applyDiscount, applyPairedDiscount, discounts } from "@/lib/discounts";
@@ -80,6 +81,16 @@ export function CommissionCalculator({ operation, tariffs }: { operation: Operat
   const motivationValid = Number.isFinite(motivation) && motivation >= 0 && motivation <= 100;
   const motivationAmount = discounted && motivationValid ? Math.round((discounted.total * motivation / 100 + Number.EPSILON) * 100) / 100 : null;
   const clear = () => { setPrice(""); setCredit(""); setDiscountId("none"); setPairedPrice(""); update("motivationPercent", ""); update("motivationOpen", false); };
+  const [savedKey, setSavedKey] = useState("");
+  const save = () => {
+    if (result.status !== "ok" || !discounted) return;
+    const params = { operation, category, price, credit, discountId, pairedPrice, motivationPercent };
+    const key = JSON.stringify(params);
+    if (savedKey === key) return;
+    saveCalculation({ kind: "commission", title: `Комиссия — ${sale ? "Продажа" : "Покупка"}`, summary: money(discounted.total), params, results: { commission: money(result.total), final: money(discounted.total), discount: discount?.name ?? "Без скидки" } });
+    setSavedKey(key);
+    toast.success("Расчёт сохранён в историю");
+  };
   const copy = async () => {
     if (result.status !== "ok" || !discounted) return;
     try { await navigator.clipboard.writeText(money(discounted.total)); toast.success("Сумма скопирована в буфер обмена"); }
