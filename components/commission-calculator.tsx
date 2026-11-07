@@ -217,7 +217,7 @@ export function CommissionCalculator({ operation, tariffs }: { operation: Operat
                   {motivationOpen && discounted && <div id="motivation-panel" className="mt-4 rounded-2xl border border-white/80 bg-white/75 p-4 sm:p-5">
                     <div className="mb-4 flex items-center gap-2 text-sm font-semibold"><Wallet aria-hidden="true" className="size-4 text-[#647184]" />Вознаграждение по сделке</div>
                     <label htmlFor="motivation-percent" className="mb-2 block text-sm font-semibold">Ваш партнерский процент</label>
-                    <div className="relative max-w-48"><input id="motivation-percent" autoFocus onFocus={event => scrollFocusedInputIntoView(event.currentTarget)} inputMode="decimal" enterKeyHint="done" autoComplete="off" placeholder="Например, 43.5" value={motivationPercent} onChange={event => {
+                    <div className="relative max-w-48"><input id="motivation-percent" autoFocus onFocus={event => scrollFocusedInputIntoView(event.currentTarget)} onClick={event => scrollFocusedInputIntoView(event.currentTarget)} inputMode="decimal" enterKeyHint="done" autoComplete="off" placeholder="Например, 43.5" value={motivationPercent} onChange={event => {
                        const raw = event.target.value.replace(",", ".").replace(/[^\d.]/g, "");
                        const parts = raw.split(".");
                        const candidate = parts.length > 2 ? parts[0] + "." + parts.slice(1).join("") : raw;
