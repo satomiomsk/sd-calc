@@ -293,7 +293,7 @@ export default function Home() {
       <div className={`flex w-full flex-col items-center justify-center gap-4 border px-4 sm:gap-5 ${screen === "home" ? "mx-auto mt-8 max-w-[900px] !rounded-2xl !border !border-[#E1E6ED] bg-white py-5 max-sm:py-2 sm:mt-20 sm:py-6 dark:!border-[#405064] dark:!bg-[#111820]" : "rounded-3xl border-[#F3DAD8] bg-[#FFF7F6] py-2 sm:py-3"}`}>
         <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-6">
         <div className="relative shrink-0">
-          <Image src={publicAsset("/images/svdemidenko-portrait-v3.png")} alt="Портрет SvDemidenko" width={512} height={512} unoptimized className={`block aspect-square size-20 shrink-0 rounded-full border-[3px] border-white object-contain object-center shadow-sm sm:size-28 ${screen === "home" ? "max-sm:size-14 max-sm:[@media(max-height:650px)]:size-12" : ""}`} />
+          <Image src={publicAsset("/images/svdemidenko-portrait.webp")} alt="Портрет SvDemidenko" width={512} height={512} unoptimized className={`block aspect-square size-20 shrink-0 rounded-full border-[3px] border-white object-contain object-center shadow-sm sm:size-28 ${screen === "home" ? "max-sm:size-14 max-sm:[@media(max-height:650px)]:size-12" : ""}`} />
         </div>
         <div className="min-w-0 text-left">
           <nav aria-label="Социальные сети" className="flex items-center gap-0 sm:gap-1">
