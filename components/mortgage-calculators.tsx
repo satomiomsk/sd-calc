@@ -175,7 +175,6 @@ function MortgageCard({ config }: { config: typeof configs[number] }) {
           <output data-testid="mortgage-adjustment-down-payment" className={`mt-2 block text-xl font-semibold tabular-nums ${theme.accent}`}>
             {downPayment.status === "ok" ? <span className="whitespace-nowrap">{rubles.format(downPayment.total)} ₽</span> : "-"}
           </output>
-          {downPayment.status === "ok" && <details className="mt-3 text-xs leading-relaxed text-[#6E7886]"><summary className="cursor-pointer font-semibold">Подробности расчёта</summary><p data-testid="mortgage-down-payment-formula" className="mt-2 break-words">{downPayment.formula} = <span className="whitespace-nowrap">{rubles.format(downPayment.total)} ₽</span></p></details>}
           {downPayment.status === "error" && <p role="alert" className="mt-2 text-xs text-[#A94442]">{downPayment.message}</p>}
         </div>}
       </div>
