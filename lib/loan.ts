@@ -3,7 +3,7 @@ export type LoanResult = { principal: number; months: number; annualRate: number
 function validateTermAndRate(months: number, annualRate: number) {
   if (Number.isFinite(months) && months > 360) throw new Error("Срок кредита должен составлять не более 30 лет");
   if (!Number.isSafeInteger(months) || months <= 0) throw new Error("Срок должен составлять целое положительное число месяцев.");
-  if (!Number.isFinite(annualRate) || annualRate < 0 || annualRate > 30) throw new Error("Введите корректную ставку от 0 до 30%.");
+  if (!Number.isFinite(annualRate) || annualRate < 0 || annualRate > 30) throw new Error("Проверьте ставку.");
 }
 
 export function calculateLoan(principal: number, months: number, annualRate: number): LoanResult {
