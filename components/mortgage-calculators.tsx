@@ -1,10 +1,11 @@
 "use client";
 
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
-import { ChartNoAxesCombined, Copy, House, RotateCcw, Wallet } from "lucide-react";
+import { ArrowUp, Bookmark, ChartNoAxesCombined, Copy, House, RotateCcw, Wallet } from "lucide-react";
 import { toast } from "sonner";
 import { formatInput } from "@/lib/calculator";
 import { calculateMortgage, type MortgageMode } from "@/lib/mortgage";
+import { saveCalculation } from "@/lib/history";
 
 const rubles = new Intl.NumberFormat("ru-RU", { maximumFractionDigits: 0 });
 const percent = new Intl.NumberFormat("ru-RU", { maximumFractionDigits: 6 });
@@ -48,11 +49,19 @@ function MortgageInput({ id, label, value, money, suffix, placeholder, onChange 
 
 function MortgageCard({ config }: { config: typeof configs[number] }) {
   const [values, setValues] = useState(config.defaults);
+  const [savedKey, setSavedKey] = useState("");
   const result = calculateMortgage(config.mode, values);
   const Icon = config.mode === "part" ? Wallet : config.mode === "adjustment" ? ChartNoAxesCombined : House;
   const adjustment = config.mode === "adjustment";
   const downPayment = adjustment && result.status === "ok" ? calculateMortgage("part", [String(result.total), values[2]]) : null;
   const theme = themes[config.mode];
+  const snapshotKey = JSON.stringify(values);
+  const save = () => {
+    if (result.status !== "ok" || savedKey === snapshotKey) return;
+    const kind = config.mode === "part" ? "mortgage-part" : config.mode === "whole" ? "mortgage-whole" : "mortgage-adjustment";
+    saveCalculation({ kind, title: config.title, summary: `${rubles.format(result.total)} ₽`, params: Object.fromEntries(config.labels.map((label, index) => [label, values[index]])), results: { [config.resultLabel]: `${rubles.format(result.total)} ₽`, formula: result.formula, ...(downPayment?.status === "ok" ? { downPayment: `${rubles.format(downPayment.total)} ₽` } : {}) } });
+    setSavedKey(snapshotKey);
+  };
   const copy = async () => {
     if (result.status !== "ok") return;
     try { await navigator.clipboard.writeText(`${rubles.format(result.total)} ₽`); toast.success("Сумма скопирована в буфер обмена"); }
@@ -79,7 +88,7 @@ function MortgageCard({ config }: { config: typeof configs[number] }) {
         </div>}
       </div>
     </div>
-    <div className="mt-5 flex flex-wrap items-center justify-between gap-3 border-t border-[#EBEEF2] pt-4"><p className="hidden text-xs text-[#748195] lg:block">Автоматический расчёт</p><button type="button" onClick={() => window.scrollTo({ top: 0, behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "instant" : "smooth" })} className="rounded-md py-1 text-xs font-medium text-[#647184] outline-offset-4 hover:text-[#E83C35] focus-visible:outline-2 lg:hidden">Вернуться</button><button type="button" aria-label={`Сбросить: ${config.title}`} onClick={() => setValues(previous => previous.map((value, i) => i === previous.length - 1 ? value : ""))} className="flex items-center gap-1.5 rounded-md py-1 text-xs font-medium text-[#647184] outline-offset-4 hover:text-[#E83C35] focus-visible:outline-2"><RotateCcw className="size-3.5" />Сбросить</button></div>
+    <div className="mt-5 grid grid-cols-3 items-center border-t border-[#EBEEF2] pt-3"><button type="button" aria-label="Наверх" title="Наверх" onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })} className="flex h-9 items-center justify-center text-[#26364A] hover:text-[#E83C35]"><ArrowUp className="size-4" /></button><button type="button" aria-label={`Сохранить: ${config.title}`} title="Сохранить в историю" disabled={result.status !== "ok"} onClick={save} className={`flex h-9 items-center justify-center border-x border-[#E4E8ED] disabled:opacity-30 ${savedKey === snapshotKey ? "text-[#E83C35]" : "text-[#26364A] hover:text-[#E83C35]"}`}><Bookmark className="size-4" /></button><button type="button" aria-label={`Сбросить: ${config.title}`} title="Сбросить" onClick={() => { setValues(previous => previous.map((value, i) => i === previous.length - 1 ? value : "")); setSavedKey(""); }} className="flex h-9 items-center justify-center text-[#26364A] hover:text-[#E83C35]"><RotateCcw className="size-4" /></button></div>
   </section>;
 }
 
