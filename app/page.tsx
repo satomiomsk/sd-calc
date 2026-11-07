@@ -54,7 +54,7 @@ function historyLabel(key: string) {
 
 function historyValue(key: string, value: string) {
   if (key === "mode") {
-    return ({ principal: "Основной долг", payment: "Ежемесячный платёж", total: "Общая сумма выплат" } as Record<string, string>)[value] ?? value;
+    return ({ principal: "По сумме кредита", payment: "По ежемесячному платежу", total: "По общей сумме выплат" } as Record<string, string>)[value] ?? value;
   }
   if (key === "unit") {
     return ({ years: "лет", months: "месяцев" } as Record<string, string>)[value] ?? value;
