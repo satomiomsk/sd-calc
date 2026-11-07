@@ -62,7 +62,7 @@ export function LoanCalculator() {
   useEffect(() => {
     if (getHistoryMode() !== "auto" || !result || changed || error || savedKey === snapshotKey || dismissedKey === snapshotKey) return;
     const timer = window.setTimeout(() => {
-      saveCalculation({ kind: "loan", title: "Кредитный калькулятор", summary: amount(result.monthlyPayment), params: { mode, value, term, unit, rate }, results: { monthlyPayment: amount(result.monthlyPayment), principal: amount(result.principal), interest: amount(result.interest), totalPayment: amount(result.totalPayment), months: String(result.months), annualRate: `${result.annualRate}%` } });
+      saveCalculation({ kind: "loan", title: "Кредитный калькулятор", summary: amount(result.monthlyPayment), params: { mode, value, term, unit, rate }, results: { monthlyPayment: amount(result.monthlyPayment), principal: amount(result.principal), interest: amount(result.interest), totalPayment: amount(result.totalPayment), months: String(result.months), annualRate: `${result.annualRate}%` } }, true);
       setSavedKey(snapshotKey);
     }, 500);
     return () => window.clearTimeout(timer);
