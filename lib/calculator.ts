@@ -18,7 +18,8 @@ export function formatInput(value: string): string {
   const normalized = value.replace(/[ \u00a0\u202f]/g, "");
   if (!/^\d*(?:[.,]\d*)?$/.test(normalized)) return value;
   const [rawWhole, fraction] = normalized.split(/[.,]/);
-  const whole = rawWhole.replace(/^0+(?=\d)/, "").slice(0, 9);
+  const cleanedWhole = rawWhole.replace(/^0+(?=\d)/, "");
+  const whole = cleanedWhole.length > 9 ? "999999999" : cleanedWhole;
   const separator = normalized.includes(",") ? "," : ".";
   return whole.replace(/\B(?=(\d{3})+(?!\d))/g, " ") + (fraction !== undefined ? separator + fraction : "");
 }
