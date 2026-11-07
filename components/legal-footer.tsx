@@ -71,8 +71,8 @@ function LegalDialog({ footer = false }: { footer?: boolean }) {
           </section>
         </div>
         <div className="shrink-0 border-t border-[#E4E8ED] px-5 py-3 sm:px-7"><DialogClose asChild><button type="button" className="min-h-10 rounded-xl bg-[#26364A] px-5 text-sm font-medium text-white outline-offset-4 focus-visible:outline-2">Понятно</button></DialogClose></div>
-      </Dialog
-  </Dialog>;
+      </DialogContent>
+    </Dialog>;
 }
 
 export function LegalSettings() {
