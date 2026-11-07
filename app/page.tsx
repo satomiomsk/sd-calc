@@ -244,7 +244,7 @@ export default function Home() {
         </div>
       </div>
     </header>
-    <main className={`mx-auto w-full max-w-[1200px] flex-1 px-5 sm:px-8 ${screen === "home" ? "pb-14 pt-8 sm:pt-10" : "pb-14 pt-3 sm:pt-6"}`}>
+    <main className={`mx-auto w-full max-w-[1200px] flex-1 px-5 sm:px-8 ${screen === "home" ? "pb-0 pt-8 sm:pt-10" : "pb-14 pt-3 sm:pt-6"}`}>
       {screen === "home" && <div className="mb-4 text-center sm:mb-6"><h1 className="text-[40px] font-bold tracking-[-0.045em] sm:text-[54px]">Калькулятор <span className="text-[#E83C35]">SD</span></h1><p className="mt-1 text-[13px] text-[#748195] sm:mt-2 sm:text-base">Выберите раздел для расчёта</p></div>}
       {screen !== "home" && <div className="mb-4 flex items-center justify-between gap-3"><button type="button" onClick={() => navigate("home")} className="inline-flex min-h-10 items-center gap-2 rounded-lg py-2 text-sm font-medium text-[#647184] hover:text-[#E83C35] focus-visible:outline-2 focus-visible:outline-offset-4"><ArrowLeft className="size-4" />На главный экран</button><h1 className="text-xl font-semibold tracking-tight sm:text-3xl">{titles[screen]}</h1></div>}
       {screen === "home" && <div className={`${navigationFont.className} mx-auto max-w-[900px] space-y-3 sm:space-y-6`}>
@@ -289,7 +289,7 @@ export default function Home() {
       </section>}
     </main>
     <footer className={`mx-auto mt-auto w-full max-w-[1200px] px-5 pb-7 sm:px-8 ${screen === "home" ? "max-sm:pb-[calc(.25rem+env(safe-area-inset-bottom,0px))]" : ""}`}>
-      <div className={`flex w-full flex-col items-center justify-center gap-4 border px-4 sm:gap-5 ${screen === "home" ? "mx-auto mt-0 max-w-[900px] rounded-2xl border-[#E4E8ED] bg-white py-5 max-sm:py-2 sm:mt-6 sm:py-6" : "rounded-3xl border-[#F3DAD8] bg-[#FFF7F6] py-2 sm:py-3"}`}>
+      <div className={`flex w-full flex-col items-center justify-center gap-4 border px-4 sm:gap-5 ${screen === "home" ? "mx-auto mt-0 max-w-[900px] rounded-2xl border-[#E4E8ED] bg-white py-5 max-sm:py-2 sm:mt-0 sm:py-4" : "rounded-3xl border-[#F3DAD8] bg-[#FFF7F6] py-2 sm:py-3"}`}>
         <div className="flex items-center justify-center gap-4 sm:gap-6">
         <div className="relative shrink-0">
           <Image src={publicAsset("/images/svdemidenko-portrait-v3.png")} alt="Портрет SvDemidenko" width={512} height={512} unoptimized className={`block aspect-square size-20 shrink-0 rounded-full border-[3px] border-white object-contain object-center shadow-sm sm:size-28 ${screen === "home" ? "max-sm:size-14 max-sm:[@media(max-height:650px)]:size-12" : ""}`} />
