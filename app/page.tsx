@@ -224,7 +224,7 @@ export default function Home() {
     return () => window.removeEventListener("popstate", onBack);
   }, []);
   const navigate = (next: Screen, calculator?: Operation | "downpayment" | "loan") => {
-    if (next === "commission") setOperation(calculator === "purchase" ? "purchase" : "sale");
+    if (next === "commission") { const nextOperation = calculator === "purchase" ? "purchase" : "sale"; setOperation(nextOperation); try { window.sessionStorage.setItem("sd-commission-operation", nextOperation); } catch {} }
     if (next === "mortgage") { const nextTab = calculator === "loan" ? "loan" : "downpayment"; setMortgageTab(nextTab); try { window.sessionStorage.setItem("sd-mortgage-tab", nextTab); } catch {} }
     if (next !== screen) window.history.pushState({ ...window.history.state, sdScreen: next }, "");
     try { window.sessionStorage.setItem("sd-current-screen", next); } catch {}
