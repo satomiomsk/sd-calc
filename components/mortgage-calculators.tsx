@@ -97,6 +97,7 @@ function MortgageCard({ config }: { config: typeof configs[number] }) {
   const adjustment = config.mode === "adjustment";
   const downPayment = adjustment && result.status === "ok" ? calculateMortgage("part", [String(result.total), values[2]]) : null;
   const theme = themes[config.mode];
+  const historyKind = config.mode === "part" ? "mortgage-part" : config.mode === "whole" ? "mortgage-whole" : "mortgage-adjustment";
   const snapshotKey = JSON.stringify(values);
   const snapshotParams = Object.fromEntries(config.labels.map((label, index) => [label, values[index]]));
   useEffect(() => {
@@ -129,7 +130,6 @@ function MortgageCard({ config }: { config: typeof configs[number] }) {
     return () => window.clearTimeout(timer);
   }, [snapshotKey, result.status, result.status === "ok" ? result.total : 0, savedKey, dismissedKey, config, values, downPayment?.status, downPayment?.status === "ok" ? downPayment.total : 0, historyModeVersion]);
 
-  const historyKind = config.mode === "part" ? "mortgage-part" : config.mode === "whole" ? "mortgage-whole" : "mortgage-adjustment";
   const isSaved = savedKey === snapshotKey;
   const save = () => {
     if (result.status !== "ok") return;
