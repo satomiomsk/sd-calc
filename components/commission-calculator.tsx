@@ -82,6 +82,8 @@ export function CommissionCalculator({ operation, tariffs }: { operation: Operat
   const motivationAmount = discounted && motivationValid ? Math.round((discounted.total * motivation / 100 + Number.EPSILON) * 100) / 100 : null;
   const clear = () => { setPrice(""); setCredit(""); setDiscountId("none"); setPairedPrice(""); update("motivationPercent", ""); update("motivationOpen", false); };
   const [savedKey, setSavedKey] = useState("");
+  const [historyModeVersion, setHistoryModeVersion] = useState(0);
+  useEffect(() => { const update = () => setHistoryModeVersion(v => v + 1); window.addEventListener("sd-history-settings-updated", update); return () => window.removeEventListener("sd-history-settings-updated", update); }, []);
   useEffect(() => {
     const restore = (event: Event) => {
       const record = (event as CustomEvent<CalculationRecord>).detail;
@@ -107,7 +109,7 @@ export function CommissionCalculator({ operation, tariffs }: { operation: Operat
       setSavedKey(key);
     }, 650);
     return () => window.clearTimeout(timer);
-  }, [operation, category, price, credit, discountId, pairedPrice, motivationPercent, result.status, result.status === "ok" ? result.total : 0, discounted?.total, savedKey, sale, discount?.name]);
+  }, [operation, category, price, credit, discountId, pairedPrice, motivationPercent, result.status, result.status === "ok" ? result.total : 0, discounted?.total, savedKey, sale, discount?.name, historyModeVersion]);
 
   const save = () => {
     if (result.status !== "ok" || !discounted) return;
