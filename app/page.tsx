@@ -194,11 +194,20 @@ export default function Home() {
     };
   }, [screen]);
   useEffect(() => {
-    // Keep calculator navigation in the same document, preserving all input state.
-    window.history.replaceState({ ...window.history.state, sdScreen: "home" }, "");
+    // Restore the current section after a browser refresh in the same tab.
+    const validScreen = (value: unknown): value is Screen =>
+      value === "home" || value === "commission" || value === "mortgage" || value === "history" || value === "settings";
+    let restored: Screen = "home";
+    try {
+      const saved = window.sessionStorage.getItem("sd-current-screen");
+      if (validScreen(saved)) restored = saved;
+    } catch {}
+    setScreen(restored);
+    window.history.replaceState({ ...window.history.state, sdScreen: restored }, "");
     const onBack = (event: PopStateEvent) => {
-      const next = event.state?.sdScreen;
-      setScreen(next === "commission" || next === "mortgage" || next === "history" || next === "settings" ? next : "home");
+      const next = validScreen(event.state?.sdScreen) ? event.state.sdScreen : "home";
+      setScreen(next);
+      try { window.sessionStorage.setItem("sd-current-screen", next); } catch {}
       window.scrollTo({ top: 0, behavior: "instant" });
     };
     window.addEventListener("popstate", onBack);
@@ -212,6 +221,7 @@ export default function Home() {
     if (next === "commission") setOperation(calculator === "purchase" ? "purchase" : "sale");
     if (next === "mortgage") setMortgageTab(calculator === "loan" ? "loan" : "downpayment");
     if (next !== screen) window.history.pushState({ ...window.history.state, sdScreen: next }, "");
+    try { window.sessionStorage.setItem("sd-current-screen", next); } catch {}
     setScreen(next);
     window.scrollTo({ top: 0, behavior: "instant" });
   };
