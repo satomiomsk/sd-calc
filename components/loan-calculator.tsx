@@ -1,9 +1,10 @@
 "use client";
 
 import { useState, type FormEvent, type KeyboardEvent } from "react";
-import { Calculator, RotateCcw } from "lucide-react";
+import { Bookmark, Calculator, RotateCcw } from "lucide-react";
 import { formatInput } from "@/lib/calculator";
 import { calculateLoan, calculateLoanFromPayment, type LoanResult } from "@/lib/loan";
+import { saveCalculation } from "@/lib/history";
 
 const currency = new Intl.NumberFormat("ru-RU", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 const amount = (value: number) => `${currency.format(value)}\u00a0₽`;
@@ -39,6 +40,13 @@ export function LoanCalculator() {
     } catch (error) { update({ error: error instanceof Error ? error.message : "Проверьте параметры кредита.", result: null }); }
   };
   const reset = () => setDrafts(previous => ({ ...previous, [mode]: emptyDraft() }));
+  const [savedKey, setSavedKey] = useState("");
+  const snapshotKey = JSON.stringify({ mode, value, term, unit, rate });
+  const save = () => {
+    if (!result || changed || error || savedKey === snapshotKey) return;
+    saveCalculation({ kind: "loan", title: "Кредитный калькулятор", summary: amount(result.monthlyPayment), params: { mode, value, term, unit, rate }, results: { monthlyPayment: amount(result.monthlyPayment), principal: amount(result.principal), interest: amount(result.interest), totalPayment: amount(result.totalPayment), months: String(result.months), annualRate: `${result.annualRate}%` } });
+    setSavedKey(snapshotKey);
+  };
   const inputStyle = "h-14 w-full min-w-0 rounded-xl border border-[#E4E8ED] bg-[#F7F8FA] px-4 text-lg font-medium tabular-nums outline-none placeholder:text-sm placeholder:font-normal placeholder:text-[#8993A2] focus:border-[#E83C35] focus:ring-4 focus:ring-[#E83C35]/10";
   return <div>
     <div role="group" aria-label="Режим кредитного расчёта" className="mb-5 grid grid-cols-2 border-b border-[#E4E8ED] sm:flex sm:overflow-x-auto">
@@ -58,7 +66,7 @@ export function LoanCalculator() {
     <div className="min-w-0 space-y-4" aria-live="polite">
       {result ? <>
         <section aria-label="Результаты кредита" className="min-w-0 rounded-3xl border border-[#F3DAD8] bg-[#FCEBEA] p-6 sm:p-8">
-          <h3 className="text-xl font-semibold lg:flex lg:min-h-11 lg:items-center">Результаты расчета</h3>
+          <div className="flex items-center justify-between gap-3"><h3 className="text-xl font-semibold lg:flex lg:min-h-11 lg:items-center">Результаты расчета</h3><button type="button" aria-label="Сохранить расчёт в историю" title="Сохранить в историю" disabled={changed || !!error} onClick={save} className={`rounded-lg p-1.5 transition hover:bg-white/60 disabled:opacity-30 ${savedKey === snapshotKey ? "text-[#E83C35]" : "text-[#26364A]"}`}><Bookmark className="size-4" /></button></div>
           {changed && <p className="mt-3 text-xs leading-relaxed text-[#A94442]">Параметры изменены. Нажмите «Рассчитать», чтобы обновить результат.</p>}
           <p className="mb-2 mt-6 text-sm text-[#6E7886]">{reverse ? "Сумма кредита" : "Ежемесячный платёж"}</p><p data-testid={reverse ? "loan-available-principal" : "loan-monthly"} className="text-[clamp(1.5rem,6vw,2.5rem)] font-semibold tracking-tight text-[#E83C35] tabular-nums">{amount(reverse ? result.principal : result.monthlyPayment)}</p>
           <dl className="mt-6 space-y-4 border-t border-[#26364A]/10 pt-5 text-sm">
