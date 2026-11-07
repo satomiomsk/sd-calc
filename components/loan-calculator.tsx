@@ -1,10 +1,10 @@
 "use client";
 
-import { useState, type FormEvent, type KeyboardEvent } from "react";
+import { useEffect, useState, type FormEvent, type KeyboardEvent } from "react";
 import { Bookmark, Calculator, RotateCcw } from "lucide-react";
 import { formatInput } from "@/lib/calculator";
 import { calculateLoan, calculateLoanFromPayment, type LoanResult } from "@/lib/loan";
-import { saveCalculation } from "@/lib/history";
+import { getHistoryMode, saveCalculation, type CalculationRecord } from "@/lib/history";
 
 const currency = new Intl.NumberFormat("ru-RU", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 const amount = (value: number) => `${currency.format(value)}\u00a0₽`;
@@ -42,6 +42,29 @@ export function LoanCalculator() {
   const reset = () => setDrafts(previous => ({ ...previous, [mode]: emptyDraft() }));
   const [savedKey, setSavedKey] = useState("");
   const snapshotKey = JSON.stringify({ mode, value, term, unit, rate });
+  useEffect(() => {
+    const restore = (event: Event) => {
+      const record = (event as CustomEvent<CalculationRecord>).detail;
+      if (record?.kind !== "loan") return;
+      const target: LoanMode = record.params.mode === "payment" ? "payment" : "principal";
+      setMode(target);
+      setDrafts(previous => ({ ...previous, [target]: {
+        ...emptyDraft(), value: record.params.value || "", term: record.params.term || "",
+        unit: record.params.unit || "years", rate: record.params.rate || ""
+      }}));
+    };
+    window.addEventListener("sd-history-restore", restore);
+    return () => window.removeEventListener("sd-history-restore", restore);
+  }, []);
+  useEffect(() => {
+    if (getHistoryMode() !== "auto" || !result || changed || error || savedKey === snapshotKey) return;
+    const timer = window.setTimeout(() => {
+      saveCalculation({ kind: "loan", title: "Кредитный калькулятор", summary: amount(result.monthlyPayment), params: { mode, value, term, unit, rate }, results: { monthlyPayment: amount(result.monthlyPayment), principal: amount(result.principal), interest: amount(result.interest), totalPayment: amount(result.totalPayment), months: String(result.months), annualRate: `${result.annualRate}%` } });
+      setSavedKey(snapshotKey);
+    }, 500);
+    return () => window.clearTimeout(timer);
+  }, [snapshotKey, result, changed, error, savedKey, mode, value, term, unit, rate]);
+
   const save = () => {
     if (!result || changed || error || savedKey === snapshotKey) return;
     saveCalculation({ kind: "loan", title: "Кредитный калькулятор", summary: amount(result.monthlyPayment), params: { mode, value, term, unit, rate }, results: { monthlyPayment: amount(result.monthlyPayment), principal: amount(result.principal), interest: amount(result.interest), totalPayment: amount(result.totalPayment), months: String(result.months), annualRate: `${result.annualRate}%` } });
