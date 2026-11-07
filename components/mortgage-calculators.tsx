@@ -4,6 +4,7 @@ import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { ArrowUp, Bookmark, ChartNoAxesCombined, Copy, House, RotateCcw, Wallet } from "lucide-react";
 import { toast } from "sonner";
 import { formatInput } from "@/lib/calculator";
+import { scrollFocusedInputIntoView } from "@/lib/scroll-focused-input";
 import { calculateMortgage, type MortgageMode } from "@/lib/mortgage";
 import { getCalculationHistory, getHistoryMode, removeCalculationByParams, saveCalculation, upsertCalculationByParams, type CalculationRecord } from "@/lib/history";
 
@@ -43,7 +44,7 @@ function MortgageInput({ id, label, value, money, suffix, placeholder, onChange 
   useLayoutEffect(() => {
     if (cursor.current !== null) { ref.current?.setSelectionRange(cursor.current, cursor.current); cursor.current = null; }
   });
-  return <div><label htmlFor={id} className="mb-3 block text-sm font-semibold">{label}</label><div className="relative"><input id={id} ref={ref} value={value} inputMode="decimal" enterKeyHint="done" autoComplete="off" placeholder={placeholder} onFocus={event => { if (money && value === "0") event.currentTarget.select(); }} onClick={event => { if (money && value === "0") event.currentTarget.select(); }} onKeyDown={event => {
+  return <div><label htmlFor={id} className="mb-3 block text-sm font-semibold">{label}</label><div className="relative"><input id={id} ref={ref} value={value} inputMode="decimal" enterKeyHint="done" autoComplete="off" placeholder={placeholder} onFocus={event => { if (money && value === "0") event.currentTarget.select(); scrollFocusedInputIntoView(event.currentTarget); }} onClick={event => { if (money && value === "0") event.currentTarget.select(); }} onKeyDown={event => {
     if (event.key === "Enter" && !event.nativeEvent.isComposing) { event.preventDefault(); event.currentTarget.blur(); }
   }} onChange={event => {
     const raw = event.target.value;
