@@ -55,7 +55,7 @@ export default function RootLayout({
   return (
     <html lang="ru">
       <head>
-        <script dangerouslySetInnerHTML={{ __html: `(function(){var m=null;var match=document.cookie.match(/(?:^|;\\s*)sd-theme-mode-v1=(light|dark|system)(?:;|$)/);if(match)m=match[1];if(!m){try{m=localStorage.getItem("sd-theme-mode-v1");}catch(e){}}var d=m==="dark"||(m!=="light"&&m!=="system"&&window.matchMedia("(prefers-color-scheme: dark)").matches)||(m==="system"&&window.matchMedia("(prefers-color-scheme: dark)").matches);document.documentElement.classList.toggle("dark",d);})();` }} />
+        <script dangerouslySetInnerHTML={{ __html: `(function(){var m=null;var match=document.cookie.match(/(?:^|;\s*)sd-theme-mode-v1=(light|dark|system)(?:;|$)/);if(match)m=match[1];if(!m){try{m=localStorage.getItem("sd-theme-mode-v1");}catch(e){}}var d=m==="dark"||(m!=="light"&&m!=="system"&&window.matchMedia("(prefers-color-scheme: dark)").matches)||(m==="system"&&window.matchMedia("(prefers-color-scheme: dark)").matches);document.documentElement.classList.toggle("dark",d);})();` }} />
       </head>
       <body className={`${inter.className} antialiased [touch-action:pan-x_pan-y]`}>
         <ReactErrorBoundary>
