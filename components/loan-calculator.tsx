@@ -21,13 +21,13 @@ const dismissKeyboard = (event: KeyboardEvent<HTMLInputElement>) => {
 };
 
 type LoanMode = "principal" | "payment";
-type LoanDraft = { value: string; term: string; unit: string; rate: string; result: LoanResult | null; error: string; changed: boolean };
-const emptyDraft = (): LoanDraft => ({ value: "", term: "", unit: "years", rate: "", result: null, error: "", changed: false });
+type LoanDraft = { value: string; term: string; unit: string; rate: string; result: LoanResult | null; error: string; changed: boolean; calculated: boolean };
+const emptyDraft = (): LoanDraft => ({ value: "", term: "", unit: "years", rate: "", result: null, error: "", changed: false, calculated: false });
 
 export function LoanCalculator() {
   const [mode, setMode] = useState<LoanMode>("principal");
   const [drafts, setDrafts] = useState<Record<LoanMode, LoanDraft>>({ principal: emptyDraft(), payment: emptyDraft() });
-  const { value, term, unit, rate, result, error, changed } = drafts[mode];
+  const { value, term, unit, rate, result, error, changed, calculated } = drafts[mode];
   const reverse = mode === "payment";
   const update = (patch: Partial<LoanDraft>) => setDrafts(previous => ({ ...previous, [mode]: { ...previous[mode], ...patch } }));
   const edit = (patch: Partial<LoanDraft>) => update({ ...patch, changed: true, error: "" });
@@ -36,10 +36,27 @@ export function LoanCalculator() {
     try {
       const months = parse(term) * (unit === "years" ? 12 : 1);
       const calculation = reverse ? calculateLoanFromPayment(parse(value), months, parse(rate)) : calculateLoan(parse(value), months, parse(rate));
-      update({ result: calculation, error: "", changed: false });
+      update({ result: calculation, error: "", changed: false, calculated: true });
     } catch (error) { update({ error: error instanceof Error ? error.message : "Проверьте параметры кредита.", result: null }); }
   };
   const reset = () => setDrafts(previous => ({ ...previous, [mode]: emptyDraft() }));
+  useEffect(() => {
+    if (!drafts[mode].calculated) return;
+    const current = drafts[mode];
+    if (!current.value.trim() || !current.term.trim() || !current.rate.trim()) {
+      setDrafts(previous => ({ ...previous, [mode]: { ...previous[mode], result: null, error: "", changed: true } }));
+      return;
+    }
+    try {
+      const months = parse(current.term) * (current.unit === "years" ? 12 : 1);
+      const calculation = mode === "payment"
+        ? calculateLoanFromPayment(parse(current.value), months, parse(current.rate))
+        : calculateLoan(parse(current.value), months, parse(current.rate));
+      setDrafts(previous => ({ ...previous, [mode]: { ...previous[mode], result: calculation, error: "", changed: false } }));
+    } catch (calculationError) {
+      setDrafts(previous => ({ ...previous, [mode]: { ...previous[mode], result: null, error: calculationError instanceof Error ? calculationError.message : "Проверьте параметры кредита.", changed: false } }));
+    }
+  }, [mode, drafts[mode].value, drafts[mode].term, drafts[mode].unit, drafts[mode].rate, drafts[mode].calculated]);
   const [savedKey, setSavedKey] = useState("");
   const [dismissedKey, setDismissedKey] = useState("");
   const [historyModeVersion, setHistoryModeVersion] = useState(0);
@@ -53,7 +70,7 @@ export function LoanCalculator() {
       setMode(target);
       setDrafts(previous => ({ ...previous, [target]: {
         ...emptyDraft(), value: record.params.value || "", term: record.params.term || "",
-        unit: record.params.unit || "years", rate: record.params.rate || ""
+        unit: record.params.unit || "years", rate: record.params.rate || "", calculated: true
       }}));
     };
     window.addEventListener("sd-history-restore", restore);
@@ -64,7 +81,7 @@ export function LoanCalculator() {
     const timer = window.setTimeout(() => {
       saveCalculation({ kind: "loan", title: "Кредитный калькулятор", summary: amount(result.monthlyPayment), params: { mode, value, term, unit, rate }, results: { monthlyPayment: amount(result.monthlyPayment), principal: amount(result.principal), interest: amount(result.interest), totalPayment: amount(result.totalPayment), months: String(result.months), annualRate: `${result.annualRate}%` } }, true);
       setSavedKey(snapshotKey);
-    }, 500);
+    }, 2500);
     return () => window.clearTimeout(timer);
   }, [snapshotKey, result, changed, error, savedKey, dismissedKey, mode, value, term, unit, rate, historyModeVersion]);
 
@@ -95,13 +112,13 @@ export function LoanCalculator() {
         <div><label htmlFor="loan-rate" className="mb-3 block text-sm font-semibold">Процентная ставка</label><div className="relative"><input id="loan-rate" inputMode="decimal" enterKeyHint="done" onKeyDown={dismissKeyboard} value={rate} onChange={event => edit({ rate: event.target.value })} placeholder="Годовая ставка" className={`${inputStyle} pr-12`} /><span className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-[#7B8797]">%</span></div></div>
       </div>
       {error && <p role="alert" className="mt-4 text-sm leading-relaxed text-[#BD302A]">{error}</p>}
-      <div className="mt-7 flex flex-wrap gap-3"><button type="submit" className="min-h-12 flex-1 rounded-xl bg-[#E83C35] px-5 py-3 text-sm font-semibold text-white hover:bg-[#D6332D] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#E83C35]">РАССЧИТАТЬ</button><button type="button" onClick={reset} className="flex min-h-12 items-center justify-center gap-2 rounded-xl border border-[#E4E8ED] px-4 py-3 text-sm font-semibold text-[#647184] hover:bg-[#F5F7FA]"><RotateCcw className="size-4" />СБРОСИТЬ</button></div>
+      <div className="mt-7 flex flex-wrap gap-3">{!calculated && <button type="submit" className="min-h-12 flex-1 rounded-xl bg-[#E83C35] px-5 py-3 text-sm font-semibold text-white hover:bg-[#D6332D] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#E83C35]">РАССЧИТАТЬ</button>}{calculated && <p className="flex flex-1 items-center text-sm font-medium text-[#647184]">Автоматический пересчёт включён</p>}<button type="button" onClick={reset} className="flex min-h-12 items-center justify-center gap-2 rounded-xl border border-[#E4E8ED] px-4 py-3 text-sm font-semibold text-[#647184] hover:bg-[#F5F7FA]"><RotateCcw className="size-4" />СБРОСИТЬ</button></div>
     </form>
     <div className="min-w-0 space-y-4" aria-live="polite">
       {result ? <>
         <section aria-label="Результаты кредита" className="min-w-0 rounded-3xl border border-[#F3DAD8] bg-[#FCEBEA] p-6 sm:p-8">
           <div className="flex items-center justify-between gap-3"><h3 className="text-xl font-semibold lg:flex lg:min-h-11 lg:items-center">Результаты расчёта</h3><button type="button" aria-label={isSaved ? "Отменить сохранение" : "Сохранить в историю"} title={isSaved ? "Отменить сохранение" : "Сохранить в историю"} disabled={changed || !!error} onClick={save} className={`inline-flex size-11 shrink-0 items-center justify-center rounded-full border transition-all duration-200 hover:scale-105 disabled:opacity-30 ${isSaved ? "border-[#E83C35]/20 bg-[#E83C35] text-white shadow-sm shadow-[#E83C35]/20" : "border-[#F0C9C6] bg-white/80 text-[#E83C35] hover:bg-[#FCEBEA]"}`}><Bookmark className="size-5" strokeWidth={2.2} fill={isSaved ? "currentColor" : "none"} /></button></div>
-          {changed && <p className="mt-3 text-xs leading-relaxed text-[#A94442]">Параметры изменены. Нажмите «Рассчитать», чтобы обновить результат.</p>}
+          {changed && <p className="mt-3 text-xs leading-relaxed text-[#A94442]">Результат обновляется автоматически после изменения параметров.</p>}
           <p className="mb-2 mt-6 text-sm text-[#6E7886]">{reverse ? "Сумма кредита" : "Ежемесячный платёж"}</p><p data-testid={reverse ? "loan-available-principal" : "loan-monthly"} className="text-[clamp(1.5rem,6vw,2.5rem)] font-semibold tracking-tight text-[#E83C35] tabular-nums">{amount(reverse ? result.principal : result.monthlyPayment)}</p>
           <dl className="mt-6 space-y-4 border-t border-[#26364A]/10 pt-5 text-sm">
             {reverse ? <ResultRow label="Ежемесячный платёж" value={amount(result.monthlyPayment)} /> : <ResultRow label="Основной долг" value={amount(result.principal)} />}
