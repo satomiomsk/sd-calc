@@ -4,6 +4,7 @@ import localFont from "next/font/local"
 import { Toaster } from "@/components/ui/sonner"
 import "./globals.css"
 import { ErrorReporter, ConsoleReporter, ReactErrorBoundary } from "@/components/error-reporter"
+import PwaRegister from "@/components/pwa-register"
 
 const inter = localFont({ src: "../public/fonts/InterVariable.woff2", display: "swap", weight: "100 900" });
 
@@ -57,6 +58,7 @@ export default function RootLayout({
         <ReactErrorBoundary>
           {children}
         </ReactErrorBoundary>
+        <PwaRegister />
         <Toaster />
         <ErrorReporter />
         <ConsoleReporter />
