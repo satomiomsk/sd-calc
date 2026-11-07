@@ -41,6 +41,8 @@ export function LoanCalculator() {
   };
   const reset = () => setDrafts(previous => ({ ...previous, [mode]: emptyDraft() }));
   const [savedKey, setSavedKey] = useState("");
+  const [historyModeVersion, setHistoryModeVersion] = useState(0);
+  useEffect(() => { const update = () => setHistoryModeVersion(v => v + 1); window.addEventListener("sd-history-settings-updated", update); return () => window.removeEventListener("sd-history-settings-updated", update); }, []);
   const snapshotKey = JSON.stringify({ mode, value, term, unit, rate });
   useEffect(() => {
     const restore = (event: Event) => {
@@ -63,7 +65,7 @@ export function LoanCalculator() {
       setSavedKey(snapshotKey);
     }, 500);
     return () => window.clearTimeout(timer);
-  }, [snapshotKey, result, changed, error, savedKey, mode, value, term, unit, rate]);
+  }, [snapshotKey, result, changed, error, savedKey, mode, value, term, unit, rate, historyModeVersion]);
 
   const save = () => {
     if (!result || changed || error || savedKey === snapshotKey) return;
