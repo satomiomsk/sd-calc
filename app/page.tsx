@@ -285,7 +285,7 @@ export default function Home() {
               { name: "MAX", href: "https://max.ru/u/f9LHodD0cOK4HS3ILV9kidFm5zkxzt0iRbfZYiViC9zB7MF8pvVrcAskwJk", icon: "max" },
               { name: "ВКонтакте", href: "https://vk.ru/lanaomsk", icon: "vk" },
               { name: "Telegram", href: "https://t.me/svdemidenko", icon: "telegram" },
-            ].map(social => <a key={social.icon} href={social.href} target="_blank" rel="noopener noreferrer" aria-label={social.name} title={social.name} className="flex size-9 shrink-0 items-center justify-center rounded-xl text-[#647184] outline-offset-2 transition-colors hover:bg-white hover:text-[#26364A] focus-visible:outline-2 focus-visible:outline-[#A94442] min-[375px]:size-11">{social.icon === "instagram" ? <Instagram aria-hidden="true" className="size-7" strokeWidth={1.7} /> : <Image src={publicAsset(`/images/social-${social.icon}.svg`)} alt="" width={28} height={28} unoptimized className="size-7" />}</a>)}
+            ].map(social => <a key={social.icon} href={social.href} target="_blank" rel="noopener noreferrer" aria-label={social.name} title={social.name} className="flex size-9 shrink-0 items-center justify-center rounded-xl text-[#647184] outline-offset-2 transition-colors hover:bg-white hover:text-[#26364A] focus-visible:outline-2 focus-visible:outline-[#A94442] min-[375px]:size-11"><Image src={publicAsset(`/images/social-${social.icon}.svg`)} alt="" width={28} height={28} unoptimized className="size-7" /></a>)}
           </nav>
         </div>
         </div>
