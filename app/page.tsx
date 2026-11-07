@@ -141,7 +141,7 @@ export default function Home() {
   useEffect(() => {
     const refresh = () => setHistoryItems(getCalculationHistory());
     refresh(); setHistoryModeState(getHistoryMode());
-    const cookieTheme = document.cookie.match(/(?:^|;\\s*)sd-theme-mode-v1=(light|dark|system)(?:;|$)/)?.[1];
+    const cookieTheme = document.cookie.match(/(?:^|;\s*)sd-theme-mode-v1=(light|dark|system)(?:;|$)/)?.[1];
     let savedTheme: string | null = cookieTheme ?? null;
     if (savedTheme !== "light" && savedTheme !== "dark" && savedTheme !== "system") {
       try { savedTheme = localStorage.getItem("sd-theme-mode-v1"); } catch {}
