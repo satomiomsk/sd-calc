@@ -39,6 +39,18 @@ export function saveCalculation(record: Omit<CalculationRecord, "id" | "createdA
   return entry;
 }
 
+export function upsertCalculationByParams(record: Omit<CalculationRecord, "id" | "createdAt">): CalculationRecord {
+  const entry: CalculationRecord = { ...record, id: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`, createdAt: new Date().toISOString() };
+  const matches = (candidate: Record<string, string>) => Object.keys(record.params).length === Object.keys(candidate).length && Object.entries(record.params).every(([key, value]) => candidate[key] === value);
+  const existing = getCalculationHistory();
+  const sameKind = existing.filter(item => item.kind === entry.kind && !matches(item.params));
+  const otherKinds = existing.filter(item => item.kind !== entry.kind);
+  const next = [...sameKind, entry].slice(-HISTORY_LIMIT);
+  localStorage.setItem(STORAGE_KEY, JSON.stringify([...otherKinds, ...next].sort((a, b) => b.createdAt.localeCompare(a.createdAt))));
+  window.dispatchEvent(new CustomEvent("sd-history-updated"));
+  return entry;
+}
+
 export function deleteCalculation(id: string) {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(getCalculationHistory().filter(item => item.id !== id)));
   window.dispatchEvent(new CustomEvent("sd-history-updated"));
