@@ -49,7 +49,15 @@ function MortgageInput({ id, label, value, money, suffix, placeholder, onChange 
     const raw = event.target.value;
     const position = event.target.selectionStart ?? raw.length;
     const significant = raw.slice(0, position).replace(/\s/g, "").length;
-    const next = money ? formatInput(raw) : raw;
+    const next = money
+       ? formatInput(raw)
+       : (() => {
+           const normalized = raw.replace(",", ".").replace(/[^\d.]/g, "");
+           const parts = normalized.split(".");
+           const candidate = parts.length > 2 ? parts[0] + "." + parts.slice(1).join("") : normalized;
+           const numericValue = Number(candidate);
+           return candidate !== "" && Number.isFinite(numericValue) && numericValue > 100 ? "100" : candidate;
+         })();
     let index = 0, count = 0;
     while (index < next.length && count < significant) { if (!/\s/.test(next[index])) count++; index++; }
     cursor.current = index; onChange(next); render(n => n + 1);
