@@ -159,7 +159,7 @@ export function CommissionCalculator({ operation, tariffs }: { operation: Operat
         <section aria-labelledby="form-title" className="rounded-3xl border border-[#EBEEF2] bg-white p-6 shadow-[0_3px_18px_#26364A03] sm:p-8">
           <div className="mb-6 flex items-start gap-3.5">
             <span className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-[#FCEBEA] text-[#E83C35]"><Calculator className="size-[22px]" /></span>
-            <div><h2 id="form-title" className="text-xl font-semibold leading-snug tracking-tight">Рассчитать комиссию при {sale ? "продаже" : "покупке"}</h2><p className="mt-2 text-sm leading-relaxed text-[#748195] dark:text-[#B8C4D2]">Выберите тип {sale ? "" : "приобретаемой "}недвижимости и укажите стоимость объекта</p></div>
+            <div><h2 id="form-title" className="text-xl font-semibold leading-snug tracking-tight">Рассчитать комиссию при {sale ? "продаже" : "покупке"}</h2><p className="mt-2 text-sm leading-relaxed text-[#748195] dark:text-[#B8C4D2]">Выберите тип недвижимости и укажите её стоимость</p></div>
           </div>
           <div>
             <label htmlFor="category" className="mb-3 block text-sm font-semibold">Что {sale ? "продаём" : "покупаем"}?</label>
