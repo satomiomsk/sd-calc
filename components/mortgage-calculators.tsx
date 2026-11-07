@@ -5,7 +5,7 @@ import { ArrowUp, Bookmark, ChartNoAxesCombined, Copy, House, RotateCcw, Wallet 
 import { toast } from "sonner";
 import { formatInput } from "@/lib/calculator";
 import { calculateMortgage, type MortgageMode } from "@/lib/mortgage";
-import { getCalculationHistory, getHistoryMode, removeCalculationByParams, saveCalculation, type CalculationRecord } from "@/lib/history";
+import { getCalculationHistory, getHistoryMode, removeCalculationByParams, saveCalculation, upsertCalculationByParams, type CalculationRecord } from "@/lib/history";
 
 const rubles = new Intl.NumberFormat("ru-RU", { maximumFractionDigits: 0 });
 const percent = new Intl.NumberFormat("ru-RU", { maximumFractionDigits: 6 });
@@ -124,7 +124,7 @@ function MortgageCard({ config }: { config: typeof configs[number] }) {
     if (getHistoryMode() !== "auto" || result.status !== "ok" || savedKey === snapshotKey || dismissedKey === snapshotKey) return;
     const timer = window.setTimeout(() => {
       const kind = config.mode === "part" ? "mortgage-part" : config.mode === "whole" ? "mortgage-whole" : "mortgage-adjustment";
-      saveCalculation({ kind, title: config.title, summary: `${rubles.format(result.total)} ₽`, params: snapshotParams, results: { [config.resultLabel]: `${rubles.format(result.total)} ₽`, formula: result.formula, ...(downPayment?.status === "ok" ? { downPayment: `${rubles.format(downPayment.total)} ₽` } : {}) } }, true);
+      upsertCalculationByParams({ kind, title: config.title, summary: `${rubles.format(result.total)} ₽`, params: snapshotParams, results: { [config.resultLabel]: `${rubles.format(result.total)} ₽`, formula: result.formula, ...(downPayment?.status === "ok" ? { downPayment: `${rubles.format(downPayment.total)} ₽` } : {}) } });
       setSavedKey(snapshotKey);
     }, 650);
     return () => window.clearTimeout(timer);
