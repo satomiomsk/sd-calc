@@ -199,15 +199,14 @@ export default function Home() {
       value === "home" || value === "commission" || value === "mortgage" || value === "history" || value === "settings";
     let restored: Screen = "home";
     const navigationType = window.performance.getEntriesByType("navigation")[0] as PerformanceNavigationTiming | undefined;
-    const isReload = navigationType?.type === "reload";
-    if (!isReload) {
-      try {
-        const saved = window.sessionStorage.getItem("sd-current-screen");
-        if (validScreen(saved)) restored = saved;
-      } catch {}
-    } else {
-      try { window.sessionStorage.setItem("sd-current-screen", "home"); } catch {}
-    }
+    try {
+      const saved = window.sessionStorage.getItem("sd-current-screen");
+      if (validScreen(saved)) restored = saved;
+      const savedOperation = window.sessionStorage.getItem("sd-commission-operation");
+      if (savedOperation === "sale" || savedOperation === "purchase") setOperation(savedOperation);
+      const savedMortgageTab = window.sessionStorage.getItem("sd-mortgage-tab");
+      if (savedMortgageTab === "downpayment" || savedMortgageTab === "loan") setMortgageTab(savedMortgageTab);
+    } catch {}
     setScreen(restored);
     window.history.replaceState({ ...window.history.state, sdScreen: restored }, "");
     const onBack = (event: PopStateEvent) => {
@@ -267,10 +266,10 @@ export default function Home() {
         </section>
       </div>}
       {screen === "commission" && <div role="group" aria-label="Калькуляторы комиссии" className="mb-4 grid grid-cols-2 gap-2 rounded-2xl border border-[#E4E8ED] bg-[#EEF1F5] p-1.5">
-        {(["sale", "purchase"] as const).map(value => <button key={value} type="button" aria-pressed={operation === value} onClick={() => setOperation(value)} className={`flex min-h-14 items-center justify-center gap-2 rounded-xl px-3 py-3 text-sm font-semibold transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#E83C35] sm:text-base ${operation === value ? value === "sale" ? "bg-[#E83C35] text-white shadow-sm" : "bg-[#26364A] text-white shadow-sm" : "bg-white text-[#647184] hover:bg-[#FFF7F6]"}`}>{value === "sale" ? <ArrowUpRight className="size-5 shrink-0" /> : <ArrowDownLeft className="size-5 shrink-0" />}{value === "sale" ? "Продажа" : "Покупка"}</button>)}
+        {(["sale", "purchase"] as const).map(value => <button key={value} type="button" aria-pressed={operation === value} onClick={() => { setOperation(value); try { window.sessionStorage.setItem("sd-commission-operation", value); } catch {} }} className={`flex min-h-14 items-center justify-center gap-2 rounded-xl px-3 py-3 text-sm font-semibold transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#E83C35] sm:text-base ${operation === value ? value === "sale" ? "bg-[#E83C35] text-white shadow-sm" : "bg-[#26364A] text-white shadow-sm" : "bg-white text-[#647184] hover:bg-[#FFF7F6]"}`}>{value === "sale" ? <ArrowUpRight className="size-5 shrink-0" /> : <ArrowDownLeft className="size-5 shrink-0" />}{value === "sale" ? "Продажа" : "Покупка"}</button>)}
       </div>}
       {screen === "mortgage" && <div role="group" aria-label="Калькуляторы ипотеки" className="mb-4 grid grid-cols-2 gap-1.5 rounded-[14px] border border-[#E4E8ED] bg-[#EEF1F5] p-1 sm:flex sm:gap-2 sm:overflow-x-auto sm:rounded-2xl sm:p-1.5">
-        {(["downpayment", "loan"] as const).map(value => <button key={value} type="button" aria-pressed={mortgageTab === value} onClick={() => setMortgageTab(value)} className={`flex min-h-[60px] min-w-0 items-center justify-center gap-1.5 text-balance rounded-[10px] px-1.5 py-2 text-sm leading-[19px] font-semibold transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#26364A] sm:min-h-14 sm:min-w-max sm:flex-1 sm:gap-2 sm:whitespace-nowrap sm:rounded-xl sm:px-4 sm:py-3 sm:text-base ${mortgageTab === value ? value === "downpayment" ? "bg-[#E83C35] text-white shadow-sm" : "bg-[#26364A] text-white shadow-sm" : "bg-white text-[#647184] hover:bg-[#F7F8FA]"}`}>{value === "downpayment" ? <House className="size-[18px] shrink-0 sm:size-5" /> : <Calculator className="size-[18px] shrink-0 sm:size-5" />}<span>{value === "downpayment" ? <><span className="sm:hidden">Расчёт по ПВ</span><span className="hidden sm:inline">Расчёт по первоначальному взносу</span></> : "Кредитный калькулятор"}</span></button>)}
+        {(["downpayment", "loan"] as const).map(value => <button key={value} type="button" aria-pressed={mortgageTab === value} onClick={() => { setMortgageTab(value); try { window.sessionStorage.setItem("sd-mortgage-tab", value); } catch {} }} className={`flex min-h-[60px] min-w-0 items-center justify-center gap-1.5 text-balance rounded-[10px] px-1.5 py-2 text-sm leading-[19px] font-semibold transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#26364A] sm:min-h-14 sm:min-w-max sm:flex-1 sm:gap-2 sm:whitespace-nowrap sm:rounded-xl sm:px-4 sm:py-3 sm:text-base ${mortgageTab === value ? value === "downpayment" ? "bg-[#E83C35] text-white shadow-sm" : "bg-[#26364A] text-white shadow-sm" : "bg-white text-[#647184] hover:bg-[#F7F8FA]"}`}>{value === "downpayment" ? <House className="size-[18px] shrink-0 sm:size-5" /> : <Calculator className="size-[18px] shrink-0 sm:size-5" />}<span>{value === "downpayment" ? <><span className="sm:hidden">Расчёт по ПВ</span><span className="hidden sm:inline">Расчёт по первоначальному взносу</span></> : "Кредитный калькулятор"}</span></button>)}
       </div>}
       <div id="commission-calculator" hidden={screen !== "commission"}><CommissionCalculator operation={operation} tariffs={tariffs} tariffStatus={tariffStatus} /></div>
       <div id="loan-calculator" hidden={screen !== "mortgage" || mortgageTab !== "loan"}><LoanCalculator /></div>
