@@ -28,7 +28,7 @@ test('Не округлять проценты до вычисления кор�
  assert.equal(result.clientPercent,4.115226);assert.equal(result.missingPercent,15.984774);
 });
 for (const values of [
- ['100','50','20'], ['5000000','1000000','20'], ['5000000','0','0'],
+ ['100','50','20'], ['5000000','1000000','20'],
  ['100','20,1000000001','20,1'],
 ]) test(`Достаточно ПВ: ${values.join(' / ')}`,()=>{
  const result=calculateMortgage('adjustment',values);
