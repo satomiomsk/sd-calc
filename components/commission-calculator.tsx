@@ -124,7 +124,7 @@ export function CommissionCalculator({ operation, tariffs }: { operation: Operat
       toast.success("Расчёт убран из истории");
       return;
     }
-    saveCalculation({ kind: "commission", title: `Комиссия - ${sale ? "Продажа" : "Покупка"}`, summary: money(discounted.total), params: currentParams, results: { commission: money(result.total), final: money(discounted.total), discount: discount?.name ?? "Без скидки" } });
+    saveCalculation({ kind: "commission", title: `Комиссия - ${sale ? "Продажа" : "Покупка"}`, summary: money(discounted.total), params: currentParams, results: { commission: money(result.total), final: money(discounted.total), ...(discounted.saving > 0 ? { discountSaving: money(discounted.saving) } : {}), discount: discount?.name ?? "Без скидки" } });
     setSavedKey(currentKey);
     setDismissedKey("");
     toast.success("Расчёт сохранён в историю");
