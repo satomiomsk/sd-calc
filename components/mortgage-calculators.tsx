@@ -5,7 +5,7 @@ import { ArrowUp, Bookmark, ChartNoAxesCombined, Copy, House, RotateCcw, Wallet 
 import { toast } from "sonner";
 import { formatInput } from "@/lib/calculator";
 import { calculateMortgage, type MortgageMode } from "@/lib/mortgage";
-import { saveCalculation } from "@/lib/history";
+import { getHistoryMode, saveCalculation, type CalculationRecord } from "@/lib/history";
 
 const rubles = new Intl.NumberFormat("ru-RU", { maximumFractionDigits: 0 });
 const percent = new Intl.NumberFormat("ru-RU", { maximumFractionDigits: 6 });
@@ -56,6 +56,27 @@ function MortgageCard({ config }: { config: typeof configs[number] }) {
   const downPayment = adjustment && result.status === "ok" ? calculateMortgage("part", [String(result.total), values[2]]) : null;
   const theme = themes[config.mode];
   const snapshotKey = JSON.stringify(values);
+  useEffect(() => {
+    const restore = (event: Event) => {
+      const record = (event as CustomEvent<CalculationRecord>).detail;
+      const expected = config.mode === "part" ? "mortgage-part" : config.mode === "whole" ? "mortgage-whole" : "mortgage-adjustment";
+      if (record?.kind !== expected) return;
+      setValues(config.labels.map(label => record.params[label] ?? ""));
+      setSavedKey("");
+    };
+    window.addEventListener("sd-history-restore", restore);
+    return () => window.removeEventListener("sd-history-restore", restore);
+  }, [config]);
+  useEffect(() => {
+    if (getHistoryMode() !== "auto" || result.status !== "ok" || savedKey === snapshotKey) return;
+    const timer = window.setTimeout(() => {
+      const kind = config.mode === "part" ? "mortgage-part" : config.mode === "whole" ? "mortgage-whole" : "mortgage-adjustment";
+      saveCalculation({ kind, title: config.title, summary: `${rubles.format(result.total)} ₽`, params: Object.fromEntries(config.labels.map((label, index) => [label, values[index]])), results: { [config.resultLabel]: `${rubles.format(result.total)} ₽`, formula: result.formula, ...(downPayment?.status === "ok" ? { downPayment: `${rubles.format(downPayment.total)} ₽` } : {}) } });
+      setSavedKey(snapshotKey);
+    }, 650);
+    return () => window.clearTimeout(timer);
+  }, [snapshotKey, result.status, result.status === "ok" ? result.total : 0, savedKey, config, values, downPayment?.status, downPayment?.status === "ok" ? downPayment.total : 0]);
+
   const save = () => {
     if (result.status !== "ok" || savedKey === snapshotKey) return;
     const kind = config.mode === "part" ? "mortgage-part" : config.mode === "whole" ? "mortgage-whole" : "mortgage-adjustment";
