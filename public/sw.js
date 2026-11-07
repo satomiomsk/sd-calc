@@ -1,4 +1,4 @@
-const CACHE_NAME = "sd-calculator-pwa-v2";
+const CACHE_NAME = "sd-calculator-pwa-v3";
 const APP_SHELL = [
   "/",
   "/manifest.webmanifest",
@@ -23,22 +23,39 @@ const APP_SHELL = [
 ];
 
 self.addEventListener("install", (event) => {
-  event.waitUntil(
-    caches.open(CACHE_NAME)
-      .then(async (cache) => {
-        // Cache available assets individually so one missing optional image
-        // cannot prevent the service worker from installing.
-        await Promise.all(APP_SHELL.map(async (url) => {
+  event.waitUntil((async () => {
+    const cache = await caches.open(CACHE_NAME);
+    // Cache the document first, then its actual Next.js JS/CSS dependencies.
+    try {
+      const response = await fetch("/", { cache: "reload" });
+      if (response.ok) {
+        await cache.put("/", response.clone());
+        const html = await response.text();
+        const assets = [...html.matchAll(/(?:src|href)=["']([^"']*\\/_next\\/static\\/[^"']+)["']/g)]
+          .map((match) => new URL(match[1], self.location.origin).pathname);
+        await Promise.all([...new Set(assets)].map(async (url) => {
           try {
-            const response = await fetch(url, { cache: "reload" });
-            if (response.ok) await cache.put(url, response);
+            const asset = await fetch(url, { cache: "reload" });
+            if (asset.ok) await cache.put(url, asset);
           } catch {
-            // Optional asset; it can be cached later on first successful request.
+            // A failed optional chunk must not block installation.
           }
         }));
-      })
-      .then(() => self.skipWaiting())
-  );
+      }
+    } catch {
+      // Installation may still complete and populate the shell on later requests.
+    }
+
+    await Promise.all(APP_SHELL.filter((url) => url !== "/").map(async (url) => {
+      try {
+        const response = await fetch(url, { cache: "reload" });
+        if (response.ok) await cache.put(url, response);
+      } catch {
+        // Optional asset; it can be cached on first successful request.
+      }
+    }));
+    await self.skipWaiting();
+  })());
 });
 
 self.addEventListener("activate", (event) => {
@@ -64,7 +81,7 @@ self.addEventListener("fetch", (event) => {
           }
           return response;
         })
-        .catch(async () => (await caches.match(request)) || (await caches.match("/")))
+        .catch(async () => (await caches.match(request, { ignoreSearch: true })) || (await caches.match("/")))
     );
     return;
   }
@@ -74,7 +91,7 @@ self.addEventListener("fetch", (event) => {
     url.pathname.startsWith("/icons/") ||
     url.pathname.startsWith("/images/") ||
     url.pathname.startsWith("/fonts/") ||
-    /\.(?:png|jpe?g|svg|webp|ico|woff2?|ttf|otf)$/i.test(url.pathname) ||
+    /\\.(?:png|jpe?g|svg|webp|ico|woff2?|ttf|otf)$/i.test(url.pathname) ||
     url.pathname === "/manifest.webmanifest";
 
   if (isAppAsset) {
