@@ -170,10 +170,14 @@ export default function Home() {
     let listener: { remove: () => Promise<void> } | undefined;
     App.addListener("backButton", ({ canGoBack }) => {
       if (screen !== "home") {
-        // Android system back gesture/button should return to the app's home screen.
-        setScreen("home");
-        window.history.replaceState({ ...window.history.state, sdScreen: "home" }, "");
-        window.scrollTo({ top: 0, behavior: "instant" });
+        // Follow the in-app navigation stack so recalculating from history returns to history.
+        if (window.history.state?.sdScreen && window.history.state.sdScreen !== "home") {
+          window.history.back();
+        } else {
+          setScreen("home");
+          window.history.replaceState({ ...window.history.state, sdScreen: "home" }, "");
+          window.scrollTo({ top: 0, behavior: "instant" });
+        }
       } else if (!canGoBack) {
         void App.exitApp();
       } else {
@@ -193,7 +197,7 @@ export default function Home() {
     window.history.replaceState({ ...window.history.state, sdScreen: "home" }, "");
     const onBack = (event: PopStateEvent) => {
       const next = event.state?.sdScreen;
-      setScreen(next === "commission" || next === "mortgage" ? next : "home");
+      setScreen(next === "commission" || next === "mortgage" || next === "history" || next === "settings" ? next : "home");
       window.scrollTo({ top: 0, behavior: "instant" });
     };
     window.addEventListener("popstate", onBack);
@@ -258,7 +262,7 @@ export default function Home() {
         <div className="flex justify-end"><button type="button" onClick={() => { clearCalculationHistory(); setHistoryItems([]); }} disabled={!historyItems.length} className="text-sm text-[#A94442] disabled:opacity-40">Очистить историю</button></div>
         {historyItems.length === 0 ? <div className="rounded-3xl border border-[#EBEEF2] bg-white p-8 text-center text-sm text-[#748195]">Сохранённых расчётов пока нет</div> : historyItems.map(item => <article key={item.id} className="rounded-2xl border border-[#EBEEF2] bg-white p-4">
           <button type="button" onClick={() => setExpandedHistory(current => { const next = new Set(current); if (next.has(item.id)) next.delete(item.id); else next.add(item.id); return next; })} className="flex w-full items-center gap-3 text-left"><span className="min-w-0 flex-1"><span className="block font-semibold">{item.title}</span><span className="text-xs text-[#748195]">{new Date(item.createdAt).toLocaleString("ru-RU")}</span></span><strong className="text-right tabular-nums">{item.summary}</strong><ChevronDown className={`size-4 transition-transform ${expandedHistory.has(item.id) ? "rotate-180" : ""}`} /></button>
-          {expandedHistory.has(item.id) && <div className="mt-4 space-y-3 border-t border-[#EBEEF2] pt-3 text-sm"><p className="font-semibold">Условия расчёта</p>{Object.entries(item.params).filter(([key, value]) => key !== "unit" && key !== "formula" && value !== "").map(([key,value]) => <div key={key} className="flex justify-between gap-3"><span className="text-[#748195]">{key === "term" ? "Срок" : historyLabel(key).replace(/,\s*[₽%]$/, "")}</span><span className="text-right">{historyDisplayValue(key, value, item.params)}</span></div>)}<p className="pt-2 font-semibold">Результаты</p>{Object.entries(item.results).filter(([key]) => key !== "formula" && (item.kind !== "commission" || key === "final")).map(([key,value]) => <div key={key} className="flex justify-between gap-3"><span className="text-[#748195]">{historyLabel(key)}</span><span className="text-right">{historyDisplayValue(key, value, item.params)}</span></div>)}<div className="mt-5 flex flex-wrap items-center justify-between gap-4"><button type="button" onClick={() => { let targetId = "commission-calculator"; if (item.kind === "commission") { setOperation(item.params.operation === "purchase" ? "purchase" : "sale"); setScreen("commission"); } else { setMortgageTab(item.kind === "loan" ? "loan" : "downpayment"); setScreen("mortgage"); targetId = item.kind === "loan" ? "loan-calculator" : item.kind === "mortgage-part" ? "mortgage-part" : item.kind === "mortgage-whole" ? "mortgage-whole" : "mortgage-adjustment"; } window.dispatchEvent(new CustomEvent("sd-history-restore", { detail: item })); requestAnimationFrame(() => requestAnimationFrame(() => document.getElementById(targetId)?.scrollIntoView({ behavior: "instant", block: "start" }))); }} className="text-sm font-medium text-[#26364A] hover:text-[#E83C35]">Пересчитать</button><button type="button" onClick={() => deleteCalculation(item.id)} className="inline-flex items-center gap-1 text-sm text-[#A94442]"><Trash2 className="size-4" />Удалить</button></div></div>}
+          {expandedHistory.has(item.id) && <div className="mt-4 space-y-3 border-t border-[#EBEEF2] pt-3 text-sm"><p className="font-semibold">Условия расчёта</p>{Object.entries(item.params).filter(([key, value]) => key !== "unit" && key !== "formula" && value !== "").map(([key,value]) => <div key={key} className="flex justify-between gap-3"><span className="text-[#748195]">{key === "term" ? "Срок" : historyLabel(key).replace(/,\s*[₽%]$/, "")}</span><span className="text-right">{historyDisplayValue(key, value, item.params)}</span></div>)}<p className="pt-2 font-semibold">Результаты</p>{Object.entries(item.results).filter(([key]) => key !== "formula" && (item.kind !== "commission" || key === "final")).map(([key,value]) => <div key={key} className="flex justify-between gap-3"><span className="text-[#748195]">{historyLabel(key)}</span><span className="text-right">{historyDisplayValue(key, value, item.params)}</span></div>)}<div className="mt-5 flex flex-wrap items-center justify-between gap-4"><button type="button" onClick={() => { let targetId = "commission-calculator"; if (item.kind === "commission") { navigate("commission", item.params.operation === "purchase" ? "purchase" : "sale"); } else { navigate("mortgage", item.kind === "loan" ? "loan" : "downpayment"); targetId = item.kind === "loan" ? "loan-calculator" : item.kind === "mortgage-part" ? "mortgage-part" : item.kind === "mortgage-whole" ? "mortgage-whole" : "mortgage-adjustment"; } window.dispatchEvent(new CustomEvent("sd-history-restore", { detail: item })); requestAnimationFrame(() => requestAnimationFrame(() => document.getElementById(targetId)?.scrollIntoView({ behavior: "instant", block: "start" }))); }} className="text-sm font-medium text-[#26364A] hover:text-[#E83C35]">Пересчитать</button><button type="button" onClick={() => deleteCalculation(item.id)} className="inline-flex items-center gap-1 text-sm text-[#A94442]"><Trash2 className="size-4" />Удалить</button></div></div>}
         </article>)}
       </section>}
       {screen === "settings" && <section className="space-y-5">
