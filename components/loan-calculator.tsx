@@ -30,7 +30,9 @@ export function LoanCalculator() {
   const [draftsRestored, setDraftsRestored] = useState(false);
   useEffect(() => {
     try {
-      const saved = window.sessionStorage.getItem("sd-loan-drafts");
+      const isRefresh = performance.getEntriesByType("navigation")[0]?.type === "reload";
+      if (isRefresh) window.sessionStorage.removeItem("sd-loan-drafts");
+      const saved = isRefresh ? null : window.sessionStorage.getItem("sd-loan-drafts");
       if (saved) {
         const parsed = JSON.parse(saved) as Partial<Record<LoanMode, LoanDraft>>;
         setDrafts(previous => ({ principal: { ...previous.principal, ...(parsed.principal ?? {}) }, payment: { ...previous.payment, ...(parsed.payment ?? {}) } }));
