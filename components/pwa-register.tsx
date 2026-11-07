@@ -15,5 +15,42 @@ export default function PwaRegister() {
     return () => window.removeEventListener("load", register);
   }, []);
 
+  useEffect(() => {
+    const isEditable = (target: EventTarget | null): target is HTMLElement => {
+      if (!(target instanceof HTMLElement)) return false;
+      if (target instanceof HTMLTextAreaElement || target instanceof HTMLSelectElement) return true;
+      return target instanceof HTMLInputElement && !["button", "checkbox", "radio", "submit", "reset", "file"].includes(target.type);
+    };
+
+    let frame = 0;
+    const revealFocusedField = () => {
+      cancelAnimationFrame(frame);
+      frame = requestAnimationFrame(() => {
+        const field = document.activeElement;
+        if (!isEditable(field)) return;
+        const viewport = window.visualViewport;
+        const visibleTop = viewport?.offsetTop ?? 0;
+        const visibleBottom = visibleTop + (viewport?.height ?? window.innerHeight);
+        const rect = field.getBoundingClientRect();
+        const margin = 20;
+        if (rect.bottom > visibleBottom - margin || rect.top < visibleTop + margin) {
+          field.scrollIntoView({ block: "center", inline: "nearest", behavior: "auto" });
+        }
+      });
+    };
+
+    document.addEventListener("focusin", revealFocusedField);
+    window.addEventListener("resize", revealFocusedField);
+    window.visualViewport?.addEventListener("resize", revealFocusedField);
+    window.visualViewport?.addEventListener("scroll", revealFocusedField);
+    return () => {
+      cancelAnimationFrame(frame);
+      document.removeEventListener("focusin", revealFocusedField);
+      window.removeEventListener("resize", revealFocusedField);
+      window.visualViewport?.removeEventListener("resize", revealFocusedField);
+      window.visualViewport?.removeEventListener("scroll", revealFocusedField);
+    };
+  }, []);
+
   return null;
 }
