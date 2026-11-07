@@ -58,6 +58,22 @@ function MortgageInput({ id, label, value, money, suffix, placeholder, onChange 
 
 function MortgageCard({ config }: { config: typeof configs[number] }) {
   const [values, setValues] = useState(config.defaults);
+  const [valuesRestored, setValuesRestored] = useState(false);
+  const storageKey = `sd-mortgage-${config.mode}`;
+  useEffect(() => {
+    try {
+      const saved = window.sessionStorage.getItem(storageKey);
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed) && parsed.length === config.defaults.length && parsed.every(value => typeof value === "string")) setValues(parsed);
+      }
+    } catch {}
+    setValuesRestored(true);
+  }, [storageKey, config.defaults]);
+  useEffect(() => {
+    if (!valuesRestored) return;
+    try { window.sessionStorage.setItem(storageKey, JSON.stringify(values)); } catch {}
+  }, [values, valuesRestored, storageKey]);
   const [savedKey, setSavedKey] = useState("");
   const [dismissedKey, setDismissedKey] = useState("");
   const [historyModeVersion, setHistoryModeVersion] = useState(0);
