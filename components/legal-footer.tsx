@@ -12,12 +12,12 @@ function AuthorContact() {
 
 export function LegalFooter() {
   return <div className="mt-5 border-t border-[#DDE3EB] pt-4 text-[#748195] sm:mt-7 sm:pt-5">
-    <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between sm:gap-8">
-      <div className="max-w-[680px]">
+    <div className="flex flex-col items-end gap-2 text-right sm:flex-row sm:items-center sm:justify-between sm:gap-8">
+      <div className="max-w-[680px] text-right sm:text-left">
         <p className="text-[11px] leading-5 sm:text-xs">© 2026 Автор: Светлана Демиденко</p>
       </div>
       <Dialog>
-        <DialogTrigger asChild><button type="button" className="w-fit shrink-0 rounded-sm text-left text-[11px] leading-[1.6] underline decoration-[#A7B1BF] underline-offset-4 transition-colors hover:text-[#26364A] focus-visible:outline-2 focus-visible:outline-offset-4 sm:max-w-[300px] sm:text-right lg:max-w-none lg:whitespace-nowrap">Условия использования и политика конфиденциальности</button></DialogTrigger>
+        <DialogTrigger asChild><button type="button" className="w-fit max-w-full shrink-0 rounded-sm text-right text-[11px] leading-[1.6] underline decoration-[#A7B1BF] underline-offset-4 transition-colors hover:text-[#26364A] focus-visible:outline-2 focus-visible:outline-offset-4 sm:max-w-[300px] lg:max-w-none lg:whitespace-nowrap">Условия использования и политика конфиденциальности</button></DialogTrigger>
         <DialogContent className="flex max-h-[85dvh] flex-col gap-0 overflow-hidden rounded-2xl p-0 sm:max-w-3xl">
           <DialogHeader className="shrink-0 px-5 pt-6 pb-4 pr-10 sm:px-7 sm:pr-12">
             <DialogTitle className="text-left text-lg leading-snug text-[#26364A] sm:text-xl">Условия использования и политика конфиденциальности</DialogTitle>
