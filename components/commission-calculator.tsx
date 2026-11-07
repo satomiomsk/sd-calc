@@ -105,7 +105,7 @@ export function CommissionCalculator({ operation, tariffs }: { operation: Operat
     const key = JSON.stringify(params);
     if (savedKey === key) return;
     const timer = window.setTimeout(() => {
-      saveCalculation({ kind: "commission", title: `Комиссия — ${sale ? "Продажа" : "Покупка"}`, summary: money(discounted.total), params, results: { commission: money(result.total), final: money(discounted.total), discount: discount?.name ?? "Без скидки" } });
+      saveCalculation({ kind: "commission", title: `Комиссия - ${sale ? "Продажа" : "Покупка"}`, summary: money(discounted.total), params, results: { commission: money(result.total), final: money(discounted.total), discount: discount?.name ?? "Без скидки" } });
       setSavedKey(key);
     }, 650);
     return () => window.clearTimeout(timer);
@@ -116,7 +116,7 @@ export function CommissionCalculator({ operation, tariffs }: { operation: Operat
     const params = { operation, category, price, credit, discountId, pairedPrice, motivationPercent };
     const key = JSON.stringify(params);
     if (savedKey === key) return;
-    saveCalculation({ kind: "commission", title: `Комиссия — ${sale ? "Продажа" : "Покупка"}`, summary: money(discounted.total), params, results: { commission: money(result.total), final: money(discounted.total), discount: discount?.name ?? "Без скидки" } });
+    saveCalculation({ kind: "commission", title: `Комиссия - ${sale ? "Продажа" : "Покупка"}`, summary: money(discounted.total), params, results: { commission: money(result.total), final: money(discounted.total), discount: discount?.name ?? "Без скидки" } });
     setSavedKey(key);
     toast.success("Расчёт сохранён в историю");
   };
