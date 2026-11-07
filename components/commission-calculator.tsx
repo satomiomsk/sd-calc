@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { ArrowUp, Bookmark, Calculator, Copy, Info, RotateCcw, Wallet } from "lucide-react";
-import { getHistoryMode, saveCalculation, type CalculationRecord } from "@/lib/history";
+import { getHistoryMode, removeCalculationByParams, saveCalculation, type CalculationRecord } from "@/lib/history";
 import { toast } from "sonner";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { applyDiscount, applyPairedDiscount, discounts } from "@/lib/discounts";
@@ -82,6 +82,7 @@ export function CommissionCalculator({ operation, tariffs }: { operation: Operat
   const motivationAmount = discounted && motivationValid ? Math.round((discounted.total * motivation / 100 + Number.EPSILON) * 100) / 100 : null;
   const clear = () => { setPrice(""); setCredit(""); setDiscountId("none"); setPairedPrice(""); update("motivationPercent", ""); update("motivationOpen", false); };
   const [savedKey, setSavedKey] = useState("");
+  const [dismissedKey, setDismissedKey] = useState("");
   const [historyModeVersion, setHistoryModeVersion] = useState(0);
   useEffect(() => { const update = () => setHistoryModeVersion(v => v + 1); window.addEventListener("sd-history-settings-updated", update); return () => window.removeEventListener("sd-history-settings-updated", update); }, []);
   useEffect(() => {
@@ -103,21 +104,29 @@ export function CommissionCalculator({ operation, tariffs }: { operation: Operat
     if (getHistoryMode() !== "auto" || result.status !== "ok" || !discounted) return;
     const params = { operation, category, price, credit, discountId, pairedPrice, motivationPercent };
     const key = JSON.stringify(params);
-    if (savedKey === key) return;
+    if (savedKey === key || dismissedKey === key) return;
     const timer = window.setTimeout(() => {
       saveCalculation({ kind: "commission", title: `Комиссия - ${sale ? "Продажа" : "Покупка"}`, summary: money(discounted.total), params, results: { commission: money(result.total), final: money(discounted.total), discount: discount?.name ?? "Без скидки" } });
       setSavedKey(key);
     }, 650);
     return () => window.clearTimeout(timer);
-  }, [operation, category, price, credit, discountId, pairedPrice, motivationPercent, result.status, result.status === "ok" ? result.total : 0, discounted?.total, savedKey, sale, discount?.name, historyModeVersion]);
+  }, [operation, category, price, credit, discountId, pairedPrice, motivationPercent, result.status, result.status === "ok" ? result.total : 0, discounted?.total, savedKey, dismissedKey, sale, discount?.name, historyModeVersion]);
 
+  const currentParams = { operation, category, price, credit, discountId, pairedPrice, motivationPercent };
+  const currentKey = JSON.stringify(currentParams);
+  const isSaved = savedKey === currentKey;
   const save = () => {
     if (result.status !== "ok" || !discounted) return;
-    const params = { operation, category, price, credit, discountId, pairedPrice, motivationPercent };
-    const key = JSON.stringify(params);
-    if (savedKey === key) return;
-    saveCalculation({ kind: "commission", title: `Комиссия - ${sale ? "Продажа" : "Покупка"}`, summary: money(discounted.total), params, results: { commission: money(result.total), final: money(discounted.total), discount: discount?.name ?? "Без скидки" } });
-    setSavedKey(key);
+    if (isSaved) {
+      removeCalculationByParams("commission", currentParams);
+      setSavedKey("");
+      setDismissedKey(currentKey);
+      toast.success("Расчёт убран из истории");
+      return;
+    }
+    saveCalculation({ kind: "commission", title: `Комиссия - ${sale ? "Продажа" : "Покупка"}`, summary: money(discounted.total), params: currentParams, results: { commission: money(result.total), final: money(discounted.total), discount: discount?.name ?? "Без скидки" } });
+    setSavedKey(currentKey);
+    setDismissedKey("");
     toast.success("Расчёт сохранён в историю");
   };
   const copy = async () => {
@@ -172,7 +181,7 @@ export function CommissionCalculator({ operation, tariffs }: { operation: Operat
               <div className="flex items-center justify-between gap-2"><h2 className="text-lg font-semibold tracking-tight">Агентское вознаграждение</h2><span className={`flex size-9 items-center justify-center rounded-full bg-white/65 ${sale ? "text-[#D95850]" : "text-[#26364A]"}`}><span className="text-lg font-medium">₽</span></span></div>
               <div aria-live="polite" aria-atomic="true">
                 {result.status === "ok" ? <>
-                  <div className="mb-2 mt-5 flex flex-wrap items-center gap-3"><p data-testid="total" className="text-[42px] font-semibold leading-tight tracking-[-0.04em] text-[#E83C35] tabular-nums sm:text-[50px]">{discounted ? money(discounted.total) : "-"}</p><span className="inline-flex shrink-0 items-center gap-1"><button onClick={copy} disabled={!discounted} aria-label="Скопировать итоговую сумму" title="Скопировать итоговую сумму" className="inline-flex size-9 shrink-0 items-center justify-center rounded-xl text-[#647184] outline-offset-2 hover:bg-white/60 focus-visible:outline-2"><Copy aria-hidden="true" className="size-4" /></button><button type="button" onClick={() => update("motivationOpen", !motivationOpen)} disabled={!discounted} aria-label="Рассчитать вознаграждение риелтора" title="Рассчитать вознаграждение риелтора" aria-expanded={motivationOpen} aria-controls="motivation-panel" className={`inline-flex size-9 shrink-0 items-center justify-center rounded-xl outline-offset-2 hover:bg-white/60 focus-visible:outline-2 disabled:opacity-40 ${motivationOpen ? "bg-white/65 text-[#E83C35]" : "text-[#647184]"}`}><Wallet aria-hidden="true" className="size-4" /></button></span></div>
+                  <div className="mb-2 mt-5 flex flex-wrap items-center gap-3"><p data-testid="total" className="text-[42px] font-semibold leading-tight tracking-[-0.04em] text-[#E83C35] tabular-nums sm:text-[50px]">{discounted ? money(discounted.total) : "-"}</p><span className="inline-flex shrink-0 items-center gap-1"><button onClick={copy} disabled={!discounted} aria-label="Скопировать итоговую сумму" title="Скопировать итоговую сумму" className="inline-flex size-10 shrink-0 items-center justify-center rounded-xl text-[#647184] outline-offset-2 hover:bg-white/60 focus-visible:outline-2"><Copy aria-hidden="true" className="size-5" /></button><button type="button" onClick={save} disabled={!discounted} aria-label={isSaved ? "Убрать комиссию из истории" : "Сохранить комиссию в историю"} title={isSaved ? "Убрать из истории" : "Сохранить в историю"} className={`inline-flex min-h-10 items-center gap-2 rounded-xl border px-3 py-2 text-xs font-semibold outline-offset-2 hover:bg-white/60 focus-visible:outline-2 disabled:opacity-40 sm:text-sm ${isSaved ? "border-[#E83C35]/30 bg-white/70 text-[#E83C35]" : "border-[#E4E8ED] text-[#26364A]"}`}><Bookmark aria-hidden="true" className="size-5" fill={isSaved ? "currentColor" : "none"} /><span>{isSaved ? "Сохранено · убрать" : "Сохранить"}</span></button><button type="button" onClick={() => update("motivationOpen", !motivationOpen)} disabled={!discounted} aria-label="Рассчитать вознаграждение риелтора" title="Рассчитать вознаграждение риелтора" aria-expanded={motivationOpen} aria-controls="motivation-panel" className={`inline-flex size-10 shrink-0 items-center justify-center rounded-xl outline-offset-2 hover:bg-white/60 focus-visible:outline-2 disabled:opacity-40 ${motivationOpen ? "bg-white/65 text-[#E83C35]" : "text-[#647184]"}`}><Wallet aria-hidden="true" className="size-5" /></button></span></div>
                   <p className="text-xs text-[#6E7886]">Итоговая комиссия, округлённая до рубля</p>
                   {motivationOpen && discounted && <div id="motivation-panel" className="mt-4 rounded-2xl border border-white/80 bg-white/75 p-4 sm:p-5">
                     <div className="mb-4 flex items-center gap-2 text-sm font-semibold"><Wallet aria-hidden="true" className="size-4 text-[#647184]" />Вознаграждение по сделке</div>
