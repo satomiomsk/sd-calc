@@ -4,7 +4,7 @@ import { useEffect, useRef, useState, type FormEvent, type KeyboardEvent } from 
 import { Bookmark, Calculator, RotateCcw } from "lucide-react";
 import { formatInput } from "@/lib/calculator";
 import { calculateLoan, calculateLoanFromPayment, type LoanResult } from "@/lib/loan";
-import { getHistoryMode, removeCalculationByKind, saveCalculation, type CalculationRecord } from "@/lib/history";
+import { getCalculationHistory, getHistoryMode, removeCalculationByParams, saveCalculation, type CalculationRecord } from "@/lib/history";
 
 const currency = new Intl.NumberFormat("ru-RU", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 const amount = (value: number) => `${currency.format(value)}\u00a0₽`;
@@ -83,7 +83,17 @@ export function LoanCalculator() {
   const [dismissedKey, setDismissedKey] = useState("");
   const [historyModeVersion, setHistoryModeVersion] = useState(0);
   useEffect(() => { const update = () => setHistoryModeVersion(v => v + 1); window.addEventListener("sd-history-settings-updated", update); return () => window.removeEventListener("sd-history-settings-updated", update); }, []);
-  const snapshotKey = JSON.stringify({ mode, value, term, unit, rate });
+  const snapshotParams = { mode, value, term, unit, rate };
+  const snapshotKey = JSON.stringify(snapshotParams);
+  useEffect(() => {
+    const syncSavedState = () => {
+      const exists = getCalculationHistory().some(item => item.kind === "loan" && JSON.stringify(item.params) === JSON.stringify(snapshotParams));
+      setSavedKey(exists ? snapshotKey : "");
+    };
+    syncSavedState();
+    window.addEventListener("sd-history-updated", syncSavedState);
+    return () => window.removeEventListener("sd-history-updated", syncSavedState);
+  }, [snapshotKey, mode, value, term, unit, rate]);
   useEffect(() => {
     const restore = (event: Event) => {
       const record = (event as CustomEvent<CalculationRecord>).detail;
@@ -101,7 +111,7 @@ export function LoanCalculator() {
   useEffect(() => {
     if (getHistoryMode() !== "auto" || !result || changed || error || savedKey === snapshotKey || dismissedKey === snapshotKey) return;
     const timer = window.setTimeout(() => {
-      saveCalculation({ kind: "loan", title: "Кредитный калькулятор", summary: amount(result.monthlyPayment), params: { mode, value, term, unit, rate }, results: { monthlyPayment: amount(result.monthlyPayment), principal: amount(result.principal), interest: amount(result.interest), totalPayment: amount(result.totalPayment), months: String(result.months), annualRate: `${result.annualRate}%` } }, false, { key: "mode", value: mode });
+      saveCalculation({ kind: "loan", title: "Кредитный калькулятор", summary: amount(result.monthlyPayment), params: snapshotParams, results: { monthlyPayment: amount(result.monthlyPayment), principal: amount(result.principal), interest: amount(result.interest), totalPayment: amount(result.totalPayment), months: String(result.months), annualRate: `${result.annualRate}%` } }, false, { key: "mode", value: mode });
       setSavedKey(snapshotKey);
     }, 2500);
     return () => window.clearTimeout(timer);
@@ -111,7 +121,7 @@ export function LoanCalculator() {
   const save = () => {
     if (!result || changed || error) return;
     if (isSaved) {
-      removeCalculationByKind("loan");
+      removeCalculationByParams("loan", snapshotParams);
       setSavedKey("");
       setDismissedKey(snapshotKey);
       return;
