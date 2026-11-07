@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState, type FormEvent, type KeyboardEvent } from "react";
 import { Bookmark, Calculator, RotateCcw } from "lucide-react";
 import { formatInput } from "@/lib/calculator";
+import { scrollFocusedInputIntoView } from "@/lib/scroll-focused-input";
 import { calculateLoan, calculateLoanFromPayment, type LoanResult } from "@/lib/loan";
 import { getCalculationHistory, getHistoryMode, removeCalculationByParams, saveCalculation, upsertCalculationByParams, type CalculationRecord } from "@/lib/history";
 
@@ -139,19 +140,19 @@ export function LoanCalculator() {
     <form onSubmit={submit} autoComplete="off" className="min-w-0 rounded-3xl border border-[#EBEEF2] bg-white p-6 sm:p-8">
       <div className="mb-6 flex items-center gap-3"><span className="flex size-11 items-center justify-center rounded-xl bg-[#FCEBEA] text-[#E83C35]"><Calculator className="size-6" /></span><h3 className="text-xl font-semibold">Параметры кредита</h3></div>
       <div className="space-y-5">
-        <div><label htmlFor={reverse ? "loan-payment" : "loan-principal"} className="mb-3 block text-sm font-semibold">{reverse ? "Комфортный платёж в месяц" : "Сумма кредита"}</label><div className="relative"><input id={reverse ? "loan-payment" : "loan-principal"} inputMode="decimal" enterKeyHint="done" onKeyDown={dismissKeyboard} autoComplete="off" value={value} onChange={event => {
+        <div><label htmlFor={reverse ? "loan-payment" : "loan-principal"} className="mb-3 block text-sm font-semibold">{reverse ? "Комфортный платёж в месяц" : "Сумма кредита"}</label><div className="relative"><input id={reverse ? "loan-payment" : "loan-principal"} onFocus={event => scrollFocusedInputIntoView(event.currentTarget)} inputMode="decimal" enterKeyHint="done" onKeyDown={dismissKeyboard} autoComplete="off" value={value} onChange={event => {
           const raw = event.target.value;
           const digitsBeforeDecimal = raw.replace(/\s/g, "").split(/[.,]/)[0].replace(/^0+/, "");
           if (digitsBeforeDecimal.length > 9) return;
           edit({ value: formatInput(raw) });
         }} placeholder={reverse ? "Введите платёж" : "Введите сумму"} className={`${inputStyle} pr-12`} /><span className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-[#7B8797]">₽</span></div></div>
-        <div><label htmlFor="loan-term" className="mb-3 block text-sm font-semibold">Срок кредита</label><div className="flex gap-2"><input id="loan-term" inputMode="decimal" enterKeyHint="done" autoComplete="off" onKeyDown={dismissKeyboard} value={term} onChange={event => {
+        <div><label htmlFor="loan-term" className="mb-3 block text-sm font-semibold">Срок кредита</label><div className="flex gap-2"><input id="loan-term" onFocus={event => scrollFocusedInputIntoView(event.currentTarget)} inputMode="decimal" enterKeyHint="done" autoComplete="off" onKeyDown={dismissKeyboard} value={term} onChange={event => {
           const raw = event.target.value.replace(/[^\d]/g, "").slice(0, 3);
           const limit = unit === "years" ? 30 : 360;
           const numeric = Number(raw);
           edit({ term: raw !== "" && numeric > limit ? String(limit) : raw });
         }} placeholder="Введите срок" className={inputStyle} /><select aria-label="Единицы срока кредита" value={unit} onChange={event => edit({ unit: event.target.value })} className="h-14 shrink-0 rounded-xl border border-[#E4E8ED] bg-[#F7F8FA] px-3 text-sm outline-none focus:ring-2 focus:ring-[#E83C35]"><option value="years">лет</option><option value="months">месяцев</option></select></div></div>
-        <div><label htmlFor="loan-rate" className="mb-3 block text-sm font-semibold">Процентная ставка</label><div className="relative"><input id="loan-rate" inputMode="decimal" enterKeyHint="done" autoComplete="off" onKeyDown={dismissKeyboard} value={rate} onChange={event => {
+        <div><label htmlFor="loan-rate" className="mb-3 block text-sm font-semibold">Процентная ставка</label><div className="relative"><input id="loan-rate" onFocus={event => scrollFocusedInputIntoView(event.currentTarget)} inputMode="decimal" enterKeyHint="done" autoComplete="off" onKeyDown={dismissKeyboard} value={rate} onChange={event => {
           const raw = event.target.value.replace(",", ".").replace(/[^\d.]/g, "");
           const parts = raw.split(".");
           const candidate = parts.length > 2 ? parts[0] + "." + parts.slice(1).join("") : raw;
