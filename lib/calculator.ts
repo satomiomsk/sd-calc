@@ -11,7 +11,7 @@ export function parseMoney(value: string): number | null {
   const normalized = value.replace(/[ \u00a0\u202f]/g, "").replace(",", ".");
   if (!/^\d+(?:\.\d+)?$/.test(normalized)) return null;
   const number = Number(normalized);
-  return Number.isFinite(number) && number > 0 && number <= Number.MAX_SAFE_INTEGER ? number : null;
+  return Number.isFinite(number) && number > 0 && number <= 999999999 ? number : null;
 }
 
 export function formatInput(value: string): string {
