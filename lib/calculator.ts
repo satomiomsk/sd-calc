@@ -17,7 +17,8 @@ export function parseMoney(value: string): number | null {
 export function formatInput(value: string): string {
   const normalized = value.replace(/[ \u00a0\u202f]/g, "");
   if (!/^\d*(?:[.,]\d*)?$/.test(normalized)) return value;
-  const [whole, fraction] = normalized.split(/[.,]/);
+  const [rawWhole, fraction] = normalized.split(/[.,]/);
+  const whole = rawWhole.replace(/^0+(?=\d)/, "").slice(0, 9);
   const separator = normalized.includes(",") ? "," : ".";
   return whole.replace(/\B(?=(\d{3})+(?!\d))/g, " ") + (fraction !== undefined ? separator + fraction : "");
 }
