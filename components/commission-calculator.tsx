@@ -64,7 +64,9 @@ export function CommissionCalculator({ operation, tariffs }: { operation: Operat
   const [draftsRestored, setDraftsRestored] = useState(false);
   useEffect(() => {
     try {
-      const saved = window.sessionStorage.getItem("sd-commission-drafts");
+      const isRefresh = performance.getEntriesByType("navigation")[0]?.type === "reload";
+      if (isRefresh) window.sessionStorage.removeItem("sd-commission-drafts");
+      const saved = isRefresh ? null : window.sessionStorage.getItem("sd-commission-drafts");
       if (saved) {
         const parsed = JSON.parse(saved) as Partial<Record<Operation, Draft>>;
         setDrafts(previous => ({ sale: { ...previous.sale, ...(parsed.sale ?? {}) }, purchase: { ...previous.purchase, ...(parsed.purchase ?? {}) } }));
