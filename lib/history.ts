@@ -55,6 +55,12 @@ export function removeCalculationByKind(kind: CalculationKind) {
   window.dispatchEvent(new CustomEvent("sd-history-updated"));
 }
 
+export function clearCalculationKinds(kinds: CalculationKind[]) {
+  const selected = new Set(kinds);
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(getCalculationHistory().filter(item => !selected.has(item.kind))));
+  window.dispatchEvent(new CustomEvent("sd-history-updated"));
+}
+
 export function clearCalculationHistory() {
   localStorage.removeItem(STORAGE_KEY);
   window.dispatchEvent(new CustomEvent("sd-history-updated"));
