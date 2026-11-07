@@ -31,9 +31,9 @@ const formulas: Record<MortgageMode, string> = {
 };
 
 const themes = {
-  part: { background: "bg-[#FCEBEA]", accent: "text-[#A94442]", border: "border-[#F3DAD8]", link: "border-[#F3DAD8] bg-[#FFFAFA] text-[#A94442] hover:bg-[#FCEBEA]" },
-  whole: { background: "bg-[#FBF4E5]", accent: "text-[#80682F]", border: "border-[#E7DDC8]", link: "border-[#E7DDC8] bg-[#FBF4E5] text-[#80682F] hover:bg-[#F5EBD4]" },
-  adjustment: { background: "bg-[#EAF2FB]", accent: "text-[#536A84]", border: "border-[#D6E2F0]", link: "border-[#D6E2F0] bg-[#EAF2FB] text-[#536A84] hover:bg-[#DFEAF7]" },
+  part: { background: "bg-[#EEF1F5]", accent: "text-[#E83C35]", border: "border-[#E4E8ED]", link: "border-[#E4E8ED] bg-[#F7F8FA] text-[#E83C35] hover:bg-[#EEF1F5]" },
+  whole: { background: "bg-[#EEF1F5]", accent: "text-[#E83C35]", border: "border-[#E4E8ED]", link: "border-[#E4E8ED] bg-[#F7F8FA] text-[#E83C35] hover:bg-[#EEF1F5]" },
+  adjustment: { background: "bg-[#EEF1F5]", accent: "text-[#E83C35]", border: "border-[#E4E8ED]", link: "border-[#E4E8ED] bg-[#F7F8FA] text-[#E83C35] hover:bg-[#EEF1F5]" },
 };
 
 function MortgageInput({ id, label, value, money, suffix, placeholder, onChange }: { id: string; label: string; value: string; money: boolean; suffix?: string; placeholder: string; onChange: (value: string) => void }) {
