@@ -51,6 +51,16 @@ export default function Home() {
     return () => window.removeEventListener("sd-history-updated", refresh);
   }, []);
   useEffect(() => {
+    const media = window.matchMedia("(prefers-color-scheme: dark)");
+    const syncSystemTheme = () => {
+      if (themeMode === "system") document.documentElement.classList.toggle("dark", media.matches);
+    };
+    syncSystemTheme();
+    if (themeMode !== "system") return;
+    media.addEventListener("change", syncSystemTheme);
+    return () => media.removeEventListener("change", syncSystemTheme);
+  }, [themeMode]);
+  useEffect(() => {
     if (!Capacitor.isNativePlatform()) return;
     let active = true;
     let listener: { remove: () => Promise<void> } | undefined;
