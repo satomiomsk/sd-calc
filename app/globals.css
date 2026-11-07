@@ -143,3 +143,20 @@ html.dark [class*="text-[#8993A2]"] { color: #AAB6C4 !important; }
 html.dark [class*="bg-[#26364A]"] { background-color: #344252 !important; }
 html.dark [class*="bg-[#EEF1F5]"] { background-color: #253241 !important; }
 html.dark input, html.dark select, html.dark textarea { background-color: #1B2632; color: #E8EDF3; border-color: #465568; }
+
+
+/* Dark-mode refinements for secondary surfaces and controls. */
+html.dark [class*="bg-[#FCEBEA]"],
+html.dark [class*="bg-[#FFF7F6]"] { background-color: #382726 !important; }
+html.dark [class*="bg-[#F7F8FA]"],
+html.dark [class*="bg-[#F5F7FA]"] { background-color: #111820 !important; }
+html.dark [class*="border-[#F0DBD9]"],
+html.dark [class*="border-[#F3DAD8]"],
+html.dark [class*="border-[#F3C7C5]"] { border-color: #63413F !important; }
+html.dark [class*="border-[#E4E8ED]"],
+html.dark [class*="border-[#EBEEF2]"] { border-color: #344252 !important; }
+html.dark [class*="text-[#A94442]"] { color: #F0A19C !important; }
+html.dark button:disabled { opacity: .48; }
+html.dark input::placeholder,
+html.dark textarea::placeholder { color: #8795A5; }
+html.dark :focus-visible { outline-color: #F07870; }
