@@ -54,6 +54,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ru">
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: `(function(){try{var m=localStorage.getItem("sd-theme-mode-v1");var d=m==="dark"||(m!=="light"&&window.matchMedia("(prefers-color-scheme: dark)").matches);document.documentElement.classList.toggle("dark",d);}catch(e){}})();` }} />
+      </head>
       <body className={`${inter.className} antialiased [touch-action:pan-x_pan-y]`}>
         <ReactErrorBoundary>
           {children}
