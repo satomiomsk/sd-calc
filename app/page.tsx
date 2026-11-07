@@ -136,24 +136,25 @@ export default function Home() {
   const [historyItems, setHistoryItems] = useState<CalculationRecord[]>([]);
   const [historyMode, setHistoryModeState] = useState<HistoryMode>("manual");
   const [themeMode, setThemeMode] = useState<ThemeMode>("system");
+  const [themeReady, setThemeReady] = useState(false);
   const [expandedHistory, setExpandedHistory] = useState<Set<string>>(() => new Set());
   useEffect(() => {
     const refresh = () => setHistoryItems(getCalculationHistory());
     refresh(); setHistoryModeState(getHistoryMode());
-    let savedTheme: string | null = null;
-    try { savedTheme = localStorage.getItem("sd-theme-mode-v1"); } catch {}
+    const cookieTheme = document.cookie.match(/(?:^|;\\s*)sd-theme-mode-v1=(light|dark|system)(?:;|$)/)?.[1];
+    let savedTheme: string | null = cookieTheme ?? null;
     if (savedTheme !== "light" && savedTheme !== "dark" && savedTheme !== "system") {
-      const cookieTheme = document.cookie.match(/(?:^|; )sd-theme-mode-v1=(light|dark|system)(?:;|$)/)?.[1];
-      savedTheme = cookieTheme ?? null;
+      try { savedTheme = localStorage.getItem("sd-theme-mode-v1"); } catch {}
     }
-    const mode: ThemeMode = savedTheme === "light" || savedTheme === "dark" ? savedTheme : "system";
+    const mode: ThemeMode = savedTheme === "light" || savedTheme === "dark" || savedTheme === "system" ? savedTheme : "system";
     setThemeMode(mode);
-    const applyTheme = () => document.documentElement.classList.toggle("dark", mode === "dark" || (mode === "system" && window.matchMedia("(prefers-color-scheme: dark)").matches));
-    applyTheme();
+    setThemeReady(true);
+    document.documentElement.classList.toggle("dark", mode === "dark" || (mode === "system" && window.matchMedia("(prefers-color-scheme: dark)").matches));
     window.addEventListener("sd-history-updated", refresh);
     return () => window.removeEventListener("sd-history-updated", refresh);
   }, []);
   useEffect(() => {
+    if (!themeReady) return;
     const media = window.matchMedia("(prefers-color-scheme: dark)");
     const syncSystemTheme = () => {
       if (themeMode === "system") document.documentElement.classList.toggle("dark", media.matches);
@@ -162,7 +163,7 @@ export default function Home() {
     if (themeMode !== "system") return;
     media.addEventListener("change", syncSystemTheme);
     return () => media.removeEventListener("change", syncSystemTheme);
-  }, [themeMode]);
+  }, [themeMode, themeReady]);
   useEffect(() => {
     if (!Capacitor.isNativePlatform()) return;
     let active = true;
