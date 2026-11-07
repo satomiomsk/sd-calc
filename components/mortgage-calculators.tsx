@@ -47,6 +47,8 @@ function MortgageInput({ id, label, value, money, suffix, placeholder, onChange 
     if (event.key === "Enter" && !event.nativeEvent.isComposing) { event.preventDefault(); event.currentTarget.blur(); }
   }} onChange={event => {
     const raw = event.target.value;
+    const digitsBeforeDecimal = raw.replace(/\s/g, "").split(/[.,]/)[0].replace(/^0+/, "");
+    if (money && digitsBeforeDecimal.length > 9) return;
     const position = event.target.selectionStart ?? raw.length;
     const significant = raw.slice(0, position).replace(/\s/g, "").length;
     const next = money
