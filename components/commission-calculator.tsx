@@ -41,6 +41,8 @@ function MoneyInput({ id, label, value, onChange }: { id: string; label: string;
         }}
         onChange={e => {
           const raw = e.target.value;
+          const digitsBeforeDecimal = raw.replace(/[ \u00a0\u202f]/g, "").split(/[.,]/)[0].replace(/^0+/, "");
+          if (digitsBeforeDecimal.length > 9) return;
           const caret = e.target.selectionStart ?? raw.length;
           const significant = raw.slice(0, caret).replace(/[ \u00a0\u202f]/g, "").length;
           const formatted = formatInput(raw);
