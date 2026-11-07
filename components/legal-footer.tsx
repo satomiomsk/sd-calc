@@ -17,7 +17,7 @@ export function LegalFooter() {
         <p className="text-[11px] leading-5 sm:text-xs">© 2026 Автор: Светлана Демиденко</p>
       </div>
       <Dialog>
-        <DialogTrigger asChild><button type="button" className="w-fit max-w-full shrink-0 rounded-sm text-right text-[11px] leading-[1.6] underline decoration-[#A7B1BF] underline-offset-4 transition-colors hover:text-[#26364A] focus-visible:outline-2 focus-visible:outline-offset-4 sm:max-w-[300px] lg:max-w-none lg:whitespace-nowrap">Условия использования и политика конфиденциальности</button></DialogTrigger>
+        <DialogTrigger asChild><button type="button" className="w-fit max-w-full shrink-0 rounded-sm text-right text-[11px] leading-[1.6] no-underline transition-colors hover:text-[#26364A] focus-visible:outline-2 focus-visible:outline-offset-4 sm:max-w-[300px] lg:max-w-none lg:whitespace-nowrap">Условия использования и политика конфиденциальности</button></DialogTrigger>
         <DialogContent className="flex max-h-[85dvh] flex-col gap-0 overflow-hidden rounded-2xl p-0 sm:max-w-3xl">
           <DialogHeader className="shrink-0 px-5 pt-6 pb-4 pr-10 sm:px-7 sm:pr-12">
             <DialogTitle className="text-left text-lg leading-snug text-[#26364A] sm:text-xl">Условия использования и политика конфиденциальности</DialogTitle>
