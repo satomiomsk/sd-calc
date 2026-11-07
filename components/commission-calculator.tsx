@@ -1,8 +1,8 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { ArrowUp, Bookmark, Calculator, Copy, Info, RotateCcw, Wallet } from "lucide-react";
-import { saveCalculation } from "@/lib/history";
+import { getHistoryMode, saveCalculation, type CalculationRecord } from "@/lib/history";
 import { toast } from "sonner";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { applyDiscount, applyPairedDiscount, discounts } from "@/lib/discounts";
@@ -82,6 +82,33 @@ export function CommissionCalculator({ operation, tariffs }: { operation: Operat
   const motivationAmount = discounted && motivationValid ? Math.round((discounted.total * motivation / 100 + Number.EPSILON) * 100) / 100 : null;
   const clear = () => { setPrice(""); setCredit(""); setDiscountId("none"); setPairedPrice(""); update("motivationPercent", ""); update("motivationOpen", false); };
   const [savedKey, setSavedKey] = useState("");
+  useEffect(() => {
+    const restore = (event: Event) => {
+      const record = (event as CustomEvent<CalculationRecord>).detail;
+      if (record?.kind !== "commission") return;
+      const p = record.params;
+      const target = p.operation === "purchase" ? "purchase" : "sale";
+      setDrafts(previous => ({ ...previous, [target]: {
+        category: (p.category || "apartment") as Category, price: p.price || "", credit: p.credit || "",
+        discountId: p.discountId || "none", pairedPrice: p.pairedPrice || "", motivationOpen: Boolean(p.motivationPercent),
+        motivationPercent: p.motivationPercent || ""
+      }}));
+    };
+    window.addEventListener("sd-history-restore", restore);
+    return () => window.removeEventListener("sd-history-restore", restore);
+  }, []);
+  useEffect(() => {
+    if (getHistoryMode() !== "auto" || result.status !== "ok" || !discounted) return;
+    const params = { operation, category, price, credit, discountId, pairedPrice, motivationPercent };
+    const key = JSON.stringify(params);
+    if (savedKey === key) return;
+    const timer = window.setTimeout(() => {
+      saveCalculation({ kind: "commission", title: `Комиссия — ${sale ? "Продажа" : "Покупка"}`, summary: money(discounted.total), params, results: { commission: money(result.total), final: money(discounted.total), discount: discount?.name ?? "Без скидки" } });
+      setSavedKey(key);
+    }, 650);
+    return () => window.clearTimeout(timer);
+  }, [operation, category, price, credit, discountId, pairedPrice, motivationPercent, result.status, result.status === "ok" ? result.total : 0, discounted?.total, savedKey, sale, discount?.name]);
+
   const save = () => {
     if (result.status !== "ok" || !discounted) return;
     const params = { operation, category, price, credit, discountId, pairedPrice, motivationPercent };
