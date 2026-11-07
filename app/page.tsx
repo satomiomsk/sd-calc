@@ -214,7 +214,7 @@ export default function Home() {
     <header className="border-b border-[#E7EBF0] bg-white">
       <div className="mx-auto flex min-h-20 max-w-[1200px] flex-nowrap items-center justify-between gap-x-2 px-4 pt-[calc(1.5rem+env(safe-area-inset-top,0px))] pb-4 sm:gap-x-4 sm:px-8 max-sm:min-h-16 max-sm:pt-[calc(.75rem+env(safe-area-inset-top,0px))] max-sm:pb-3">
         <a href="#" onClick={event => { event.preventDefault(); navigate("home"); }} aria-label="Калькулятор SD - главная" className="flex shrink-0 items-center gap-1 rounded-lg outline-offset-4 focus-visible:outline-2 focus-visible:outline-[#E83C35] sm:gap-3">
-          <span className="flex size-7 shrink-0 items-center justify-center min-[375px]:size-8 sm:size-10"><svg aria-hidden="true" className="absolute h-0 w-0 overflow-hidden"><defs><filter id="sd-remove-white-background" colorInterpolationFilters="sRGB"><feColorMatrix type="matrix" values="1 0 0 0 0 0 1 0 0 0 0 1 0 0 0 -0.2126 -0.7152 -0.0722 0 1" /></filter></defs></svg><Image src={publicAsset("/images/sd-calculator-logo.png")} alt="Логотип SD" width={160} height={160} unoptimized className="size-full object-contain dark:[filter:url(#sd-remove-white-background)]" /></span>
+          <span className="flex size-7 shrink-0 items-center justify-center min-[375px]:size-8 sm:size-10"><Image src={publicAsset("/images/sd-calculator-logo-transparent.svg")} alt="Логотип SD" width={96} height={96} unoptimized className="size-full object-contain" /></span>
           <span className="whitespace-nowrap text-[13px] font-semibold tracking-tight min-[375px]:text-sm sm:text-[18px]">SvDemidenko</span>
         </a>
         <div className="ml-auto flex shrink-0 items-center gap-2 min-[375px]:gap-2.5 sm:gap-3">
