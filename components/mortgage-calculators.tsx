@@ -62,7 +62,9 @@ function MortgageCard({ config }: { config: typeof configs[number] }) {
   const storageKey = `sd-mortgage-${config.mode}`;
   useEffect(() => {
     try {
-      const saved = window.sessionStorage.getItem(storageKey);
+      const isRefresh = performance.getEntriesByType("navigation")[0]?.type === "reload";
+      if (isRefresh) window.sessionStorage.removeItem(storageKey);
+      const saved = isRefresh ? null : window.sessionStorage.getItem(storageKey);
       if (saved) {
         const parsed = JSON.parse(saved);
         if (Array.isArray(parsed) && parsed.length === config.defaults.length && parsed.every(value => typeof value === "string")) setValues(parsed);
