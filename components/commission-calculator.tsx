@@ -8,6 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { applyDiscount, applyPairedDiscount, discounts } from "@/lib/discounts";
 import type { TariffSnapshot } from "@/lib/tariffs";
 import { calculate, formatInput, parseMoney, type Category, type Operation } from "@/lib/calculator";
+import { scrollFocusedInputIntoView } from "@/lib/scroll-focused-input";
 
 const titles: Record<Category, string> = {
   apartment: "Квартира / жилое помещение", country: "Загородная недвижимость", garage: "Гараж / парковочное место", commercial: "Коммерческая недвижимость", land: "Земельный участок с ипотекой на строительство дома",
@@ -35,7 +36,7 @@ function MoneyInput({ id, label, value, onChange }: { id: string; label: string;
   return <div>
     <label htmlFor={id} className="mb-3 block text-sm font-semibold">{label}</label>
     <div className={`relative rounded-2xl border bg-[#F7F8FA] transition focus-within:border-[#E83C35] focus-within:ring-4 focus-within:ring-[#E83C35]/10 ${invalid ? "border-[#E83C35]" : "border-[#E4E8ED]"}`}>
-      <input ref={input} id={id} inputMode="decimal" enterKeyHint="done" autoComplete="off" placeholder="Введите стоимость" value={value} aria-invalid={invalid} aria-describedby={invalid ? `${id}-error` : undefined}
+      <input ref={input} id={id} onFocus={event => scrollFocusedInputIntoView(event.currentTarget)} inputMode="decimal" enterKeyHint="done" autoComplete="off" placeholder="Введите стоимость" value={value} aria-invalid={invalid} aria-describedby={invalid ? `${id}-error` : undefined}
         onKeyDown={event => {
           if (event.key === "Enter" && !event.nativeEvent.isComposing) { event.preventDefault(); event.currentTarget.blur(); }
         }}
@@ -216,7 +217,7 @@ export function CommissionCalculator({ operation, tariffs }: { operation: Operat
                   {motivationOpen && discounted && <div id="motivation-panel" className="mt-4 rounded-2xl border border-white/80 bg-white/75 p-4 sm:p-5">
                     <div className="mb-4 flex items-center gap-2 text-sm font-semibold"><Wallet aria-hidden="true" className="size-4 text-[#647184]" />Вознаграждение по сделке</div>
                     <label htmlFor="motivation-percent" className="mb-2 block text-sm font-semibold">Ваш партнерский процент</label>
-                    <div className="relative max-w-48"><input id="motivation-percent" autoFocus inputMode="decimal" enterKeyHint="done" autoComplete="off" placeholder="Например, 43.5" value={motivationPercent} onChange={event => {
+                    <div className="relative max-w-48"><input id="motivation-percent" autoFocus onFocus={event => scrollFocusedInputIntoView(event.currentTarget)} inputMode="decimal" enterKeyHint="done" autoComplete="off" placeholder="Например, 43.5" value={motivationPercent} onChange={event => {
                        const raw = event.target.value.replace(",", ".").replace(/[^\d.]/g, "");
                        const parts = raw.split(".");
                        const candidate = parts.length > 2 ? parts[0] + "." + parts.slice(1).join("") : raw;
