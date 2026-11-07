@@ -198,10 +198,16 @@ export default function Home() {
     const validScreen = (value: unknown): value is Screen =>
       value === "home" || value === "commission" || value === "mortgage" || value === "history" || value === "settings";
     let restored: Screen = "home";
-    try {
-      const saved = window.sessionStorage.getItem("sd-current-screen");
-      if (validScreen(saved)) restored = saved;
-    } catch {}
+    const navigationType = window.performance.getEntriesByType("navigation")[0] as PerformanceNavigationTiming | undefined;
+    const isReload = navigationType?.type === "reload";
+    if (!isReload) {
+      try {
+        const saved = window.sessionStorage.getItem("sd-current-screen");
+        if (validScreen(saved)) restored = saved;
+      } catch {}
+    } else {
+      try { window.sessionStorage.setItem("sd-current-screen", "home"); } catch {}
+    }
     setScreen(restored);
     window.history.replaceState({ ...window.history.state, sdScreen: restored }, "");
     const onBack = (event: PopStateEvent) => {
