@@ -30,7 +30,7 @@ export function LoanCalculator() {
   const [draftsRestored, setDraftsRestored] = useState(false);
   useEffect(() => {
     try {
-      const isRefresh = performance.getEntriesByType("navigation")[0]?.type === "reload";
+      const isRefresh = (performance.getEntriesByType("navigation")[0] as PerformanceNavigationTiming | undefined)?.type === "reload";
       const activeCalculator = window.sessionStorage.getItem("sd-current-screen") === "mortgage" && window.sessionStorage.getItem("sd-mortgage-tab") === "loan";
       if (isRefresh && activeCalculator) window.sessionStorage.removeItem("sd-loan-drafts");
       const saved = isRefresh && activeCalculator ? null : window.sessionStorage.getItem("sd-loan-drafts");
