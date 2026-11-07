@@ -125,3 +125,21 @@ nextjs-portal { display: none !important; }
     @apply bg-background text-foreground;
   }
 }
+
+/* Dark premium palette: keep the brand red while adapting common surfaces. */
+html.dark body { background: #111820; color: #E8EDF3; color-scheme: dark; }
+html.dark [class*="bg-white"] { background-color: #1B2632 !important; }
+html.dark [class*="bg-[#F5F7FA]"],
+html.dark [class*="bg-[#EEF1F5]"],
+html.dark [class*="bg-[#F7F8FA]"] { background-color: #111820 !important; }
+html.dark [class*="border-[#E7EBF0]"],
+html.dark [class*="border-[#EBEEF2]"],
+html.dark [class*="border-[#E4E8ED]"],
+html.dark [class*="border-[#E1E6ED]"] { border-color: #344252 !important; }
+html.dark [class*="text-[#26364A]"] { color: #E8EDF3 !important; }
+html.dark [class*="text-[#647184]"],
+html.dark [class*="text-[#748195]"],
+html.dark [class*="text-[#8993A2]"] { color: #AAB6C4 !important; }
+html.dark [class*="bg-[#26364A]"] { background-color: #344252 !important; }
+html.dark [class*="bg-[#EEF1F5]"] { background-color: #253241 !important; }
+html.dark input, html.dark select, html.dark textarea { background-color: #1B2632; color: #E8EDF3; border-color: #465568; }
