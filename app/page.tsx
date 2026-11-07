@@ -54,6 +54,10 @@ const historyFieldLabels: Record<string, string> = {
   propertyPrice: "Стоимость недвижимости",
   purchasePrice: "Стоимость покупки",
   salePrice: "Стоимость продажи",
+  "Стоимость объекта, ₽": "Стоимость объекта",
+  "Сумма первоначального взноса, ₽": "Сумма первоначального взноса",
+  "Первоначальный взнос, %": "Первоначальный взнос",
+  "Необходимый первоначальный взнос, %": "Необходимый первоначальный взнос",
 };
 
 function historyLabel(key: string) {
@@ -76,9 +80,9 @@ function historyDuration(value: string, unit: string) {
 function historyDisplayValue(key: string, value: string, params?: Record<string, string>) {
   if (key === "term") return historyDuration(value, params?.unit ?? "months");
   if (key === "months") return historyDuration(value, "months");
-  if (["rate", "annualRate", "downPaymentPercent", "motivationPercent"].includes(key)) return value ? (value.endsWith("%") ? value : `${value}%`) : "-";
+  if (["rate", "annualRate", "downPaymentPercent", "motivationPercent", "Первоначальный взнос, %", "Необходимый первоначальный взнос, %"].includes(key)) return value ? (value.endsWith("%") ? value : `${value}%`) : "-";
   const currencyKeys = ["value", "price", "amount", "credit", "pairedPrice", "downPayment", "loanAmount", "propertyPrice", "purchasePrice", "salePrice", "monthlyPayment", "principal", "interest", "totalPayment", "commission", "total", "payment", "final"];
-  if (currencyKeys.includes(key)) return value.includes("₽") ? value : `${value} ₽`;
+  if (currencyKeys.includes(key) || ["Стоимость объекта, ₽", "Сумма первоначального взноса, ₽"].includes(key)) return value.includes("₽") ? value : `${value} ₽`;
   return historyValue(key, value) || "-";
 }
 
