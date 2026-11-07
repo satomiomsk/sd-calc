@@ -22,6 +22,49 @@ type Screen = "home" | "commission" | "mortgage" | "history" | "settings";
 type ThemeMode = "light" | "dark" | "system";
 const titles = { commission: "Комиссия", mortgage: "Ипотека", history: "История расчётов", settings: "Настройки" };
 
+const historyFieldLabels: Record<string, string> = {
+  mode: "Тип расчёта",
+  value: "Сумма кредита",
+  term: "Срок",
+  unit: "Единица срока",
+  rate: "Процентная ставка",
+  operation: "Операция",
+  price: "Стоимость недвижимости",
+  amount: "Сумма",
+  downPayment: "Первоначальный взнос",
+  downPaymentPercent: "Первоначальный взнос",
+  loanAmount: "Сумма кредита",
+  monthlyPayment: "Ежемесячный платёж",
+  principal: "Основной долг",
+  interest: "Переплата по процентам",
+  totalPayment: "Общая сумма выплат",
+  months: "Количество месяцев",
+  annualRate: "Годовая ставка",
+  commission: "Комиссия",
+  total: "Итого",
+  payment: "Платёж",
+  propertyPrice: "Стоимость недвижимости",
+  purchasePrice: "Стоимость покупки",
+  salePrice: "Стоимость продажи",
+};
+
+function historyLabel(key: string) {
+  return historyFieldLabels[key] ?? key;
+}
+
+function historyValue(key: string, value: string) {
+  if (key === "mode") {
+    return ({ principal: "Основной долг", payment: "Ежемесячный платёж", total: "Общая сумма выплат" } as Record<string, string>)[value] ?? value;
+  }
+  if (key === "unit") {
+    return ({ years: "лет", months: "месяцев" } as Record<string, string>)[value] ?? value;
+  }
+  if (key === "operation") {
+    return ({ sale: "Продажа", purchase: "Покупка" } as Record<string, string>)[value] ?? value;
+  }
+  return value;
+}
+
 function NavigationRow({ title, icon: Icon, red, onClick }: { title: string; icon: LucideIcon; red?: boolean; onClick: () => void }) {
   return <button type="button" onClick={onClick} className={`group flex min-h-16 w-full min-w-0 items-center gap-3 px-4 py-2 text-left transition-colors duration-200 focus-visible:outline-2 focus-visible:outline-offset-[-2px] sm:min-h-[84px] sm:gap-4 sm:px-4 sm:py-5 max-sm:[@media(max-height:650px)]:min-h-14 max-sm:[@media(max-height:650px)]:gap-2 max-sm:[@media(max-height:650px)]:px-3 max-sm:[@media(max-height:650px)]:py-1.5 ${red ? "bg-white hover:bg-[#FFF7F6] focus-visible:outline-[#A72A25]" : "bg-white hover:bg-[#F5F7FA] focus-visible:outline-[#26364A]"} text-[#26364A]`}>
     <span className={`flex size-10 shrink-0 items-center justify-center rounded-[10px] border transition-colors sm:size-12 max-sm:[@media(max-height:650px)]:size-9 ${red ? "border-transparent bg-[#FCEBEA] text-[#E83C35] group-hover:bg-[#F9DFDD]" : "border-transparent bg-[#EEF1F5] text-[#26364A] group-hover:bg-[#E4E9F0]"}`}><Icon aria-hidden="true" className="size-[23px] sm:size-6" strokeWidth={1.7} /></span>
@@ -154,7 +197,7 @@ export default function Home() {
         <div className="flex flex-wrap gap-2"><span className="text-sm text-[#748195]">Сохранено: {historyItems.length} из 75</span><button type="button" onClick={() => { clearCalculationHistory(); setHistoryItems([]); }} disabled={!historyItems.length} className="ml-auto text-sm text-[#A94442] disabled:opacity-40">Очистить историю</button></div>
         {historyItems.length === 0 ? <div className="rounded-3xl border border-[#EBEEF2] bg-white p-8 text-center text-sm text-[#748195]">Сохранённых расчётов пока нет</div> : historyItems.map(item => <article key={item.id} className="rounded-2xl border border-[#EBEEF2] bg-white p-4">
           <button type="button" onClick={() => setExpandedHistory(expandedHistory === item.id ? null : item.id)} className="flex w-full items-center gap-3 text-left"><span className="min-w-0 flex-1"><span className="block font-semibold">{item.title}</span><span className="text-xs text-[#748195]">{new Date(item.createdAt).toLocaleString("ru-RU")}</span></span><strong className="text-right tabular-nums">{item.summary}</strong><ChevronDown className={`size-4 transition-transform ${expandedHistory === item.id ? "rotate-180" : ""}`} /></button>
-          {expandedHistory === item.id && <div className="mt-4 space-y-3 border-t border-[#EBEEF2] pt-3 text-sm"><p className="font-semibold">Условия расчёта</p>{Object.entries(item.params).map(([key,value]) => <div key={key} className="flex justify-between gap-3"><span className="text-[#748195]">{key}</span><span className="text-right">{value || "-"}</span></div>)}<p className="pt-2 font-semibold">Результаты</p>{Object.entries(item.results).map(([key,value]) => <div key={key} className="flex justify-between gap-3"><span className="text-[#748195]">{key}</span><span className="text-right">{value}</span></div>)}<div className="flex flex-wrap justify-end gap-4"><button type="button" onClick={() => { if (item.kind === "commission") { setOperation(item.params.operation === "purchase" ? "purchase" : "sale"); setScreen("commission"); } else { setMortgageTab(item.kind === "loan" ? "loan" : "downpayment"); setScreen("mortgage"); } window.dispatchEvent(new CustomEvent("sd-history-restore", { detail: item })); window.scrollTo({ top: 0, behavior: "instant" }); }} className="text-sm font-medium text-[#26364A] hover:text-[#E83C35]">Пересчитать</button><button type="button" onClick={() => deleteCalculation(item.id)} className="inline-flex items-center gap-1 text-sm text-[#A94442]"><Trash2 className="size-4" />Удалить</button></div></div>}
+          {expandedHistory === item.id && <div className="mt-4 space-y-3 border-t border-[#EBEEF2] pt-3 text-sm"><p className="font-semibold">Условия расчёта</p>{Object.entries(item.params).map(([key,value]) => <div key={key} className="flex justify-between gap-3"><span className="text-[#748195]">{historyLabel(key)}</span><span className="text-right">{historyValue(key, value) || "-"}</span></div>)}<p className="pt-2 font-semibold">Результаты</p>{Object.entries(item.results).map(([key,value]) => <div key={key} className="flex justify-between gap-3"><span className="text-[#748195]">{historyLabel(key)}</span><span className="text-right">{historyValue(key, value)}</span></div>)}<div className="flex flex-wrap justify-end gap-4"><button type="button" onClick={() => { if (item.kind === "commission") { setOperation(item.params.operation === "purchase" ? "purchase" : "sale"); setScreen("commission"); } else { setMortgageTab(item.kind === "loan" ? "loan" : "downpayment"); setScreen("mortgage"); } window.dispatchEvent(new CustomEvent("sd-history-restore", { detail: item })); window.scrollTo({ top: 0, behavior: "instant" }); }} className="text-sm font-medium text-[#26364A] hover:text-[#E83C35]">Пересчитать</button><button type="button" onClick={() => deleteCalculation(item.id)} className="inline-flex items-center gap-1 text-sm text-[#A94442]"><Trash2 className="size-4" />Удалить</button></div></div>}
         </article>)}
       </section>}
       {screen === "settings" && <section className="space-y-5">
