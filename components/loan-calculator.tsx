@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, type FormEvent, type KeyboardEvent } from "react";
+import { useEffect, useRef, useState, type FormEvent, type KeyboardEvent } from "react";
 import { Bookmark, Calculator, RotateCcw } from "lucide-react";
 import { formatInput } from "@/lib/calculator";
 import { calculateLoan, calculateLoanFromPayment, type LoanResult } from "@/lib/loan";
@@ -27,6 +27,25 @@ const emptyDraft = (): LoanDraft => ({ value: "", term: "", unit: "years", rate:
 export function LoanCalculator() {
   const [mode, setMode] = useState<LoanMode>("principal");
   const [drafts, setDrafts] = useState<Record<LoanMode, LoanDraft>>({ principal: emptyDraft(), payment: emptyDraft() });
+  const [draftsRestored, setDraftsRestored] = useState(false);
+  useEffect(() => {
+    try {
+      const saved = window.sessionStorage.getItem("sd-loan-drafts");
+      if (saved) {
+        const parsed = JSON.parse(saved) as Partial<Record<LoanMode, LoanDraft>>;
+        setDrafts(previous => ({ principal: { ...previous.principal, ...(parsed.principal ?? {}) }, payment: { ...previous.payment, ...(parsed.payment ?? {}) } }));
+      }
+    } catch {}
+    setDraftsRestored(true);
+  }, []);
+  useEffect(() => {
+    if (!draftsRestored) return;
+    try {
+      const { principal, payment } = drafts;
+      const serializable = (draft: LoanDraft) => ({ ...draft, result: null, error: "", changed: true });
+      window.sessionStorage.setItem("sd-loan-drafts", JSON.stringify({ principal: serializable(principal), payment: serializable(payment) }));
+    } catch {}
+  }, [drafts, draftsRestored]);
   const { value, term, unit, rate, result, error, changed, calculated } = drafts[mode];
   const reverse = mode === "payment";
   const update = (patch: Partial<LoanDraft>) => setDrafts(previous => ({ ...previous, [mode]: { ...previous[mode], ...patch } }));
