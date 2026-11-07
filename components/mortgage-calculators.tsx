@@ -5,7 +5,7 @@ import { ArrowUp, Bookmark, ChartNoAxesCombined, Copy, House, RotateCcw, Wallet 
 import { toast } from "sonner";
 import { formatInput } from "@/lib/calculator";
 import { calculateMortgage, type MortgageMode } from "@/lib/mortgage";
-import { getHistoryMode, saveCalculation, type CalculationRecord } from "@/lib/history";
+import { getHistoryMode, removeCalculationByKind, saveCalculation, type CalculationRecord } from "@/lib/history";
 
 const rubles = new Intl.NumberFormat("ru-RU", { maximumFractionDigits: 0 });
 const percent = new Intl.NumberFormat("ru-RU", { maximumFractionDigits: 6 });
@@ -59,6 +59,7 @@ function MortgageInput({ id, label, value, money, suffix, placeholder, onChange 
 function MortgageCard({ config }: { config: typeof configs[number] }) {
   const [values, setValues] = useState(config.defaults);
   const [savedKey, setSavedKey] = useState("");
+  const [dismissedKey, setDismissedKey] = useState("");
   const [historyModeVersion, setHistoryModeVersion] = useState(0);
   useEffect(() => { const update = () => setHistoryModeVersion(v => v + 1); window.addEventListener("sd-history-settings-updated", update); return () => window.removeEventListener("sd-history-settings-updated", update); }, []);
   const result = calculateMortgage(config.mode, values);
@@ -79,20 +80,28 @@ function MortgageCard({ config }: { config: typeof configs[number] }) {
     return () => window.removeEventListener("sd-history-restore", restore);
   }, [config]);
   useEffect(() => {
-    if (getHistoryMode() !== "auto" || result.status !== "ok" || savedKey === snapshotKey) return;
+    if (getHistoryMode() !== "auto" || result.status !== "ok" || savedKey === snapshotKey || dismissedKey === snapshotKey) return;
     const timer = window.setTimeout(() => {
       const kind = config.mode === "part" ? "mortgage-part" : config.mode === "whole" ? "mortgage-whole" : "mortgage-adjustment";
       saveCalculation({ kind, title: config.title, summary: `${rubles.format(result.total)} ₽`, params: Object.fromEntries(config.labels.map((label, index) => [label, values[index]])), results: { [config.resultLabel]: `${rubles.format(result.total)} ₽`, formula: result.formula, ...(downPayment?.status === "ok" ? { downPayment: `${rubles.format(downPayment.total)} ₽` } : {}) } });
       setSavedKey(snapshotKey);
     }, 650);
     return () => window.clearTimeout(timer);
-  }, [snapshotKey, result.status, result.status === "ok" ? result.total : 0, savedKey, config, values, downPayment?.status, downPayment?.status === "ok" ? downPayment.total : 0, historyModeVersion]);
+  }, [snapshotKey, result.status, result.status === "ok" ? result.total : 0, savedKey, dismissedKey, config, values, downPayment?.status, downPayment?.status === "ok" ? downPayment.total : 0, historyModeVersion]);
 
+  const historyKind = config.mode === "part" ? "mortgage-part" : config.mode === "whole" ? "mortgage-whole" : "mortgage-adjustment";
+  const isSaved = savedKey === snapshotKey;
   const save = () => {
-    if (result.status !== "ok" || savedKey === snapshotKey) return;
-    const kind = config.mode === "part" ? "mortgage-part" : config.mode === "whole" ? "mortgage-whole" : "mortgage-adjustment";
-    saveCalculation({ kind, title: config.title, summary: `${rubles.format(result.total)} ₽`, params: Object.fromEntries(config.labels.map((label, index) => [label, values[index]])), results: { [config.resultLabel]: `${rubles.format(result.total)} ₽`, formula: result.formula, ...(downPayment?.status === "ok" ? { downPayment: `${rubles.format(downPayment.total)} ₽` } : {}) } });
+    if (result.status !== "ok") return;
+    if (isSaved) {
+      removeCalculationByKind(historyKind);
+      setSavedKey("");
+      setDismissedKey(snapshotKey);
+      return;
+    }
+    saveCalculation({ kind: historyKind, title: config.title, summary: `${rubles.format(result.total)} ₽`, params: Object.fromEntries(config.labels.map((label, index) => [label, values[index]])), results: { [config.resultLabel]: `${rubles.format(result.total)} ₽`, formula: result.formula, ...(downPayment?.status === "ok" ? { downPayment: `${rubles.format(downPayment.total)} ₽` } : {}) } });
     setSavedKey(snapshotKey);
+    setDismissedKey("");
   };
   const copy = async () => {
     if (result.status !== "ok") return;
@@ -120,7 +129,7 @@ function MortgageCard({ config }: { config: typeof configs[number] }) {
         </div>}
       </div>
     </div>
-    <div className="mt-5 grid grid-cols-3 items-center border-t border-[#EBEEF2] pt-3"><button type="button" aria-label="Наверх" title="Наверх" onClick={scrollPageToTop} className="flex h-9 items-center justify-center text-[#26364A] hover:text-[#E83C35]"><ArrowUp className="size-4" /></button><button type="button" aria-label={`Сохранить: ${config.title}`} title="Сохранить в историю" disabled={result.status !== "ok"} onClick={save} className={`flex h-9 items-center justify-center border-x border-[#E4E8ED] disabled:opacity-30 ${savedKey === snapshotKey ? "text-[#E83C35]" : "text-[#26364A] hover:text-[#E83C35]"}`}><Bookmark className="size-4" /></button><button type="button" aria-label={`Сбросить: ${config.title}`} title="Сбросить" onClick={() => { setValues(previous => previous.map((value, i) => i === previous.length - 1 ? value : "")); setSavedKey(""); }} className="flex h-9 items-center justify-center text-[#26364A] hover:text-[#E83C35]"><RotateCcw className="size-4" /></button></div>
+    <div className="mt-5 grid grid-cols-3 items-center border-t border-[#EBEEF2] pt-3"><button type="button" aria-label="Наверх" title="Наверх" onClick={scrollPageToTop} className="flex h-9 items-center justify-center text-[#26364A] hover:text-[#E83C35]"><ArrowUp className="size-4" /></button><button type="button" aria-label={isSaved ? `Убрать из истории: ${config.title}` : `Сохранить: ${config.title}`} title={isSaved ? "Убрать из истории" : "Сохранить в историю"} disabled={result.status !== "ok"} onClick={save} className={`flex min-h-10 items-center justify-center gap-2 border-x border-[#E4E8ED] px-2 text-xs font-semibold disabled:opacity-30 sm:text-sm ${isSaved ? "text-[#E83C35]" : "text-[#26364A] hover:text-[#E83C35]"}`}><Bookmark className="size-5" fill={isSaved ? "currentColor" : "none"} /><span>{isSaved ? "Сохранено · убрать" : "Сохранить в историю"}</span></button><button type="button" aria-label={`Сбросить: ${config.title}`} title="Сбросить" onClick={() => { setValues(previous => previous.map((value, i) => i === previous.length - 1 ? value : "")); setSavedKey(""); }} className="flex h-9 items-center justify-center text-[#26364A] hover:text-[#E83C35]"><RotateCcw className="size-4" /></button></div>
   </section>;
 }
 
