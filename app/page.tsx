@@ -122,7 +122,7 @@ function historyValue(key: string, value: string) {
 }
 
 function NavigationRow({ title, icon: Icon, red, onClick }: { title: string; icon: LucideIcon; red?: boolean; onClick: () => void }) {
-  return <button type="button" onClick={onClick} className={`group flex min-h-16 w-full min-w-0 cursor-pointer items-center gap-3 px-4 py-2 text-left transition-colors duration-200 focus-visible:outline-2 focus-visible:outline-offset-[-2px] sm:min-h-[84px] sm:gap-4 sm:px-4 sm:py-5 max-sm:[@media(max-height:650px)]:min-h-14 max-sm:[@media(max-height:650px)]:gap-2 max-sm:[@media(max-height:650px)]:px-3 max-sm:[@media(max-height:650px)]:py-1.5 ${red ? "bg-white hover:bg-[#FFF7F6] focus-visible:outline-[#A72A25] dark:bg-[#111820] dark:hover:bg-[#253241]" : "bg-white hover:bg-[#F5F7FA] focus-visible:outline-[#26364A] dark:bg-[#111820] dark:hover:bg-[#253241]"} text-[#26364A] dark:text-[#E6ECF3]`}>
+  return <button type="button" onClick={onClick} className={`group flex min-h-16 w-full min-w-0 cursor-pointer items-center gap-3 px-4 py-2 text-left transition-colors duration-200 focus-visible:outline-2 focus-visible:outline-offset-[-2px] sm:min-h-[84px] sm:gap-4 sm:px-4 sm:py-5 max-sm:[@media(max-height:650px)]:min-h-14 max-sm:[@media(max-height:650px)]:gap-2 max-sm:[@media(max-height:650px)]:px-3 max-sm:[@media(max-height:650px)]:py-1.5 ${red ? "bg-white hover:bg-[#FFF7F6] focus-visible:outline-[#A72A25] dark:!bg-[#111820] dark:hover:!bg-[#253241]" : "bg-white hover:bg-[#F5F7FA] focus-visible:outline-[#26364A] dark:!bg-[#111820] dark:hover:!bg-[#253241]"} text-[#26364A] dark:text-[#E6ECF3]`}>
     <span className={`flex size-10 shrink-0 items-center justify-center rounded-[10px] border transition-colors sm:size-12 max-sm:[@media(max-height:650px)]:size-9 ${red ? "border-transparent bg-[#FCEBEA] text-[#E83C35] group-hover:bg-[#F9DFDD]" : "border-transparent bg-[#EEF1F5] text-[#26364A] group-hover:bg-[#E4E9F0]"}`}><Icon aria-hidden="true" className="size-[23px] sm:size-6" strokeWidth={1.7} /></span>
     <span className="min-w-0 flex-1 text-sm font-medium leading-5 tracking-normal sm:text-base sm:leading-relaxed max-sm:[@media(max-height:650px)]:text-[13px] max-sm:[@media(max-height:650px)]:leading-[18px]">{title}</span>
     <span className={`flex size-7 shrink-0 items-center justify-center rounded-full transition-colors max-sm:[@media(max-height:650px)]:size-5 text-[#8993A2] group-hover:bg-white group-hover:text-[#26364A]`}><ChevronRight aria-hidden="true" className="size-4 transition-transform motion-safe:group-hover:translate-x-0.5" /></span>
@@ -250,7 +250,7 @@ export default function Home() {
       {screen === "home" && <div className={`${navigationFont.className} mx-auto mt-6 max-w-[900px] space-y-3 sm:mt-8 sm:space-y-6`}>
         <section aria-labelledby="home-commission-title" className="overflow-hidden rounded-2xl border border-[#F0DBD9] bg-white shadow-[0_4px_20px_#26364A05] dark:border-[#344252] dark:bg-[#1B2632]">
           <h2 id="home-commission-title" className={`${headingFont.className} bg-[#E83C35] px-4 py-2 text-[15px] leading-4 font-semibold tracking-normal text-white sm:px-5 sm:py-3 sm:text-base sm:leading-5`}>Комиссия</h2>
-          <div className="dark:bg-[#111820]">
+          <div className="bg-white dark:!bg-[#111820]">
             <NavigationRow title="Расчёт комиссии при продаже" icon={HousePlus} red onClick={() => navigate("commission", "sale")} />
             <div className="mr-4 ml-[68px] border-t border-[#EBEEF2] sm:mr-5 sm:ml-[80px]" />
             <NavigationRow title="Расчёт комиссии при покупке" icon={KeyRound} red onClick={() => navigate("commission", "purchase")} />
@@ -258,7 +258,7 @@ export default function Home() {
         </section>
         <section aria-labelledby="home-mortgage-title" className="overflow-hidden rounded-2xl border border-[#E1E6ED] bg-white shadow-[0_4px_20px_#26364A05] dark:border-[#344252] dark:bg-[#1B2632]">
           <h2 id="home-mortgage-title" className={`${headingFont.className} bg-[#26364A] px-4 py-2 text-[15px] leading-4 font-semibold tracking-normal text-white sm:px-5 sm:py-3 sm:text-base sm:leading-5`}>Ипотека</h2>
-          <div className="dark:bg-[#111820]">
+          <div className="bg-white dark:!bg-[#111820]">
             <NavigationRow title="Расчёт по первоначальному взносу" icon={WalletCards} onClick={() => navigate("mortgage", "downpayment")} />
             <div className="mr-4 ml-[68px] border-t border-[#EBEEF2] sm:mr-5 sm:ml-[80px]" />
             <NavigationRow title="Кредитный калькулятор" icon={Calculator} onClick={() => navigate("mortgage", "loan")} />
