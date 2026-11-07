@@ -5,20 +5,21 @@ import localFont from "next/font/local";
 import { useEffect, useState } from "react";
 import { Capacitor } from "@capacitor/core";
 import { App } from "@capacitor/app";
-import { ArrowLeft, ChevronRight, ArrowDownLeft, ArrowUpRight, HousePlus, KeyRound, WalletCards, Calculator, House, Instagram, Sparkles, History, Settings, type LucideIcon } from "lucide-react";
+import { ArrowLeft, ChevronRight, ArrowDownLeft, ArrowUpRight, HousePlus, KeyRound, WalletCards, Calculator, House, Instagram, Sparkles, History, Settings, Trash2, ChevronDown, type LucideIcon } from "lucide-react";
 import { CommissionCalculator } from "@/components/commission-calculator";
 import { MortgageCalculators } from "@/components/mortgage-calculators";
 import { LegalFooter } from "@/components/legal-footer";
 import { LoanCalculator } from "@/components/loan-calculator";
 import type { Operation } from "@/lib/calculator";
 import { useTariffs } from "@/hooks/use-tariffs";
+import { clearCalculationHistory, deleteCalculation, getCalculationHistory, getHistoryMode, setHistoryMode, type CalculationRecord, type HistoryMode } from "@/lib/history";
 
 const navigationFont = localFont({ src: "../public/fonts/OnestVariable.ttf", display: "swap", weight: "100 900" });
 const headingFont = localFont({ src: "../public/fonts/MontserratVariable.ttf", display: "swap", weight: "100 900" });
 const publicAsset = (path: string) => `${process.env.NEXT_PUBLIC_BASE_PATH ?? ""}${path}`;
 
-type Screen = "home" | "commission" | "mortgage";
-const titles = { commission: "Комиссия", mortgage: "Ипотека" };
+type Screen = "home" | "commission" | "mortgage" | "history" | "settings";
+const titles = { commission: "Комиссия", mortgage: "Ипотека", history: "История расчётов", settings: "Настройки" };
 
 function NavigationRow({ title, icon: Icon, red, onClick }: { title: string; icon: LucideIcon; red?: boolean; onClick: () => void }) {
   return <button type="button" onClick={onClick} className={`group flex min-h-16 w-full min-w-0 items-center gap-3 px-4 py-2 text-left transition-colors duration-200 focus-visible:outline-2 focus-visible:outline-offset-[-2px] sm:min-h-[84px] sm:gap-4 sm:px-4 sm:py-5 max-sm:[@media(max-height:650px)]:min-h-14 max-sm:[@media(max-height:650px)]:gap-2 max-sm:[@media(max-height:650px)]:px-3 max-sm:[@media(max-height:650px)]:py-1.5 ${red ? "bg-white hover:bg-[#FFF7F6] focus-visible:outline-[#A72A25]" : "bg-white hover:bg-[#F5F7FA] focus-visible:outline-[#26364A]"} text-[#26364A]`}>
@@ -33,6 +34,15 @@ export default function Home() {
   const [screen, setScreen] = useState<Screen>("home");
   const [operation, setOperation] = useState<Operation>("sale");
   const [mortgageTab, setMortgageTab] = useState<"downpayment" | "loan">("downpayment");
+  const [historyItems, setHistoryItems] = useState<CalculationRecord[]>([]);
+  const [historyMode, setHistoryModeState] = useState<HistoryMode>("manual");
+  const [expandedHistory, setExpandedHistory] = useState<string | null>(null);
+  useEffect(() => {
+    const refresh = () => setHistoryItems(getCalculationHistory());
+    refresh(); setHistoryModeState(getHistoryMode());
+    window.addEventListener("sd-history-updated", refresh);
+    return () => window.removeEventListener("sd-history-updated", refresh);
+  }, []);
   useEffect(() => {
     if (!Capacitor.isNativePlatform()) return;
     let active = true;
@@ -95,7 +105,7 @@ export default function Home() {
     </header>
     <main className={`mx-auto max-w-[1200px] px-5 pb-14 sm:px-8 ${screen === "home" ? "pt-6 sm:pt-8 max-sm:w-full max-sm:flex-1 max-sm:pt-3 max-sm:pb-4 max-sm:[@media(max-height:650px)]:pb-2" : "pt-3 sm:pt-6"}`}>
       {screen === "home" && <div className="mb-8 translate-y-3 text-center max-sm:mb-4 max-sm:[@media(max-height:650px)]:mb-3 max-sm:[@media(max-height:650px)]:translate-y-2"><h1 className="text-[40px] font-bold tracking-[-0.045em] sm:text-[54px] max-sm:text-[32px] max-sm:[@media(max-height:650px)]:text-[28px]">Калькулятор <span className="text-[#E83C35]">SD</span></h1><p className="mt-1 text-[13px] text-[#748195] sm:mt-2 sm:text-base">Выберите раздел для расчёта</p></div>}
-      {screen !== "home" && <div className="mb-4 flex items-center justify-between gap-3"><button type="button" onClick={() => navigate("home")} className="inline-flex min-h-10 items-center gap-2 rounded-lg py-2 text-sm font-medium text-[#647184] hover:text-[#E83C35] focus-visible:outline-2 focus-visible:outline-offset-4"><ArrowLeft className="size-4" />На главный экран</button><h1 className="text-xl font-semibold tracking-tight sm:text-3xl">{titles[screen]}</h1></div>}
+      {screen !== "home" && <div className="mb-4 flex items-center justify-between gap-3"><button type="button" onClick={() => { setScreen("home"); window.scrollTo({ top: 0, behavior: "instant" }); }} className="inline-flex min-h-10 items-center gap-2 rounded-lg py-2 text-sm font-medium text-[#647184] hover:text-[#E83C35] focus-visible:outline-2 focus-visible:outline-offset-4"><ArrowLeft className="size-4" />На главный экран</button><h1 className="text-xl font-semibold tracking-tight sm:text-3xl">{titles[screen]}</h1></div>}
       {screen === "home" && <div className={`${navigationFont.className} mx-auto max-w-[900px] space-y-4 sm:space-y-7 max-sm:pt-[clamp(0px,calc((100dvh-568px)*0.18),32px)] max-sm:[@media(max-height:650px)]:space-y-3`}>
         <section aria-labelledby="home-commission-title" className="overflow-hidden rounded-2xl border border-[#F0DBD9] bg-white shadow-[0_4px_20px_#26364A05]">
           <h2 id="home-commission-title" className={`${headingFont.className} bg-[#E83C35] px-4 py-2 text-[15px] leading-4 font-semibold tracking-normal text-white sm:px-5 sm:py-3 sm:text-base sm:leading-5`}>Комиссия</h2>
@@ -123,6 +133,17 @@ export default function Home() {
       <div hidden={screen !== "commission"}><CommissionCalculator operation={operation} tariffs={tariffs} tariffStatus={tariffStatus} /></div>
       <div hidden={screen !== "mortgage" || mortgageTab !== "loan"}><LoanCalculator /></div>
       <div hidden={screen !== "mortgage" || mortgageTab !== "downpayment"}><MortgageCalculators /></div>
+      {screen === "history" && <section className="space-y-3">
+        <div className="flex flex-wrap gap-2"><span className="text-sm text-[#748195]">Сохранено: {historyItems.length} из 75</span><button type="button" onClick={() => { clearCalculationHistory(); setHistoryItems([]); }} disabled={!historyItems.length} className="ml-auto text-sm text-[#A94442] disabled:opacity-40">Очистить историю</button></div>
+        {historyItems.length === 0 ? <div className="rounded-3xl border border-[#EBEEF2] bg-white p-8 text-center text-sm text-[#748195]">Сохранённых расчётов пока нет</div> : historyItems.map(item => <article key={item.id} className="rounded-2xl border border-[#EBEEF2] bg-white p-4">
+          <button type="button" onClick={() => setExpandedHistory(expandedHistory === item.id ? null : item.id)} className="flex w-full items-center gap-3 text-left"><span className="min-w-0 flex-1"><span className="block font-semibold">{item.title}</span><span className="text-xs text-[#748195]">{new Date(item.createdAt).toLocaleString("ru-RU")}</span></span><strong className="text-right tabular-nums">{item.summary}</strong><ChevronDown className={`size-4 transition-transform ${expandedHistory === item.id ? "rotate-180" : ""}`} /></button>
+          {expandedHistory === item.id && <div className="mt-4 space-y-3 border-t border-[#EBEEF2] pt-3 text-sm"><p className="font-semibold">Условия расчёта</p>{Object.entries(item.params).map(([key,value]) => <div key={key} className="flex justify-between gap-3"><span className="text-[#748195]">{key}</span><span className="text-right">{value || "—"}</span></div>)}<p className="pt-2 font-semibold">Результаты</p>{Object.entries(item.results).map(([key,value]) => <div key={key} className="flex justify-between gap-3"><span className="text-[#748195]">{key}</span><span className="text-right">{value}</span></div>)}<div className="flex justify-end"><button type="button" onClick={() => deleteCalculation(item.id)} className="inline-flex items-center gap-1 text-sm text-[#A94442]"><Trash2 className="size-4" />Удалить</button></div></div>}
+        </article>)}
+      </section>}
+      {screen === "settings" && <section className="space-y-5">
+        <div><h2 className="mb-3 text-lg font-semibold">История расчётов</h2><div className="rounded-2xl border border-[#EBEEF2] bg-white p-4"><p className="mb-3 font-medium">Сохранение истории</p><div className="grid grid-cols-2 gap-2"><button type="button" onClick={() => { setHistoryMode("manual"); setHistoryModeState("manual"); }} className={`rounded-xl border px-3 py-3 text-sm font-medium ${historyMode === "manual" ? "border-[#E83C35] bg-[#FCEBEA] text-[#A94442]" : "border-[#E4E8ED]"}`}>Ручное</button><button type="button" onClick={() => { setHistoryMode("auto"); setHistoryModeState("auto"); }} className={`rounded-xl border px-3 py-3 text-sm font-medium ${historyMode === "auto" ? "border-[#E83C35] bg-[#FCEBEA] text-[#A94442]" : "border-[#E4E8ED]"}`}>Автоматическое</button></div><p className="mt-2 text-xs text-[#748195]">{historyMode === "manual" ? "Записи создаются по нажатию на закладку." : "Автоматическое сохранение после завершённого расчёта."}</p></div></div>
+        <div><h2 className="mb-3 text-lg font-semibold">Приложение</h2><div className="rounded-2xl border border-[#EBEEF2] bg-white p-4 text-sm">Версия <span className="float-right text-[#748195]">1.0.0</span></div></div>
+      </section>}
     </main>
     <footer className={`mx-auto max-w-[1200px] px-5 pb-7 sm:px-8 ${screen === "home" ? "max-sm:w-full max-sm:pb-[calc(.75rem+env(safe-area-inset-bottom,0px))]" : ""}`}>
       <div className={`flex w-full flex-col items-center justify-center gap-4 border px-4 sm:gap-5 ${screen === "home" ? "mx-auto mt-0 max-w-[900px] rounded-2xl border-[#E4E8ED] bg-white py-5 max-sm:py-2 sm:mt-6 sm:py-6" : "rounded-3xl border-[#F3DAD8] bg-[#FFF7F6] py-2 sm:py-3"}`}>
