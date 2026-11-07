@@ -122,8 +122,8 @@ export function LoanCalculator() {
           <p className="mb-2 mt-6 text-sm text-[#6E7886]">{reverse ? "Сумма кредита" : "Ежемесячный платёж"}</p><p data-testid={reverse ? "loan-available-principal" : "loan-monthly"} className="text-[clamp(1.5rem,6vw,2.5rem)] font-semibold tracking-tight text-[#E83C35] tabular-nums">{amount(reverse ? result.principal : result.monthlyPayment)}</p>
           <dl className="mt-6 space-y-4 border-t border-[#26364A]/10 pt-5 text-sm">
             {reverse ? <ResultRow label="Ежемесячный платёж" value={amount(result.monthlyPayment)} /> : <ResultRow label="Основной долг" value={amount(result.principal)} />}
-            <ResultRow label="Общая сумма процентов" value={amount(result.interest)} />
-            <ResultRow label="Общая сумма выплат" value={amount(result.totalPayment)} />
+            <ResultRow label="Переплата по процентам" value={amount(result.interest)} />
+            <ResultRow label="Общая сумма" value={amount(result.totalPayment)} />
             <ResultRow label="Срок кредита" value={`${result.months} мес.`} />
           </dl>
           <svg role="img" aria-label={`Основной долг ${amount(result.principal)}, проценты ${amount(result.interest)}`} viewBox="0 0 100 12" preserveAspectRatio="none" className="mt-6 h-3 w-full overflow-hidden rounded-full"><rect width="100" height="12" className="fill-[#26364A]" /><rect width={result.principal / result.totalPayment * 100} height="12" className="fill-[#E83C35]" /></svg>
@@ -136,7 +136,7 @@ export function LoanCalculator() {
         </section>
         <div className="grid min-w-0 gap-4 sm:grid-cols-2">
           <section className="min-w-0 rounded-2xl border border-[#D6E2F0] bg-[#EAF2FB] p-5 dark:border-[#405064] dark:bg-[#253241] dark:text-[#E6EDF5]"><h3 className="text-sm font-medium">Переплата</h3><p data-testid="loan-interest" className="mt-3 text-xl font-semibold tabular-nums">{amount(result.interest)}</p><p className="mt-2 text-xs leading-relaxed text-[#6E7886] dark:text-[#B8C4D2]">Общая сумма процентов за весь срок кредита</p></section>
-          <section className="min-w-0 rounded-2xl border border-[#D6E2F0] bg-[#EAF2FB] p-5 dark:border-[#405064] dark:bg-[#253241] dark:text-[#E6EDF5]"><h3 className="text-sm font-medium">Общая сумма выплат</h3><p data-testid="loan-total" className="mt-3 text-xl font-semibold tabular-nums">{amount(result.totalPayment)}</p><p className="mt-2 text-xs leading-relaxed text-[#6E7886] dark:text-[#B8C4D2]">Основной долг плюс все начисленные проценты</p></section>
+          <section className="min-w-0 rounded-2xl border border-[#D6E2F0] bg-[#EAF2FB] p-5 dark:border-[#405064] dark:bg-[#253241] dark:text-[#E6EDF5]"><h3 className="text-sm font-medium">Общая сумма</h3><p data-testid="loan-total" className="mt-3 text-xl font-semibold tabular-nums">{amount(result.totalPayment)}</p><p className="mt-2 text-xs leading-relaxed text-[#6E7886] dark:text-[#B8C4D2]">Основной долг плюс все начисленные проценты</p></section>
         </div>
       </> : <section className="rounded-3xl border border-[#EBEEF2] bg-white p-8 text-center"><Calculator className="mx-auto mb-4 size-10 text-[#D68B86]" /><h3 className="text-lg font-semibold">Здесь появятся результаты кредита</h3><p className="mt-3 text-sm leading-relaxed text-[#748195]">{reverse ? "Укажите комфортный ежемесячный платёж, срок и годовую ставку, затем нажмите «Рассчитать»." : "Укажите сумму, срок и годовую ставку, затем нажмите «Рассчитать»."}</p></section>}
     </div>
