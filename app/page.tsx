@@ -221,10 +221,6 @@ export default function Home() {
     return () => window.removeEventListener("popstate", onBack);
   }, []);
   const navigate = (next: Screen, calculator?: Operation | "downpayment" | "loan") => {
-    if (next === "home" && screen !== "home" && (window.history.state?.sdScreen === "commission" || window.history.state?.sdScreen === "mortgage")) {
-      window.history.back();
-      return;
-    }
     if (next === "commission") setOperation(calculator === "purchase" ? "purchase" : "sale");
     if (next === "mortgage") setMortgageTab(calculator === "loan" ? "loan" : "downpayment");
     if (next !== screen) window.history.pushState({ ...window.history.state, sdScreen: next }, "");
