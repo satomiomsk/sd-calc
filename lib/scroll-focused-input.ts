@@ -1,5 +1,44 @@
+let keyboardScrollGuardInstalled = false;
+
+function installKeyboardScrollGuard() {
+  if (keyboardScrollGuardInstalled || typeof window === "undefined") return;
+  keyboardScrollGuardInstalled = true;
+
+  const viewport = window.visualViewport;
+  if (!viewport) return;
+
+  let keyboardOpen = window.innerHeight - viewport.height > 120;
+  let savedScrollY = window.scrollY;
+
+  window.addEventListener("scroll", () => {
+    if (keyboardOpen) savedScrollY = window.scrollY;
+  }, { passive: true });
+
+  viewport.addEventListener("resize", () => {
+    const nextKeyboardOpen = window.innerHeight - viewport.height > 120;
+    if (nextKeyboardOpen) {
+      if (!keyboardOpen) savedScrollY = window.scrollY;
+      keyboardOpen = true;
+      return;
+    }
+
+    if (keyboardOpen) {
+      keyboardOpen = false;
+      const restoreScroll = () => window.scrollTo({ top: savedScrollY, left: 0, behavior: "instant" });
+      requestAnimationFrame(() => {
+        restoreScroll();
+        requestAnimationFrame(restoreScroll);
+      });
+      // Some Android WebViews apply their own scroll correction after the
+      // visual viewport has finished resizing.
+      window.setTimeout(restoreScroll, 100);
+    }
+  });
+}
+
 export function scrollFocusedInputIntoView(element: HTMLElement, revealThrough?: HTMLElement | null) {
   if (typeof window === "undefined") return;
+  installKeyboardScrollGuard();
 
   const check = () => {
     if (!element.isConnected || document.activeElement !== element) return;
