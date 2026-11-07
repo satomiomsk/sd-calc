@@ -24,12 +24,16 @@ export function getCalculationHistory(): CalculationRecord[] {
   } catch { return []; }
 }
 
-export function saveCalculation(record: Omit<CalculationRecord, "id" | "createdAt">, replaceLatestOfKind = false): CalculationRecord {
+export function saveCalculation(record: Omit<CalculationRecord, "id" | "createdAt">, replaceLatestOfKind = false, replaceMatchingParam?: { key: string; value: string }): CalculationRecord {
   const entry: CalculationRecord = { ...record, id: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`, createdAt: new Date().toISOString() };
   const existing = getCalculationHistory();
   const sameKind = existing.filter(item => item.kind === entry.kind);
   const otherKinds = existing.filter(item => item.kind !== entry.kind);
-  const next = replaceLatestOfKind ? [entry] : [...sameKind, entry].slice(-HISTORY_LIMIT);
+  const next = replaceLatestOfKind
+    ? [entry]
+    : replaceMatchingParam
+      ? [...sameKind.filter(item => item.params[replaceMatchingParam.key] !== replaceMatchingParam.value), entry].slice(-HISTORY_LIMIT)
+      : [...sameKind, entry].slice(-HISTORY_LIMIT);
   localStorage.setItem(STORAGE_KEY, JSON.stringify([...otherKinds, ...next].sort((a, b) => b.createdAt.localeCompare(a.createdAt))));
   window.dispatchEvent(new CustomEvent("sd-history-updated"));
   return entry;
