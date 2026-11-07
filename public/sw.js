@@ -72,17 +72,24 @@ self.addEventListener("fetch", (event) => {
   if (request.method !== "GET" || url.origin !== self.location.origin) return;
 
   if (request.mode === "navigate") {
-    event.respondWith(
-      fetch(request)
-        .then((response) => {
+    event.respondWith((async () => {
+      const cached = await caches.match(request, { ignoreSearch: true }) || await caches.match("/");
+      if (cached) {
+        event.waitUntil(fetch(request).then(async (response) => {
           if (response.ok) {
-            const copy = response.clone();
-            caches.open(CACHE_NAME).then((cache) => cache.put("/", copy));
+            const cache = await caches.open(CACHE_NAME);
+            await cache.put("/", response.clone());
           }
-          return response;
-        })
-        .catch(async () => (await caches.match(request, { ignoreSearch: true })) || (await caches.match("/")))
-    );
+        }).catch(() => {}));
+        return cached;
+      }
+      const response = await fetch(request);
+      if (response.ok) {
+        const cache = await caches.open(CACHE_NAME);
+        await cache.put("/", response.clone());
+      }
+      return response;
+    })());
     return;
   }
 
