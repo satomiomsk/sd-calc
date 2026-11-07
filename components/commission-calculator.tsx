@@ -146,7 +146,7 @@ export function CommissionCalculator({ operation, tariffs }: { operation: Operat
               <SelectTrigger id="category" className={`h-auto! min-h-[52px] w-full rounded-xl border bg-[#F7F8FA] px-4 py-3 text-sm shadow-none [&_[data-slot=select-value]]:line-clamp-none [&_[data-slot=select-value]]:text-left [&_[data-slot=select-value]]:whitespace-normal ${sale ? "focus-visible:border-[#E83C35] focus-visible:ring-[#E83C35]/15" : "focus-visible:border-[#26364A] focus-visible:ring-[#26364A]/15"}`}>
                 <SelectValue />
               </SelectTrigger>
-              <SelectContent position="popper" className="w-[var(--radix-select-trigger-width)] min-w-0 rounded-xl">
+              <SelectContent position="popper" className="w-[var(--radix-select-trigger-width)] min-w-0 rounded-xl dark:border-[#405064] dark:bg-[#253241] dark:text-[#E6EDF5]">
                 {categories.map(item => <SelectItem key={item} value={item} className="cursor-pointer whitespace-normal py-3 text-sm">{titles[item]}</SelectItem>)}
               </SelectContent>
             </Select>
@@ -159,7 +159,7 @@ export function CommissionCalculator({ operation, tariffs }: { operation: Operat
               <label htmlFor="discount" className="mb-3 block text-sm font-semibold">Скидка</label>
               <Select value={discount?.id ?? "none"} onValueChange={value => { setDiscountId(value); setPairedPrice(""); }}>
                 <SelectTrigger id="discount" className="h-auto! min-h-[52px] w-full rounded-xl border border-[#E4E8ED] bg-[#F7F8FA] px-4 py-3 text-sm shadow-none [&_[data-slot=select-value]]:line-clamp-none [&_[data-slot=select-value]]:whitespace-normal [&_[data-slot=select-value]]:text-left"><SelectValue /></SelectTrigger>
-                <SelectContent position="popper" className="max-h-80 w-[var(--radix-select-trigger-width)] min-w-0 rounded-xl">
+                <SelectContent position="popper" className="max-h-80 w-[var(--radix-select-trigger-width)] min-w-0 rounded-xl dark:border-[#405064] dark:bg-[#253241] dark:text-[#E6EDF5]">
                   <SelectItem value="none" className="py-3 text-sm">Скидка не применена</SelectItem>
                   {availableDiscounts.map(item => <SelectItem key={item.id} value={item.id} className="cursor-pointer whitespace-normal py-3 text-sm">{item.name} - {item.paired ? "3%+3%" : `${item.percent}%`}</SelectItem>)}
                 </SelectContent>
