@@ -61,6 +61,21 @@ export function CommissionCalculator({ operation, tariffs }: { operation: Operat
   type Draft = { category: Category; price: string; credit: string; discountId: string; pairedPrice: string; motivationOpen: boolean; motivationPercent: string };
   const empty: Draft = { category: "apartment", price: "", credit: "", discountId: "none", pairedPrice: "", motivationOpen: false, motivationPercent: "" };
   const [drafts, setDrafts] = useState<Record<Operation, Draft>>({ sale: { ...empty }, purchase: { ...empty } });
+  const [draftsRestored, setDraftsRestored] = useState(false);
+  useEffect(() => {
+    try {
+      const saved = window.sessionStorage.getItem("sd-commission-drafts");
+      if (saved) {
+        const parsed = JSON.parse(saved) as Partial<Record<Operation, Draft>>;
+        setDrafts(previous => ({ sale: { ...previous.sale, ...(parsed.sale ?? {}) }, purchase: { ...previous.purchase, ...(parsed.purchase ?? {}) } }));
+      }
+    } catch {}
+    setDraftsRestored(true);
+  }, []);
+  useEffect(() => {
+    if (!draftsRestored) return;
+    try { window.sessionStorage.setItem("sd-commission-drafts", JSON.stringify(drafts)); } catch {}
+  }, [drafts, draftsRestored]);
   const { category, price, credit, discountId, pairedPrice, motivationOpen, motivationPercent } = drafts[operation];
   const update = <K extends keyof Draft>(key: K, value: Draft[K]) => setDrafts(previous => ({ ...previous, [operation]: { ...previous[operation], [key]: value } }));
   const setCategory = (value: Category) => update("category", value);
