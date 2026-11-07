@@ -160,3 +160,10 @@ html.dark button:disabled { opacity: .48; }
 html.dark input::placeholder,
 html.dark textarea::placeholder { color: #8795A5; }
 html.dark :focus-visible { outline-color: #F07870; }
+
+
+/* Keep social media marks visually neutral in dark mode. */
+html.dark footer nav[aria-label="Социальные сети"] a,
+html.dark footer nav[aria-label="Социальные сети"] a:hover {
+  background-color: transparent !important;
+}
