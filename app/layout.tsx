@@ -55,7 +55,7 @@ export default function RootLayout({
   return (
     <html lang="ru">
       <head>
-        <script dangerouslySetInnerHTML={{ __html: `(function(){try{var m=localStorage.getItem("sd-theme-mode-v1");var d=m==="dark"||(m!=="light"&&window.matchMedia("(prefers-color-scheme: dark)").matches);document.documentElement.classList.toggle("dark",d);}catch(e){}})();` }} />
+        <script dangerouslySetInnerHTML={{ __html: `(function(){var m=null;try{m=localStorage.getItem("sd-theme-mode-v1");}catch(e){}if(!m){var match=document.cookie.match(/(?:^|; )sd-theme-mode-v1=(light|dark|system)(?:;|$)/);m=match?match[1]:null;}var d=m==="dark"||(m!=="light"&&window.matchMedia("(prefers-color-scheme: dark)").matches);document.documentElement.classList.toggle("dark",d);})();` }} />
       </head>
       <body className={`${inter.className} antialiased [touch-action:pan-x_pan-y]`}>
         <ReactErrorBoundary>
