@@ -12,10 +12,10 @@ export function scrollFocusedInputIntoView(element: HTMLElement) {
     else if (rect.top < top + margin) delta = rect.top - (top + margin);
     if (Math.abs(delta) > 2) window.scrollBy({ top: delta, left: 0, behavior: "smooth" });
   };
+  // Run only on explicit focus/tap, not while the user manually scrolls.
   requestAnimationFrame(() => {
     check();
-    window.setTimeout(check, 120);
-    window.setTimeout(check, 320);
-    window.setTimeout(check, 520);
+    window.setTimeout(check, 180);
+    window.setTimeout(check, 420);
   });
 }
