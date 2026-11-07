@@ -4,7 +4,7 @@ import { useEffect, useRef, useState, type FormEvent, type KeyboardEvent } from 
 import { Bookmark, Calculator, RotateCcw } from "lucide-react";
 import { formatInput } from "@/lib/calculator";
 import { calculateLoan, calculateLoanFromPayment, type LoanResult } from "@/lib/loan";
-import { getCalculationHistory, getHistoryMode, removeCalculationByParams, saveCalculation, type CalculationRecord } from "@/lib/history";
+import { getCalculationHistory, getHistoryMode, removeCalculationByParams, saveCalculation, upsertCalculationByParams, type CalculationRecord } from "@/lib/history";
 
 const currency = new Intl.NumberFormat("ru-RU", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 const amount = (value: number) => `${currency.format(value)}\u00a0₽`;
@@ -111,7 +111,7 @@ export function LoanCalculator() {
   useEffect(() => {
     if (getHistoryMode() !== "auto" || !result || changed || error || savedKey === snapshotKey || dismissedKey === snapshotKey) return;
     const timer = window.setTimeout(() => {
-      saveCalculation({ kind: "loan", title: "Кредитный калькулятор", summary: amount(result.monthlyPayment), params: snapshotParams, results: { monthlyPayment: amount(result.monthlyPayment), principal: amount(result.principal), interest: amount(result.interest), totalPayment: amount(result.totalPayment), months: String(result.months), annualRate: `${result.annualRate}%` } }, false, { key: "mode", value: mode });
+      upsertCalculationByParams({ kind: "loan", title: "Кредитный калькулятор", summary: amount(result.monthlyPayment), params: snapshotParams, results: { monthlyPayment: amount(result.monthlyPayment), principal: amount(result.principal), interest: amount(result.interest), totalPayment: amount(result.totalPayment), months: String(result.months), annualRate: `${result.annualRate}%` } });
       setSavedKey(snapshotKey);
     }, 2500);
     return () => window.clearTimeout(timer);
