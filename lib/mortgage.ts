@@ -43,7 +43,6 @@ export function calculateMortgage(mode: MortgageMode, values: string[]): Mortgag
     if (numeric(amount) > 999999999) return { status: "error", message: "Введите корректную сумму. Максимум — 999 999 999 ₽." };
     if (second.n < BigInt(0)) return { status: "error", message: "Сумма первоначального взноса не может быть отрицательной." };
     if (numeric(second) > 999999999) return { status: "error", message: "Введите корректную сумму. Максимум — 999 999 999 ₽." };
-    if (second.n > amount.n) return { status: "error", message: "Первоначальный взнос не может быть больше стоимости объекта." };
     if (second.n * amount.d > amount.n * second.d) return { status: "error", message: "Первоначальный взнос не может быть больше стоимости объекта." };
     if (third.n <= BigInt(0) || third.n > third.d * BigInt(100)) return { status: "error", message: "Необходимый первоначальный взнос должен быть больше 0 и не превышать 100%." };
     const client = multiply(divide(second, amount), hundred);
