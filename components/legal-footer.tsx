@@ -13,9 +13,7 @@ function AuthorContact() {
 function LegalDialog({ footer = false }: { footer?: boolean }) {
   return <Dialog>
     <DialogTrigger asChild>
-      {footer
-        ? <button type="button" className="hidden w-fit max-w-full shrink-0 rounded-sm text-right text-[11px] sm:block leading-[1.6] no-underline transition-colors hover:text-[#26364A] focus-visible:outline-2 focus-visible:outline-offset-4 sm:max-w-[300px] lg:max-w-none lg:whitespace-nowrap">Условия использования и политика конфиденциальности</button>
-        : <button type="button" className="flex min-h-10 w-full items-center justify-between gap-3 text-left text-sm font-medium text-[#26364A] outline-offset-4 focus-visible:outline-2 focus-visible:outline-[#E83C35]"><span>Условия использования и политика конфиденциальности</span><span aria-hidden="true" className="text-[#748195]">›</span></button>}
+      <button type="button" className={footer ? "w-fit max-w-full shrink-0 rounded-sm text-[11px] leading-5 text-[#748195] transition-colors hover:text-[#26364A] focus-visible:outline-2 focus-visible:outline-offset-4" : "flex min-h-10 w-full items-center justify-between gap-3 text-left text-sm font-medium text-[#26364A] outline-offset-4 focus-visible:outline-2 focus-visible:outline-[#E83C35]"}>{footer ? "Условия использования и политика конфиденциальности" : <><span>Условия использования и политика конфиденциальности</span><span aria-hidden="true" className="text-[#748195]">›</span></>}</button>
     </DialogTrigger>
       <DialogContent className="flex max-h-[85dvh] flex-col gap-0 overflow-hidden rounded-2xl p-0 sm:max-w-3xl">
         <DialogHeader className="shrink-0 px-5 pt-6 pb-4 pr-10 sm:px-7 sm:pr-12">
@@ -84,8 +82,8 @@ export function LegalSettings() {
 
 export function LegalFooter() {
   return <div className="mt-5 border-t border-[#DDE3EB] pt-4 text-[#748195] sm:mt-7 sm:pt-5">
-    <div className="flex flex-col items-center justify-center gap-2 text-center sm:flex-row sm:justify-between sm:text-left">
-      <p className="text-[11px] leading-5 sm:text-xs">© 2026 Автор: Светлана Демиденко</p>
+    <div className="flex flex-col items-center justify-center gap-1 text-center sm:flex-row sm:justify-between sm:gap-4 sm:text-left">
+      <p className="text-[11px] leading-5">© 2026 Автор: Светлана Демиденко</p>
       <LegalDialog footer />
     </div>
   </div>;
