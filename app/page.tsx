@@ -244,10 +244,10 @@ export default function Home() {
         </div>
       </div>
     </header>
-    <main className={`mx-auto w-full max-w-[1200px] flex-1 px-5 sm:px-8 ${screen === "home" ? "pb-2 pt-3 sm:pb-2 sm:pt-5 max-sm:pt-2 max-sm:pb-1" : "pb-14 pt-3 sm:pt-6"}`}>
-      {screen === "home" && <div className="mb-4 text-center sm:mb-6 max-sm:mb-2 max-sm:[@media(max-height:650px)]:mb-1"><h1 className="text-[40px] font-bold tracking-[-0.045em] sm:text-[54px] max-sm:text-[30px] max-sm:[@media(max-height:650px)]:text-[25px]">Калькулятор <span className="text-[#E83C35]">SD</span></h1><p className="mt-1 text-[13px] text-[#748195] sm:mt-2 sm:text-base">Выберите раздел для расчёта</p></div>}
+    <main className={`mx-auto w-full max-w-[1200px] flex-1 px-5 sm:px-8 ${screen === "home" ? "pb-14 pt-3 sm:pt-6" : "pb-14 pt-3 sm:pt-6"}`}>
+      {screen === "home" && <div className="mb-4 text-center sm:mb-6"><h1 className="text-[40px] font-bold tracking-[-0.045em] sm:text-[54px]">Калькулятор <span className="text-[#E83C35]">SD</span></h1><p className="mt-1 text-[13px] text-[#748195] sm:mt-2 sm:text-base">Выберите раздел для расчёта</p></div>}
       {screen !== "home" && <div className="mb-4 flex items-center justify-between gap-3"><button type="button" onClick={() => { setScreen("home"); window.scrollTo({ top: 0, behavior: "instant" }); }} className="inline-flex min-h-10 items-center gap-2 rounded-lg py-2 text-sm font-medium text-[#647184] hover:text-[#E83C35] focus-visible:outline-2 focus-visible:outline-offset-4"><ArrowLeft className="size-4" />На главный экран</button><h1 className="text-xl font-semibold tracking-tight sm:text-3xl">{titles[screen]}</h1></div>}
-      {screen === "home" && <div className={`${navigationFont.className} mx-auto max-w-[900px] space-y-3 sm:space-y-6 max-sm:space-y-2 max-sm:[@media(max-height:650px)]:space-y-1.5`}>
+      {screen === "home" && <div className={`${navigationFont.className} mx-auto max-w-[900px] space-y-3 sm:space-y-6`}>
         <section aria-labelledby="home-commission-title" className="overflow-hidden rounded-2xl border border-[#F0DBD9] bg-white shadow-[0_4px_20px_#26364A05] dark:border-[#344252] dark:bg-[#1B2632]">
           <h2 id="home-commission-title" className={`${headingFont.className} bg-[#E83C35] px-4 py-2 text-[15px] leading-4 font-semibold tracking-normal text-white sm:px-5 sm:py-3 sm:text-base sm:leading-5`}>Комиссия</h2>
           <div>
