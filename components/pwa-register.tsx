@@ -42,13 +42,11 @@ export default function PwaRegister() {
     document.addEventListener("focusin", revealFocusedField);
     window.addEventListener("resize", revealFocusedField);
     window.visualViewport?.addEventListener("resize", revealFocusedField);
-    window.visualViewport?.addEventListener("scroll", revealFocusedField);
     return () => {
       cancelAnimationFrame(frame);
       document.removeEventListener("focusin", revealFocusedField);
       window.removeEventListener("resize", revealFocusedField);
       window.visualViewport?.removeEventListener("resize", revealFocusedField);
-      window.visualViewport?.removeEventListener("scroll", revealFocusedField);
     };
   }, []);
 
