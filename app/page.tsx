@@ -288,7 +288,7 @@ export default function Home() {
             setThemeMode(option.value); const dark = option.value === "dark" || (option.value === "system" && window.matchMedia("(prefers-color-scheme: dark)").matches); document.documentElement.classList.toggle("dark", dark); }} className={`rounded-xl border px-2 py-3 text-sm font-medium ${themeMode === option.value ? "border-[#E83C35] bg-[#FCEBEA] text-[#A94442]" : "border-[#E4E8ED]"}`}>{option.label}</button>)}</div><p className="mt-2 text-xs text-[#748195]"></p></div></div><div><h2 className="mb-3 text-lg font-semibold">Приложение</h2><div className="rounded-2xl border border-[#EBEEF2] bg-white p-4 text-sm">Версия <span className="float-right text-[#748195]">1.0.0</span></div></div>
       </section>}
     </main>
-    <footer className={`mx-auto mt-auto w-full max-w-[1200px] px-5 pb-7 sm:px-8 ${screen === "home" ? "max-sm:pb-[calc(.25rem+env(safe-area-inset-bottom,0px))]" : ""}`}>
+    <footer className={`mx-auto mt-auto w-full max-w-[1200px] px-5 pb-7 sm:px-8 ${screen === "home" ? "max-sm:-mt-8 max-sm:pb-[calc(.25rem+env(safe-area-inset-bottom,0px))]" : ""}`}>
       <div className={`flex w-full flex-col items-center justify-center gap-4 border px-4 sm:gap-5 ${screen === "home" ? "mx-auto mt-0 max-w-[900px] border-transparent bg-transparent py-5 max-sm:py-2 sm:mt-0 sm:py-4" : "rounded-3xl border-[#F3DAD8] bg-[#FFF7F6] py-2 sm:py-3"}`}>
         <div className="flex translate-y-2 items-center justify-center gap-4 sm:gap-6">
         <div className="relative shrink-0">
