@@ -50,6 +50,8 @@ function MortgageInput({ id, label, value, money, suffix, placeholder, onChange 
 function MortgageCard({ config }: { config: typeof configs[number] }) {
   const [values, setValues] = useState(config.defaults);
   const [savedKey, setSavedKey] = useState("");
+  const [historyModeVersion, setHistoryModeVersion] = useState(0);
+  useEffect(() => { const update = () => setHistoryModeVersion(v => v + 1); window.addEventListener("sd-history-settings-updated", update); return () => window.removeEventListener("sd-history-settings-updated", update); }, []);
   const result = calculateMortgage(config.mode, values);
   const Icon = config.mode === "part" ? Wallet : config.mode === "adjustment" ? ChartNoAxesCombined : House;
   const adjustment = config.mode === "adjustment";
@@ -75,7 +77,7 @@ function MortgageCard({ config }: { config: typeof configs[number] }) {
       setSavedKey(snapshotKey);
     }, 650);
     return () => window.clearTimeout(timer);
-  }, [snapshotKey, result.status, result.status === "ok" ? result.total : 0, savedKey, config, values, downPayment?.status, downPayment?.status === "ok" ? downPayment.total : 0]);
+  }, [snapshotKey, result.status, result.status === "ok" ? result.total : 0, savedKey, config, values, downPayment?.status, downPayment?.status === "ok" ? downPayment.total : 0, historyModeVersion]);
 
   const save = () => {
     if (result.status !== "ok" || savedKey === snapshotKey) return;
