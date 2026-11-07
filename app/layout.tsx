@@ -24,7 +24,7 @@ export const metadata: Metadata = {
       url: "https://sdcalc55.github.io/images/sd-calculator-logo.png?v=160-white",
       width: 160,
       height: 160,
-      alt: "SD — калькулятор расчётов",
+      alt: "SD - калькулятор расчётов",
     }],
   },
   twitter: {
