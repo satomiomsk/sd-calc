@@ -5,7 +5,7 @@ import { ArrowUp, Bookmark, ChartNoAxesCombined, Copy, House, RotateCcw, Wallet 
 import { toast } from "sonner";
 import { formatInput } from "@/lib/calculator";
 import { calculateMortgage, type MortgageMode } from "@/lib/mortgage";
-import { getHistoryMode, removeCalculationByKind, saveCalculation, type CalculationRecord } from "@/lib/history";
+import { getCalculationHistory, getHistoryMode, removeCalculationByParams, saveCalculation, type CalculationRecord } from "@/lib/history";
 
 const rubles = new Intl.NumberFormat("ru-RU", { maximumFractionDigits: 0 });
 const percent = new Intl.NumberFormat("ru-RU", { maximumFractionDigits: 6 });
@@ -98,6 +98,16 @@ function MortgageCard({ config }: { config: typeof configs[number] }) {
   const downPayment = adjustment && result.status === "ok" ? calculateMortgage("part", [String(result.total), values[2]]) : null;
   const theme = themes[config.mode];
   const snapshotKey = JSON.stringify(values);
+  const snapshotParams = Object.fromEntries(config.labels.map((label, index) => [label, values[index]]));
+  useEffect(() => {
+    const syncSavedState = () => {
+      const exists = getCalculationHistory().some(item => item.kind === historyKind && JSON.stringify(item.params) === JSON.stringify(snapshotParams));
+      setSavedKey(exists ? snapshotKey : "");
+    };
+    syncSavedState();
+    window.addEventListener("sd-history-updated", syncSavedState);
+    return () => window.removeEventListener("sd-history-updated", syncSavedState);
+  }, [snapshotKey, historyKind, JSON.stringify(snapshotParams)]);
   useEffect(() => {
     const restore = (event: Event) => {
       const record = (event as CustomEvent<CalculationRecord>).detail;
@@ -113,7 +123,7 @@ function MortgageCard({ config }: { config: typeof configs[number] }) {
     if (getHistoryMode() !== "auto" || result.status !== "ok" || savedKey === snapshotKey || dismissedKey === snapshotKey) return;
     const timer = window.setTimeout(() => {
       const kind = config.mode === "part" ? "mortgage-part" : config.mode === "whole" ? "mortgage-whole" : "mortgage-adjustment";
-      saveCalculation({ kind, title: config.title, summary: `${rubles.format(result.total)} ₽`, params: Object.fromEntries(config.labels.map((label, index) => [label, values[index]])), results: { [config.resultLabel]: `${rubles.format(result.total)} ₽`, formula: result.formula, ...(downPayment?.status === "ok" ? { downPayment: `${rubles.format(downPayment.total)} ₽` } : {}) } }, true);
+      saveCalculation({ kind, title: config.title, summary: `${rubles.format(result.total)} ₽`, params: snapshotParams, results: { [config.resultLabel]: `${rubles.format(result.total)} ₽`, formula: result.formula, ...(downPayment?.status === "ok" ? { downPayment: `${rubles.format(downPayment.total)} ₽` } : {}) } }, true);
       setSavedKey(snapshotKey);
     }, 650);
     return () => window.clearTimeout(timer);
@@ -124,7 +134,7 @@ function MortgageCard({ config }: { config: typeof configs[number] }) {
   const save = () => {
     if (result.status !== "ok") return;
     if (isSaved) {
-      removeCalculationByKind(historyKind);
+      removeCalculationByParams(historyKind, snapshotParams);
       setSavedKey("");
       setDismissedKey(snapshotKey);
       return;
