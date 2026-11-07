@@ -171,11 +171,18 @@ html.dark footer nav[aria-label="Социальные сети"] a:hover {
 
 /* Show an interactive cursor on desktop for every clickable control. */
 @media (hover: hover) and (pointer: fine) {
-  :is(button, a[href], select, summary, [role="button"], [role="option"], input[type="checkbox"], input[type="radio"], label:has(input[type="checkbox]), label:has(input[type="radio"])):not(:disabled):not([aria-disabled="true"]) {
+  :is(button, a[href], select, summary, [role="button"], [role="option"], input[type="checkbox"], input[type="radio"], label:has(input[type="checkbox"]), label:has(input[type="radio"])):not(:disabled):not([aria-disabled="true"]) {
     cursor: pointer;
   }
-  :is(button, a[href], select, summary, [role="button"], [role="option"], input[type="checkbox"], input[type="radio"], label:has(input[type="checkbox]), label:has(input[type="radio"])):disabled,
+  :is(button, a[href], select, summary, [role="button"], [role="option"], input[type="checkbox"], input[type="radio"], label:has(input[type="checkbox"]), label:has(input[type="radio"])):disabled,
   :is(button, a[href], select, summary, [role="button"], [role="option"], input[type="checkbox"], input[type="radio"], label[aria-disabled="true"]) {
     cursor: not-allowed;
   }
+}
+
+
+/* Restore visible outlines for bordered cards and controls throughout the app. */
+[class~="border"] {
+  border-style: solid !important;
+  border-width: 1px !important;
 }
