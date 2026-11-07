@@ -9,6 +9,15 @@ import { getHistoryMode, saveCalculation, type CalculationRecord } from "@/lib/h
 
 const rubles = new Intl.NumberFormat("ru-RU", { maximumFractionDigits: 0 });
 const percent = new Intl.NumberFormat("ru-RU", { maximumFractionDigits: 6 });
+const scrollPageToTop = () => {
+  const behavior: ScrollBehavior = window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "instant" : "smooth";
+  const scrollingElement = document.scrollingElement;
+  window.scrollTo({ top: 0, left: 0, behavior });
+  scrollingElement?.scrollTo({ top: 0, left: 0, behavior });
+  if (scrollingElement && scrollingElement.scrollTop > 0) scrollingElement.scrollTop = 0;
+  document.body.scrollTop = 0;
+  document.documentElement.scrollTop = 0;
+};
 const configs: { mode: MortgageMode; title: string; description: string; labels: string[]; defaults: string[]; resultLabel: string }[] = [
   { mode: "part", title: "Рассчитать первоначальный взнос", description: "Узнайте сумму ПВ исходя из стоимости ОН и %ПВ", labels: ["Стоимость объекта, ₽", "Первоначальный взнос, %"], defaults: ["", "20,1"], resultLabel: "Сумма первоначального взноса" },
   { mode: "whole", title: "Рассчитать бюджет по ПВ", description: "Определите бюджет по первоначальному взносу", labels: ["Сумма первоначального взноса, ₽", "Первоначальный взнос, %"], defaults: ["", "20,1"], resultLabel: "Стоимость объекта недвижимости" },
@@ -111,7 +120,7 @@ function MortgageCard({ config }: { config: typeof configs[number] }) {
         </div>}
       </div>
     </div>
-    <div className="mt-5 grid grid-cols-3 items-center border-t border-[#EBEEF2] pt-3"><button type="button" aria-label="Наверх" title="Наверх" onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })} className="flex h-9 items-center justify-center text-[#26364A] hover:text-[#E83C35]"><ArrowUp className="size-4" /></button><button type="button" aria-label={`Сохранить: ${config.title}`} title="Сохранить в историю" disabled={result.status !== "ok"} onClick={save} className={`flex h-9 items-center justify-center border-x border-[#E4E8ED] disabled:opacity-30 ${savedKey === snapshotKey ? "text-[#E83C35]" : "text-[#26364A] hover:text-[#E83C35]"}`}><Bookmark className="size-4" /></button><button type="button" aria-label={`Сбросить: ${config.title}`} title="Сбросить" onClick={() => { setValues(previous => previous.map((value, i) => i === previous.length - 1 ? value : "")); setSavedKey(""); }} className="flex h-9 items-center justify-center text-[#26364A] hover:text-[#E83C35]"><RotateCcw className="size-4" /></button></div>
+    <div className="mt-5 grid grid-cols-3 items-center border-t border-[#EBEEF2] pt-3"><button type="button" aria-label="Наверх" title="Наверх" onClick={scrollPageToTop} className="flex h-9 items-center justify-center text-[#26364A] hover:text-[#E83C35]"><ArrowUp className="size-4" /></button><button type="button" aria-label={`Сохранить: ${config.title}`} title="Сохранить в историю" disabled={result.status !== "ok"} onClick={save} className={`flex h-9 items-center justify-center border-x border-[#E4E8ED] disabled:opacity-30 ${savedKey === snapshotKey ? "text-[#E83C35]" : "text-[#26364A] hover:text-[#E83C35]"}`}><Bookmark className="size-4" /></button><button type="button" aria-label={`Сбросить: ${config.title}`} title="Сбросить" onClick={() => { setValues(previous => previous.map((value, i) => i === previous.length - 1 ? value : "")); setSavedKey(""); }} className="flex h-9 items-center justify-center text-[#26364A] hover:text-[#E83C35]"><RotateCcw className="size-4" /></button></div>
   </section>;
 }
 
