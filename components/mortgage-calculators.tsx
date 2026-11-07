@@ -11,13 +11,23 @@ import { getCalculationHistory, getHistoryMode, removeCalculationByParams, saveC
 const rubles = new Intl.NumberFormat("ru-RU", { maximumFractionDigits: 0 });
 const percent = new Intl.NumberFormat("ru-RU", { maximumFractionDigits: 6 });
 const scrollPageToTop = () => {
-  const behavior: ScrollBehavior = window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "instant" : "smooth";
-  const scrollingElement = document.scrollingElement;
-  window.scrollTo({ top: 0, left: 0, behavior });
-  scrollingElement?.scrollTo({ top: 0, left: 0, behavior });
-  if (scrollingElement && scrollingElement.scrollTop > 0) scrollingElement.scrollTop = 0;
-  document.body.scrollTop = 0;
-  document.documentElement.scrollTop = 0;
+  const active = document.activeElement;
+  if (active instanceof HTMLElement && active.matches("input, textarea, select")) active.blur();
+
+  const scroll = () => {
+    const behavior: ScrollBehavior = window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "instant" : "smooth";
+    window.scrollTo({ top: 0, left: 0, behavior });
+    document.scrollingElement?.scrollTo({ top: 0, left: 0, behavior });
+    document.body.scrollTop = 0;
+    document.documentElement.scrollTop = 0;
+  };
+
+  // Let the mobile keyboard close before asking the page to move.
+  requestAnimationFrame(() => {
+    scroll();
+    window.setTimeout(scroll, 180);
+    window.setTimeout(scroll, 360);
+  });
 };
 const configs: { mode: MortgageMode; title: string; description: string; labels: string[]; defaults: string[]; resultLabel: string }[] = [
   { mode: "part", title: "Рассчитать первоначальный взнос", description: "Узнайте сумму ПВ исходя из стоимости ОН и %ПВ", labels: ["Стоимость объекта, ₽", "Необходимый первоначальный взнос, %"], defaults: ["", "20,1"], resultLabel: "Сумма первоначального взноса" },
