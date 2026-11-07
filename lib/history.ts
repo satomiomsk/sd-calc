@@ -45,8 +45,8 @@ export function deleteCalculation(id: string) {
 }
 
 export function removeCalculationByParams(kind: CalculationKind, params: Record<string, string>) {
-  const target = JSON.stringify(params);
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(getCalculationHistory().filter(item => item.kind !== kind || JSON.stringify(item.params) !== target)));
+  const matches = (candidate: Record<string, string>) => Object.keys(params).length === Object.keys(candidate).length && Object.entries(params).every(([key, value]) => candidate[key] === value);
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(getCalculationHistory().filter(item => item.kind !== kind || !matches(item.params))));
   window.dispatchEvent(new CustomEvent("sd-history-updated"));
 }
 
