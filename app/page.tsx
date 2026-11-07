@@ -41,7 +41,7 @@ const historyFieldLabels: Record<string, string> = {
   interest: "Переплата по процентам",
   totalPayment: "Общая сумма выплат",
   months: "Количество месяцев",
-  annualRate: "Годовая ставка",
+  annualRate: "Процентная ставка",
   commission: "Комиссия",
   total: "Итого",
   payment: "Платёж",
