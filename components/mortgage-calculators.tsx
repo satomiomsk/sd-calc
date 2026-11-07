@@ -58,7 +58,8 @@ function MortgageInput({ id, label, value, money, suffix, placeholder, onChange 
            const parts = normalized.split(".");
            const candidate = parts.length > 2 ? parts[0] + "." + parts.slice(1).join("") : normalized;
            const numericValue = Number(candidate);
-           return candidate !== "" && Number.isFinite(numericValue) && numericValue > 100 ? "100" : candidate;
+           if (candidate !== "" && Number.isFinite(numericValue) && numericValue > 100) return value;
+           return candidate;
          })();
     let index = 0, count = 0;
     while (index < next.length && count < significant) { if (!/\s/.test(next[index])) count++; index++; }
