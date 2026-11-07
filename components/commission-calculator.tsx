@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { ArrowUp, Bookmark, Calculator, Copy, Info, RotateCcw, Wallet } from "lucide-react";
-import { getHistoryMode, removeCalculationByParams, saveCalculation, type CalculationRecord } from "@/lib/history";
+import { getCalculationHistory, getHistoryMode, removeCalculationByParams, saveCalculation, type CalculationRecord } from "@/lib/history";
 import { toast } from "sonner";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { applyDiscount, applyPairedDiscount, discounts } from "@/lib/discounts";
@@ -135,6 +135,15 @@ export function CommissionCalculator({ operation, tariffs }: { operation: Operat
 
   const currentParams = { operation, category, price, credit, discountId, pairedPrice, motivationPercent };
   const currentKey = JSON.stringify(currentParams);
+  useEffect(() => {
+    const syncSavedState = () => {
+      const exists = getCalculationHistory().some(item => item.kind === "commission" && JSON.stringify(item.params) === JSON.stringify(currentParams));
+      setSavedKey(exists ? currentKey : "");
+    };
+    syncSavedState();
+    window.addEventListener("sd-history-updated", syncSavedState);
+    return () => window.removeEventListener("sd-history-updated", syncSavedState);
+  }, [currentKey, operation, category, price, credit, discountId, pairedPrice, motivationPercent]);
   const isSaved = savedKey === currentKey;
   const save = () => {
     if (result.status !== "ok" || !discounted) return;
