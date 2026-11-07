@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { ArrowUp, Bookmark, Calculator, Copy, Info, RotateCcw, Wallet } from "lucide-react";
-import { getCalculationHistory, getHistoryMode, removeCalculationByParams, saveCalculation, type CalculationRecord } from "@/lib/history";
+import { getCalculationHistory, getHistoryMode, removeCalculationByParams, saveCalculation, upsertCalculationByParams, type CalculationRecord } from "@/lib/history";
 import { toast } from "sonner";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { applyDiscount, applyPairedDiscount, discounts } from "@/lib/discounts";
@@ -127,7 +127,7 @@ export function CommissionCalculator({ operation, tariffs }: { operation: Operat
     const key = JSON.stringify(params);
     if (savedKey === key || dismissedKey === key) return;
     const timer = window.setTimeout(() => {
-      saveCalculation({ kind: "commission", title: `Комиссия - ${sale ? "Продажа" : "Покупка"}`, summary: money(discounted.total), params, results: { commission: money(result.total), final: money(discounted.total), discount: discount?.name ?? "Без скидки" } }, true);
+      upsertCalculationByParams({ kind: "commission", title: `Комиссия - ${sale ? "Продажа" : "Покупка"}`, summary: money(discounted.total), params, results: { commission: money(result.total), final: money(discounted.total), discount: discount?.name ?? "Без скидки" } });
       setSavedKey(key);
     }, 650);
     return () => window.clearTimeout(timer);
