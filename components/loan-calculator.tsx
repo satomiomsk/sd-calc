@@ -140,19 +140,19 @@ export function LoanCalculator() {
     <form onSubmit={submit} autoComplete="off" className="min-w-0 rounded-3xl border border-[#EBEEF2] bg-white p-6 sm:p-8">
       <div className="mb-6 flex items-center gap-3"><span className="flex size-11 items-center justify-center rounded-xl bg-[#FCEBEA] text-[#E83C35]"><Calculator className="size-6" /></span><h3 className="text-xl font-semibold">Параметры кредита</h3></div>
       <div className="space-y-5">
-        <div><label htmlFor={reverse ? "loan-payment" : "loan-principal"} className="mb-3 block text-sm font-semibold">{reverse ? "Комфортный платёж в месяц" : "Сумма кредита"}</label><div className="relative"><input id={reverse ? "loan-payment" : "loan-principal"} onFocus={event => scrollFocusedInputIntoView(event.currentTarget)} inputMode="decimal" enterKeyHint="done" onKeyDown={dismissKeyboard} autoComplete="off" value={value} onChange={event => {
+        <div><label htmlFor={reverse ? "loan-payment" : "loan-principal"} className="mb-3 block text-sm font-semibold">{reverse ? "Комфортный платёж в месяц" : "Сумма кредита"}</label><div className="relative"><input id={reverse ? "loan-payment" : "loan-principal"} onFocus={event => scrollFocusedInputIntoView(event.currentTarget)} onClick={event => scrollFocusedInputIntoView(event.currentTarget)} inputMode="decimal" enterKeyHint="done" onKeyDown={dismissKeyboard} autoComplete="off" value={value} onChange={event => {
           const raw = event.target.value;
           const digitsBeforeDecimal = raw.replace(/\s/g, "").split(/[.,]/)[0].replace(/^0+/, "");
           if (digitsBeforeDecimal.length > 9) return;
           edit({ value: formatInput(raw) });
         }} placeholder={reverse ? "Введите платёж" : "Введите сумму"} className={`${inputStyle} pr-12`} /><span className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-[#7B8797]">₽</span></div></div>
-        <div><label htmlFor="loan-term" className="mb-3 block text-sm font-semibold">Срок кредита</label><div className="flex gap-2"><input id="loan-term" onFocus={event => scrollFocusedInputIntoView(event.currentTarget)} inputMode="decimal" enterKeyHint="done" autoComplete="off" onKeyDown={dismissKeyboard} value={term} onChange={event => {
+        <div><label htmlFor="loan-term" className="mb-3 block text-sm font-semibold">Срок кредита</label><div className="flex gap-2"><input id="loan-term" onFocus={event => scrollFocusedInputIntoView(event.currentTarget)} onClick={event => scrollFocusedInputIntoView(event.currentTarget)} inputMode="decimal" enterKeyHint="done" autoComplete="off" onKeyDown={dismissKeyboard} value={term} onChange={event => {
           const raw = event.target.value.replace(/[^\d]/g, "").slice(0, 3);
           const limit = unit === "years" ? 30 : 360;
           const numeric = Number(raw);
           edit({ term: raw !== "" && numeric > limit ? String(limit) : raw });
         }} placeholder="Введите срок" className={inputStyle} /><select aria-label="Единицы срока кредита" value={unit} onChange={event => edit({ unit: event.target.value })} className="h-14 shrink-0 rounded-xl border border-[#E4E8ED] bg-[#F7F8FA] px-3 text-sm outline-none focus:ring-2 focus:ring-[#E83C35]"><option value="years">лет</option><option value="months">месяцев</option></select></div></div>
-        <div><label htmlFor="loan-rate" className="mb-3 block text-sm font-semibold">Процентная ставка</label><div className="relative"><input id="loan-rate" onFocus={event => scrollFocusedInputIntoView(event.currentTarget)} inputMode="decimal" enterKeyHint="done" autoComplete="off" onKeyDown={dismissKeyboard} value={rate} onChange={event => {
+        <div><label htmlFor="loan-rate" className="mb-3 block text-sm font-semibold">Процентная ставка</label><div className="relative"><input id="loan-rate" onFocus={event => scrollFocusedInputIntoView(event.currentTarget)} onClick={event => scrollFocusedInputIntoView(event.currentTarget)} inputMode="decimal" enterKeyHint="done" autoComplete="off" onKeyDown={dismissKeyboard} value={rate} onChange={event => {
           const raw = event.target.value.replace(",", ".").replace(/[^\d.]/g, "");
           const parts = raw.split(".");
           const candidate = parts.length > 2 ? parts[0] + "." + parts.slice(1).join("") : raw;
@@ -177,11 +177,11 @@ export function LoanCalculator() {
           </dl>
           <svg role="img" aria-label={`Основной долг ${amount(result.principal)}, проценты ${amount(result.interest)}`} viewBox="0 0 100 12" preserveAspectRatio="none" className="mt-6 h-3 w-full overflow-hidden rounded-full"><rect width="100" height="12" className="fill-[#26364A]" /><rect width={result.principal / result.totalPayment * 100} height="12" className="fill-[#E83C35]" /></svg>
           <div className="mt-3 flex flex-wrap gap-x-4 gap-y-2 text-xs text-[#647184]"><span className="flex items-center gap-2"><span className="size-2 rounded-full bg-[#E83C35]" />Основной долг</span><span className="flex items-center gap-2"><span className="size-2 rounded-full bg-[#26364A]" />Проценты</span></div>
-          <div className="mt-6 space-y-2 border-t border-[#26364A]/10 pt-4 text-justify text-xs leading-relaxed text-[#6E7886]">
+          <details className="mt-6 border-t border-[#26364A]/10 pt-4 text-xs leading-relaxed text-[#6E7886]"><summary className="cursor-pointer font-semibold">Подробности расчёта и ограничения</summary><div className="mt-3 space-y-2 text-justify">
             <p>{reverse ? result.annualRate === 0 ? "S = A × n" : "S = A × (1 − (1 + i)⁻ⁿ) / i" : result.annualRate === 0 ? "A = S / n" : "A = S × i × (1 + i)ⁿ / ((1 + i)ⁿ − 1)"}</p>
             <p>A - ежемесячный платёж; S - сумма кредита; i - годовая ставка / 12 / 100; n - срок в месяцах.</p>
             <p>Предварительный расчёт без учёта страховок и дополнительных расходов. Не является одобрением банка. {reverse ? "Сумма кредита округляется вниз до копеек, чтобы рассчитанный платёж не превышал указанный." : "Ежемесячный платёж рассчитывается без промежуточного округления."} Суммы отображаются с точностью до копеек.</p>
-          </div>
+          </div></details>
         </section>
         <div className="grid min-w-0 gap-4 sm:grid-cols-2">
           <section className="min-w-0 rounded-2xl border border-[#D6E2F0] bg-[#EAF2FB] p-5 dark:border-[#405064] dark:bg-[#253241] dark:text-[#E6EDF5]"><h3 className="text-sm font-medium">Переплата</h3><p data-testid="loan-interest" className="mt-3 text-xl font-semibold tabular-nums">{amount(result.interest)}</p><p className="mt-2 text-xs leading-relaxed text-[#6E7886] dark:text-[#B8C4D2]">Общая сумма процентов за весь срок кредита</p></section>
