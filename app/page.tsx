@@ -19,6 +19,7 @@ const headingFont = localFont({ src: "../public/fonts/MontserratVariable.ttf", d
 const publicAsset = (path: string) => `${process.env.NEXT_PUBLIC_BASE_PATH ?? ""}${path}`;
 
 type Screen = "home" | "commission" | "mortgage" | "history" | "settings";
+type ThemeMode = "light" | "dark" | "system";
 const titles = { commission: "Комиссия", mortgage: "Ипотека", history: "История расчётов", settings: "Настройки" };
 
 function NavigationRow({ title, icon: Icon, red, onClick }: { title: string; icon: LucideIcon; red?: boolean; onClick: () => void }) {
@@ -36,10 +37,16 @@ export default function Home() {
   const [mortgageTab, setMortgageTab] = useState<"downpayment" | "loan">("downpayment");
   const [historyItems, setHistoryItems] = useState<CalculationRecord[]>([]);
   const [historyMode, setHistoryModeState] = useState<HistoryMode>("manual");
+  const [themeMode, setThemeMode] = useState<ThemeMode>("system");
   const [expandedHistory, setExpandedHistory] = useState<string | null>(null);
   useEffect(() => {
     const refresh = () => setHistoryItems(getCalculationHistory());
     refresh(); setHistoryModeState(getHistoryMode());
+    const savedTheme = localStorage.getItem("sd-theme-mode-v1");
+    const mode: ThemeMode = savedTheme === "light" || savedTheme === "dark" ? savedTheme : "system";
+    setThemeMode(mode);
+    const applyTheme = () => document.documentElement.classList.toggle("dark", mode === "dark" || (mode === "system" && window.matchMedia("(prefers-color-scheme: dark)").matches));
+    applyTheme();
     window.addEventListener("sd-history-updated", refresh);
     return () => window.removeEventListener("sd-history-updated", refresh);
   }, []);
@@ -98,8 +105,8 @@ export default function Home() {
         </a>
         <div className="ml-auto flex shrink-0 items-center gap-2 min-[375px]:gap-2.5 sm:gap-3">
           <div className="flex w-fit items-center gap-1 whitespace-nowrap rounded-full border border-[#F3C7C5] bg-[#FCEBEA] px-2 py-[5px] text-left text-[9px] font-medium leading-[14px] text-[#A94442] min-[375px]:text-[10px] sm:gap-1.5 sm:px-[15px] sm:py-[7.5px] sm:text-[11.25px] sm:leading-[18px]"><Sparkles aria-hidden="true" className="size-2.5 shrink-0 text-[#E83C35] sm:size-3" />Alpha Team</div>
-          <span title="История" aria-label="История" className="flex size-8 shrink-0 items-center justify-center rounded-xl border border-[#E7EBF0] bg-white text-[#26364A] sm:size-10"><History aria-hidden="true" className="size-[17px] sm:size-5" strokeWidth={1.8} /></span>
-          <span title="Настройки" aria-label="Настройки" className="flex size-8 shrink-0 items-center justify-center rounded-xl border border-[#E7EBF0] bg-white text-[#26364A] sm:size-10"><Settings aria-hidden="true" className="size-[17px] sm:size-5" strokeWidth={1.8} /></span>
+          <button type="button" title="История" aria-label="История" onClick={() => navigate("history")} className="flex size-8 shrink-0 items-center justify-center rounded-xl border border-[#E7EBF0] bg-white text-[#26364A] transition hover:bg-[#F5F7FA] focus-visible:outline-2 focus-visible:outline-[#E83C35] sm:size-10"><History aria-hidden="true" className="size-[17px] sm:size-5" strokeWidth={1.8} /></button>
+          <button type="button" title="Настройки" aria-label="Настройки" onClick={() => navigate("settings")} className="flex size-8 shrink-0 items-center justify-center rounded-xl border border-[#E7EBF0] bg-white text-[#26364A] transition hover:bg-[#F5F7FA] focus-visible:outline-2 focus-visible:outline-[#E83C35] sm:size-10"><Settings aria-hidden="true" className="size-[17px] sm:size-5" strokeWidth={1.8} /></button>
         </div>
       </div>
     </header>
@@ -142,7 +149,7 @@ export default function Home() {
       </section>}
       {screen === "settings" && <section className="space-y-5">
         <div><h2 className="mb-3 text-lg font-semibold">История расчётов</h2><div className="rounded-2xl border border-[#EBEEF2] bg-white p-4"><p className="mb-3 font-medium">Сохранение истории</p><div className="grid grid-cols-2 gap-2"><button type="button" onClick={() => { setHistoryMode("manual"); setHistoryModeState("manual"); }} className={`rounded-xl border px-3 py-3 text-sm font-medium ${historyMode === "manual" ? "border-[#E83C35] bg-[#FCEBEA] text-[#A94442]" : "border-[#E4E8ED]"}`}>Ручное</button><button type="button" onClick={() => { setHistoryMode("auto"); setHistoryModeState("auto"); }} className={`rounded-xl border px-3 py-3 text-sm font-medium ${historyMode === "auto" ? "border-[#E83C35] bg-[#FCEBEA] text-[#A94442]" : "border-[#E4E8ED]"}`}>Автоматическое</button></div><p className="mt-2 text-xs text-[#748195]">{historyMode === "manual" ? "Записи создаются по нажатию на закладку." : "Автоматическое сохранение после завершённого расчёта."}</p></div></div>
-        <div><h2 className="mb-3 text-lg font-semibold">Приложение</h2><div className="rounded-2xl border border-[#EBEEF2] bg-white p-4 text-sm">Версия <span className="float-right text-[#748195]">1.0.0</span></div></div>
+        <div><h2 className="mb-3 text-lg font-semibold">Внешний вид</h2><div className="rounded-2xl border border-[#EBEEF2] bg-white p-4"><p className="mb-3 font-medium">Тема приложения</p><div className="grid grid-cols-3 gap-2">{([{value:"light",label:"Светлая"},{value:"dark",label:"Тёмная"},{value:"system",label:"Авто"}] as const).map(option => <button key={option.value} type="button" aria-pressed={themeMode === option.value} onClick={() => { setThemeMode(option.value); localStorage.setItem("sd-theme-mode-v1", option.value); const dark = option.value === "dark" || (option.value === "system" && window.matchMedia("(prefers-color-scheme: dark)").matches); document.documentElement.classList.toggle("dark", dark); }} className={`rounded-xl border px-2 py-3 text-sm font-medium ${themeMode === option.value ? "border-[#E83C35] bg-[#FCEBEA] text-[#A94442]" : "border-[#E4E8ED]"}`}>{option.label}</button>)}</div><p className="mt-2 text-xs text-[#748195]">Авто подстраивается под тему устройства.</p></div></div><div><h2 className="mb-3 text-lg font-semibold">Приложение</h2><div className="rounded-2xl border border-[#EBEEF2] bg-white p-4 text-sm">Версия <span className="float-right text-[#748195]">1.0.0</span></div></div>
       </section>}
     </main>
     <footer className={`mx-auto max-w-[1200px] px-5 pb-7 sm:px-8 ${screen === "home" ? "max-sm:w-full max-sm:pb-[calc(.75rem+env(safe-area-inset-bottom,0px))]" : ""}`}>
