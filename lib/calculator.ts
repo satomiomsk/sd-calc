@@ -19,7 +19,7 @@ export function formatInput(value: string): string {
   if (!/^\d*(?:[.,]\d*)?$/.test(normalized)) return value;
   const [rawWhole, fraction] = normalized.split(/[.,]/);
   const cleanedWhole = rawWhole.replace(/^0+(?=\d)/, "");
-  const whole = cleanedWhole.length > 9 ? "999999999" : cleanedWhole;
+  const whole = cleanedWhole;
   const separator = normalized.includes(",") ? "," : ".";
   return whole.replace(/\B(?=(\d{3})+(?!\d))/g, " ") + (fraction !== undefined ? separator + fraction : "");
 }
