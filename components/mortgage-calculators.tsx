@@ -83,7 +83,7 @@ function MortgageCard({ config }: { config: typeof configs[number] }) {
     if (getHistoryMode() !== "auto" || result.status !== "ok" || savedKey === snapshotKey || dismissedKey === snapshotKey) return;
     const timer = window.setTimeout(() => {
       const kind = config.mode === "part" ? "mortgage-part" : config.mode === "whole" ? "mortgage-whole" : "mortgage-adjustment";
-      saveCalculation({ kind, title: config.title, summary: `${rubles.format(result.total)} ₽`, params: Object.fromEntries(config.labels.map((label, index) => [label, values[index]])), results: { [config.resultLabel]: `${rubles.format(result.total)} ₽`, formula: result.formula, ...(downPayment?.status === "ok" ? { downPayment: `${rubles.format(downPayment.total)} ₽` } : {}) } });
+      saveCalculation({ kind, title: config.title, summary: `${rubles.format(result.total)} ₽`, params: Object.fromEntries(config.labels.map((label, index) => [label, values[index]])), results: { [config.resultLabel]: `${rubles.format(result.total)} ₽`, formula: result.formula, ...(downPayment?.status === "ok" ? { downPayment: `${rubles.format(downPayment.total)} ₽` } : {}) } }, true);
       setSavedKey(snapshotKey);
     }, 650);
     return () => window.clearTimeout(timer);
