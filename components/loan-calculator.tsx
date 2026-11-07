@@ -56,6 +56,8 @@ export function LoanCalculator() {
   const edit = (patch: Partial<LoanDraft>) => update({ ...patch, changed: true, error: "" });
   const submit = (event: FormEvent) => {
     event.preventDefault();
+    if (!value.trim() || !term.trim()) { update({ error: "Заполните поля", result: null }); return; }
+    if (!rate.trim()) { update({ error: "Введите ставку", result: null }); return; }
     try {
       const months = parse(term) * (unit === "years" ? 12 : 1);
       const calculation = reverse ? calculateLoanFromPayment(parse(value), months, parse(rate)) : calculateLoan(parse(value), months, parse(rate));
