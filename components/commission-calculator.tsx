@@ -257,8 +257,30 @@ export function CommissionCalculator({ operation, tariffs }: { operation: Operat
                       <Row label="Фиксированная часть" value={money(result.fixed)} />
                       {result.rate > 0 && <><Row label="Процентная часть" value={`${numberFormat.format(result.rate * 100)} % × ${money(result.base)}`} /><Row label="Сумма процентной части" value={money(result.percent)} /></>}
                     </dl>
-                    <details className="mt-5 rounded-xl bg-white/65 px-3 py-2.5 sm:px-4"><summary className="cursor-pointer text-sm font-semibold text-[#647184]">Подробности расчёта</summary><div className="mt-3 border-t border-[#26364A]/10 pt-3"><p className="text-sm font-medium leading-relaxed">{(result.fixed > 0 || result.rate === 0) && <span className="whitespace-nowrap">{money(result.fixed)}</span>}{result.rate > 0 && <>{result.fixed > 0 ? " + " : ""}<span className="whitespace-nowrap">{money(result.base)}</span> × <span className="whitespace-nowrap">{numberFormat.format(result.rate * 100)} %</span></>} = <span className="whitespace-nowrap">{money(result.calculated)}</span></p>{result.minimumApplied && <p className="mt-2 text-sm font-semibold">Применена минимальная комиссия - <span className="whitespace-nowrap">{money(result.total)}</span></p>}{result.calculated !== result.total && !result.minimumApplied && <p className="mt-1 text-xs text-[#647184]">После округления: <span className="whitespace-nowrap">{money(result.total)}</span></p>}
-                    {discount && discounted && <p className="mt-3 text-sm leading-relaxed">{discount.paired ? <>С учётом встречной сделки: <span className="whitespace-nowrap">{money(result.total)}</span> - <span className="whitespace-nowrap">{money(discounted.saving)}</span></> : <>Со скидкой {discount.percent}%: <span className="whitespace-nowrap">{money(result.total)}</span> × <span className="whitespace-nowrap">{100 - discount.percent}%</span></>} = <span className="whitespace-nowrap">{money(discounted.total)}</span></p>}</div></details>
+                    <details className="mt-5 rounded-xl bg-white/65 px-3 py-2.5 sm:px-4">
+                      <summary className="cursor-pointer text-sm font-semibold text-[#647184]">Подробности расчёта</summary>
+                      <div className="mt-3 space-y-3 border-t border-[#26364A]/10 pt-3 text-sm leading-relaxed">
+                        {result.fixed > 0 && <p>Фиксированная часть: <span className="whitespace-nowrap">{money(result.fixed)}</span></p>}
+                        {result.rate > 0 && <p>Процентная часть: <span className="whitespace-nowrap">{money(result.base)}</span> × {numberFormat.format(result.rate * 100)}% = <span className="whitespace-nowrap">{money(result.percent)}</span></p>}
+                        {(result.fixed > 0 && result.rate > 0) && <p>Комиссия без скидки: <span className="whitespace-nowrap">{money(result.fixed)}</span> + <span className="whitespace-nowrap">{money(result.percent)}</span> = <span className="whitespace-nowrap">{money(result.calculated)}</span></p>}
+                        {result.minimumApplied && <p className="font-semibold">Применена минимальная комиссия: <span className="whitespace-nowrap">{money(result.total)}</span></p>}
+                        {!result.minimumApplied && result.calculated !== result.total && <p className="text-xs text-[#647184]">Комиссия после округления: <span className="whitespace-nowrap">{money(result.total)}</span></p>}
+                        {discount && discounted && (discount.paired ? <>
+                          <div className="border-t border-[#26364A]/10 pt-3">
+                            <p>Скидка по текущей сделке 3%: <span className="whitespace-nowrap">{money(result.total)}</span> × 3% = <span className="whitespace-nowrap">{money(pairedDiscounted?.currentSaving ?? 0)}</span></p>
+                            {pairedResult?.status === "ok" && pairedDiscounted && <p className="mt-2">Скидка по встречной сделке 3%: <span className="whitespace-nowrap">{money(pairedResult.total)}</span> × 3% = <span className="whitespace-nowrap">{money(pairedDiscounted.previousSaving)}</span></p>}
+                            <p className="mt-2">Общая скидка: <span className="whitespace-nowrap">{money(discounted.saving)}</span></p>
+                            <p className="mt-2 font-semibold">Итоговая комиссия: <span className="whitespace-nowrap">{money(result.total)}</span> - <span className="whitespace-nowrap">{money(discounted.saving)}</span> = <span className="whitespace-nowrap">{money(discounted.total)}</span></p>
+                          </div>
+                        </> : <>
+                          <div className="border-t border-[#26364A]/10 pt-3">
+                            <p>Скидка {discount.percent}%: <span className="whitespace-nowrap">{money(result.total)}</span> × {discount.percent}% = <span className="whitespace-nowrap">{money(discounted.saving)}</span></p>
+                            <p className="mt-2 font-semibold">Итоговая комиссия: <span className="whitespace-nowrap">{money(result.total)}</span> - <span className="whitespace-nowrap">{money(discounted.saving)}</span> = <span className="whitespace-nowrap">{money(discounted.total)}</span></p>
+                          </div>
+                        </>}
+                        {!discount && <p className="border-t border-[#26364A]/10 pt-3 font-semibold">Итоговая комиссия: <span className="whitespace-nowrap">{money(result.total)}</span></p>}
+                      </div>
+                    </details>
                   </div>
                 </> : result.status === "undefined" ? <div className="py-12"><Info className="mb-4 size-8 text-[#647184]" /><p className="text-lg font-medium leading-relaxed dark:text-[#E6EDF5]">Для указанной стоимости тариф не определён. Уточните размер комиссии</p></div> : <div className="flex min-h-[300px] flex-col items-center justify-center text-center">
                   <div className="relative mb-5 flex size-[76px] items-center justify-center rounded-[22px] border border-white/90 bg-white/65"><Calculator className={`size-9 stroke-[1.3] ${sale ? "text-[#D68B86]" : "text-[#7B8797]"}`} /><span className={`absolute -bottom-1.5 -right-1.5 flex size-7 items-center justify-center rounded-full border-4 bg-white ${sale ? "border-[#FCEBEA]" : "border-[#EEF1F5]"}`}><span className={`text-sm ${sale ? "text-[#D68B86]" : "text-[#7B8797]"}`}>₽</span></span></div>
